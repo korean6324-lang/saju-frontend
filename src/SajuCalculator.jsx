@@ -57,7 +57,7 @@ export default function SajuCalculator() {
     setError(''); 
     setResult(null);
     try {
-      const response = await axios.post('http://localhost:8000/api/saju', { ...formData, is_time_unknown: isTimeUnknown });
+      const response = await axios.post('hhttps://saju-backend-ffum.onrender.com/api/saju', { ...formData, is_time_unknown: isTimeUnknown });
       setResult(response.data);
     } catch (err) { 
       setError(err.response?.data?.detail || '서버 연결 에러가 발생했습니다.'); 
@@ -72,7 +72,7 @@ export default function SajuCalculator() {
     setError(''); 
     setGunghapResult(null);
     try {
-      const response = await axios.post('http://localhost:8000/api/gunghap', gunghapData);
+      const response = await axios.post('https://saju-backend-ffum.onrender.com/api/saju', gunghapData);
       setGunghapResult(response.data);
     } catch (err) { 
       setError(err.response?.data?.detail || '서버 연결 에러가 발생했습니다.'); 
@@ -96,7 +96,7 @@ export default function SajuCalculator() {
     try {
       setLoading(true);
       const payload = { ...formData, q1_trait: rectifyData.q1, q2_time: rectifyData.q2 };
-      const response = await axios.post('http://localhost:8000/api/rectify_time', payload);
+      const response = await axios.post('https://saju-backend-ffum.onrender.com/api/saju', payload);
       setFormData(prev => ({ ...prev, hour: response.data.estimated_hour, minute: 30 }));
       setIsTimeUnknown(false); 
       setShowRectifyModal(false);
