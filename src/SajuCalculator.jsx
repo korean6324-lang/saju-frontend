@@ -39,9 +39,9 @@ const globalStyles = `
     overflow-x: hidden;
   }
   
-  .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(15px); }
+    from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
@@ -104,7 +104,6 @@ const globalStyles = `
     padding: 25px 20px; border-bottom: 1px solid #EFECE6; background-color: #F8F7F4;
   }
   
-  /* 네비게이션 목차 버튼 */
   .menu-nav-btn {
     display: flex; align-items: center; gap: 12px; width: 100%; padding: 18px 20px;
     background: none; border: none; border-bottom: 1px solid #F3F4F6;
@@ -113,20 +112,27 @@ const globalStyles = `
   }
   .menu-nav-btn:hover { background-color: #F9FAFB; color: #B59960; }
   
-  /* 소개 및 기능 리스트 영역 */
   .menu-content { padding: 20px; flex-grow: 1; }
-  .menu-box { margin-bottom: 25px; }
-  .menu-box-title { font-size: 0.9em; color: #6B7280; margin: 0 0 12px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .menu-box { margin-bottom: 20px; border-bottom: 1px solid #F3F4F6; padding-bottom: 15px; }
   
-  .feature-list { list-style: none; padding: 0; margin: 0; }
+  /* 아코디언 스타일 */
+  .accordion-title {
+    font-size: 0.95em; color: #1C2536; margin: 0; font-weight: 700; cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .accordion-icon {
+    transition: transform 0.3s ease; color: #9CA3AF;
+  }
+  .accordion-icon.open { transform: rotate(180deg); }
+  
+  .feature-list { list-style: none; padding: 0; margin: 15px 0 0 0; }
   .feature-list li { 
-    position: relative; padding-left: 20px; margin-bottom: 10px; font-size: 0.9em; color: #4B5563; line-height: 1.5;
+    position: relative; padding-left: 20px; margin-bottom: 12px; font-size: 0.9em; color: #4B5563; line-height: 1.5;
   }
   .feature-list li::before { 
     content: '•'; position: absolute; left: 0; top: 0; color: #B59960; font-size: 1.2em; font-weight: bold; 
   }
 
-  /* 구독 배너 */
   .subscribe-banner {
     background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
     border: 1px solid #BAE6FD; border-radius: 12px; padding: 16px; margin-bottom: 20px;
@@ -136,7 +142,6 @@ const globalStyles = `
     font-size: 0.7em; padding: 3px 8px; border-radius: 20px; font-weight: bold; margin-bottom: 8px;
   }
 
-  /* 하단 연락처 (Footer) */
   .menu-footer { 
     background-color: #F8FAFC; padding: 20px; border-top: 1px solid #EFECE6; font-size: 0.85em; color: #6B7280;
   }
@@ -146,6 +151,7 @@ const globalStyles = `
 export default function SajuCalculator() {
   const [activeTab, setActiveTab] = useState('saju');
   const [isMenuOpen, setIsMenuOpen] = useState(false); 
+  const [isWhyProOpen, setIsWhyProOpen] = useState(false); // 🚨 아코디언 상태 관리
 
   // 1. 개인 사주 상태 
   const [formData, setFormData] = useState({ 
@@ -224,7 +230,7 @@ export default function SajuCalculator() {
     <>
       <style>{globalStyles}</style>
 
-      {/* 🌟 명리-PRO 사이드바 메뉴 (구조 및 디자인 개선판) 🌟 */}
+      {/* 🌟 명리-PRO 사이드바 메뉴 (아코디언 토글 추가) 🌟 */}
       <div className={`menu-overlay ${isMenuOpen ? 'open' : ''}`} onClick={() => setIsMenuOpen(false)}></div>
       <div className={`side-menu ${isMenuOpen ? 'open' : ''}`}>
         
@@ -232,7 +238,6 @@ export default function SajuCalculator() {
         <div className="menu-header">
           <h2 style={{ margin: 0, fontSize: '1.5em', color: '#1C2536', fontWeight: '900' }}>명리<span style={{ color: '#B59960' }}>-PRO</span></h2>
           <button onClick={() => setIsMenuOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-            {/* 닫기 아이콘 SVG */}
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -241,7 +246,7 @@ export default function SajuCalculator() {
         </div>
 
         {/* 목차 (네비게이션) */}
-        <div style={{ paddingBottom: '10px' }}>
+        <div style={{ paddingBottom: '5px' }}>
           <button className="menu-nav-btn" onClick={() => { setActiveTab('saju'); setIsMenuOpen(false); }}>
             <span style={{ fontSize: '1.2em' }}>👤</span> 개인 사주 분석
           </button>
@@ -251,14 +256,23 @@ export default function SajuCalculator() {
         </div>
 
         <div className="menu-content">
-          {/* 브랜드 특징 (리스트 형태) */}
+          {/* 🚨 아코디언 토글: Why 명리-PRO? */}
           <div className="menu-box">
-            <h4 className="menu-box-title">Why 명리-PRO?</h4>
-            <ul className="feature-list">
-              <li><strong>진태양시 적용:</strong> 출생지(해외 포함) 경도 좌표계산으로 1분 오차까지 보정</li>
-              <li><strong>합화/기반 정밀 판별:</strong> 단순 글자 합이 아닌 계절을 반영한 완벽한 변화 예측</li>
-              <li><strong>통관/병약 용신:</strong> 사주 내 병(病)과 약(藥)을 파악하는 최상위 전문가 로직 탑재</li>
-            </ul>
+            <h4 className="accordion-title" onClick={() => setIsWhyProOpen(!isWhyProOpen)}>
+              <span>🔍 Why 명리-PRO? (타사 비교)</span>
+              <svg className={`accordion-icon ${isWhyProOpen ? 'open' : ''}`} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </h4>
+            
+            {/* 클릭 시 아래 내용이 펼쳐집니다 */}
+            {isWhyProOpen && (
+              <ul className="feature-list fade-in">
+                <li><strong>진태양시 정밀 적용:</strong> 출생지(해외 포함) 경도 좌표계산으로 1분 1초의 오차까지 보정합니다.</li>
+                <li><strong>합화(合化) 정밀 판별:</strong> 단순 글자 합이 아닌 태어난 계절의 세력을 반영한 완벽한 기운 변화를 예측합니다.</li>
+                <li><strong>통관/병약 용신 분석:</strong> 사주 내 병(病)과 약(藥)을 파악하는 최상위 전문가 로직을 탑재했습니다.</li>
+              </ul>
+            )}
           </div>
 
           {/* 구독 서비스 배너 */}
@@ -285,7 +299,7 @@ export default function SajuCalculator() {
 
       <div style={{ maxWidth: '640px', margin: '0 auto', padding: '20px', paddingBottom: '60px' }}>
         
-        {/* 메인 화면 상단 헤더 & 햄버거 메뉴 버튼 */}
+        {/* 메인 화면 상단 헤더 & 고급 햄버거 메뉴 버튼 */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: '10px', marginBottom: '25px' }}>
           <div style={{ flex: 1 }}></div>
           <div style={{ textAlign: 'center', flex: 2 }}>
@@ -296,7 +310,6 @@ export default function SajuCalculator() {
           </div>
           <div style={{ flex: 1, textAlign: 'right', display: 'flex', justifyContent: 'flex-end' }}>
             <button onClick={() => setIsMenuOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 5px' }}>
-              {/* 고급 햄버거 아이콘 SVG */}
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1C2536" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="3" y1="12" x2="21" y2="12"></line>
                 <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -776,7 +789,7 @@ export default function SajuCalculator() {
                   <div style={{ flex: 1, opacity: gunghapData.partner.is_time_unknown ? 0.4 : 1 }}>
                     <label className="label-text">태어난 시간</label>
                     <input type="time" className="input-field" style={{ borderColor: '#FBCFE8' }} disabled={gunghapData.partner.is_time_unknown} value={formatTime(gunghapData.partner.hour, gunghapData.partner.minute)} onChange={(e) => {
-                      if(!e.target.value) return; const [h, min] = e.target.value.split(':');
+                      if(!e.target.value) return; const [h, min] = e.target.value.split('-');
                       setGunghapData(prev => ({...prev, partner: {...prev.partner, hour: parseInt(h), minute: parseInt(min)}}));
                     }} />
                   </div>
