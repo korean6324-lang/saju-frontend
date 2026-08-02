@@ -41,7 +41,7 @@ const getElementColor = (text) => {
 const formatDate = (y, m, d) => `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 const formatTime = (h, m) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 
-// 🌟 프리미엄 글로벌 CSS 스타일링
+// 🌟 프리미엄 글로벌 CSS 스타일링 & 메뉴 애니메이션
 const globalStyles = `
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
   
@@ -70,15 +70,22 @@ const globalStyles = `
     margin-bottom: 20px;
   }
 
+  /* 🚨 수정: 모바일 텍스트 색상 고정 및 반응형 구조 적용 */
   .input-field {
     width: 100%;
-    padding: 14px 16px;
+    padding: 14px 12px;
     border: 1px solid #E2DED5;
     border-radius: 10px;
     font-size: 16px;
+    color: #1C2536 !important; /* 모바일 다크모드에서도 글씨가 무조건 보이도록 고정 */
     background-color: #FAFAFA;
     transition: all 0.2s;
     box-sizing: border-box;
+    min-width: 0;
+  }
+  .input-field::placeholder {
+    color: #9CA3AF;
+    opacity: 1;
   }
   .input-field:focus {
     border-color: #B59960;
@@ -108,44 +115,19 @@ const globalStyles = `
     transition: all 0.2s;
     box-shadow: 0 4px 15px rgba(17, 24, 39, 0.2);
   }
-  .btn-primary:active {
-    transform: scale(0.98);
-  }
-  .btn-primary:disabled {
-    background: #9CA3AF;
-    box-shadow: none;
-    cursor: not-allowed;
-  }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled { background: #9CA3AF; box-shadow: none; cursor: not-allowed; }
 
   .spinner {
-    border: 3px solid rgba(243, 232, 208, 0.3);
-    border-top-color: #F3E8D0;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    animation: spin 1s linear infinite;
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 8px;
+    border: 3px solid rgba(243, 232, 208, 0.3); border-top-color: #F3E8D0; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px;
   }
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
+  @keyframes spin { to { transform: rotate(360deg); } }
   
   .horizontal-scroll {
-    display: flex;
-    overflow-x: auto;
-    gap: 8px;
-    padding-bottom: 10px;
-    scrollbar-width: thin;
+    display: flex; overflow-x: auto; gap: 8px; padding-bottom: 10px; scrollbar-width: thin;
   }
-  .horizontal-scroll::-webkit-scrollbar {
-    height: 6px;
-  }
-  .horizontal-scroll::-webkit-scrollbar-thumb {
-    background-color: #CBD5E1;
-    border-radius: 10px;
-  }
+  .horizontal-scroll::-webkit-scrollbar { height: 6px; }
+  .horizontal-scroll::-webkit-scrollbar-thumb { background-color: #CBD5E1; border-radius: 10px; }
 
   /* 사이드 메뉴바 CSS */
   .menu-overlay {
@@ -163,53 +145,25 @@ const globalStyles = `
   }
   .side-menu.open { right: 0; }
   
-  .menu-header { 
-    display: flex; justify-content: space-between; align-items: center; 
-    padding: 25px 20px; border-bottom: 1px solid #EFECE6; background-color: #F8F7F4;
-  }
-  
-  .menu-nav-btn {
-    display: flex; align-items: center; gap: 12px; width: 100%; padding: 18px 20px;
-    background: none; border: none; border-bottom: 1px solid #F3F4F6;
-    font-size: 1.05em; font-weight: 700; color: #1C2536; cursor: pointer; text-align: left;
-    transition: background-color 0.2s;
-  }
+  .menu-header { display: flex; justify-content: space-between; align-items: center; padding: 25px 20px; border-bottom: 1px solid #EFECE6; background-color: #F8F7F4; }
+  .menu-nav-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 18px 20px; background: none; border: none; border-bottom: 1px solid #F3F4F6; font-size: 1.05em; font-weight: 700; color: #1C2536; cursor: pointer; text-align: left; transition: background-color 0.2s; }
   .menu-nav-btn:hover { background-color: #F9FAFB; color: #B59960; }
   
   .menu-content { padding: 20px; flex-grow: 1; }
-  
   .menu-box { margin-bottom: 20px; border-bottom: 1px solid #F3F4F6; padding-bottom: 15px; }
   
-  /* 아코디언 스타일 */
-  .accordion-title {
-    font-size: 0.95em; color: #1C2536; margin: 0; font-weight: 700; cursor: pointer;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .accordion-icon {
-    transition: transform 0.3s ease; color: #9CA3AF;
-  }
+  .accordion-title { font-size: 0.95em; color: #1C2536; margin: 0; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+  .accordion-icon { transition: transform 0.3s ease; color: #9CA3AF; }
   .accordion-icon.open { transform: rotate(180deg); }
   
   .feature-list { list-style: none; padding: 0; margin: 15px 0 0 0; }
-  .feature-list li { 
-    position: relative; padding-left: 20px; margin-bottom: 12px; font-size: 0.9em; color: #4B5563; line-height: 1.5;
-  }
-  .feature-list li::before { 
-    content: '•'; position: absolute; left: 0; top: 0; color: #B59960; font-size: 1.2em; font-weight: bold; 
-  }
+  .feature-list li { position: relative; padding-left: 20px; margin-bottom: 12px; font-size: 0.9em; color: #4B5563; line-height: 1.5; }
+  .feature-list li::before { content: '•'; position: absolute; left: 0; top: 0; color: #B59960; font-size: 1.2em; font-weight: bold; }
 
-  .subscribe-banner {
-    background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
-    border: 1px solid #BAE6FD; border-radius: 12px; padding: 16px; margin-bottom: 20px;
-  }
-  .subscribe-tag { 
-    display: inline-block; background-color: #0284C7; color: white; 
-    font-size: 0.7em; padding: 3px 8px; border-radius: 20px; font-weight: bold; margin-bottom: 8px;
-  }
+  .subscribe-banner { background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%); border: 1px solid #BAE6FD; border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+  .subscribe-tag { display: inline-block; background-color: #0284C7; color: white; font-size: 0.7em; padding: 3px 8px; border-radius: 20px; font-weight: bold; margin-bottom: 8px; }
 
-  .menu-footer { 
-    background-color: #F8FAFC; padding: 20px; border-top: 1px solid #EFECE6; font-size: 0.85em; color: #6B7280;
-  }
+  .menu-footer { background-color: #F8FAFC; padding: 20px; border-top: 1px solid #EFECE6; font-size: 0.85em; color: #6B7280; }
   .contact-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 `;
 
@@ -224,26 +178,15 @@ export default function SajuCalculator() {
   const [formData, setFormData] = useState({ 
     name: '', 
     birthPlace: 'KR_SEO', 
-    year: 1990, 
-    month: 5, 
-    day: 15, 
-    hour: 14, 
-    minute: 30, 
-    gender: 'M', 
-    is_lunar: false, 
-    is_leap_month: false 
+    year: 1990, month: 5, day: 15, hour: 14, minute: 30, gender: 'M', is_lunar: false, is_leap_month: false 
   });
   const [isTimeUnknown, setIsTimeUnknown] = useState(false);
   const [result, setResult] = useState(null);
   
   // 2. 궁합 상태 
   const [gunghapData, setGunghapData] = useState({
-    me: { 
-      name: '', birthPlace: 'KR_SEO', year: 1990, month: 5, day: 15, hour: 14, minute: 30, gender: 'M', is_lunar: false, is_leap_month: false, is_time_unknown: false 
-    },
-    partner: { 
-      name: '', birthPlace: 'KR_SEO', year: 1995, month: 8, day: 20, hour: 10, minute: 0, gender: 'F', is_lunar: false, is_leap_month: false, is_time_unknown: false 
-    }
+    me: { name: '', birthPlace: 'KR_SEO', year: 1990, month: 5, day: 15, hour: 14, minute: 30, gender: 'M', is_lunar: false, is_leap_month: false, is_time_unknown: false },
+    partner: { name: '', birthPlace: 'KR_SEO', year: 1995, month: 8, day: 20, hour: 10, minute: 0, gender: 'F', is_lunar: false, is_leap_month: false, is_time_unknown: false }
   });
   const [gunghapResult, setGunghapResult] = useState(null);
 
@@ -259,32 +202,19 @@ export default function SajuCalculator() {
   // === API 통신 핸들러 ===
   const handleSajuSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); 
-    setError(''); 
-    setResult(null);
+    setLoading(true); setError(''); setResult(null);
     try {
       const locData = GLOBAL_LOCATIONS.find(loc => loc.id === formData.birthPlace);
-      const payload = { 
-        ...formData, 
-        is_time_unknown: isTimeUnknown, 
-        longitude: locData.lon, 
-        timezone: locData.tz 
-      };
+      const payload = { ...formData, is_time_unknown: isTimeUnknown, longitude: locData.lon, timezone: locData.tz };
       
       const response = await axios.post('https://saju-backend-ffum.onrender.com/api/saju', payload);
       setResult(response.data);
-    } catch (err) { 
-      setError(err.response?.data?.detail || '서버 연결 에러가 발생했습니다.'); 
-    } finally { 
-      setLoading(false); 
-    }
+    } catch (err) { setError(err.response?.data?.detail || '서버 연결 에러가 발생했습니다.'); } finally { setLoading(false); }
   };
 
   const handleGunghapSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); 
-    setError(''); 
-    setGunghapResult(null);
+    setLoading(true); setError(''); setGunghapResult(null);
     try {
       const meLoc = GLOBAL_LOCATIONS.find(loc => loc.id === gunghapData.me.birthPlace);
       const ptLoc = GLOBAL_LOCATIONS.find(loc => loc.id === gunghapData.partner.birthPlace);
@@ -296,21 +226,13 @@ export default function SajuCalculator() {
 
       const response = await axios.post('https://saju-backend-ffum.onrender.com/api/gunghap', payload);
       setGunghapResult(response.data);
-    } catch (err) { 
-      setError(err.response?.data?.detail || '서버 연결 에러가 발생했습니다.'); 
-    } finally { 
-      setLoading(false); 
-    }
+    } catch (err) { setError(err.response?.data?.detail || '서버 연결 에러가 발생했습니다.'); } finally { setLoading(false); }
   };
 
   const handleGunghapChange = (person, e) => {
     const { name, value, type, checked } = e.target;
     setGunghapData(prev => ({
-      ...prev,
-      [person]: { 
-        ...prev[person], 
-        [name]: type === 'checkbox' ? checked : type === 'number' ? (parseInt(value, 10) || 0) : value 
-      }
+      ...prev, [person]: { ...prev[person], [name]: type === 'checkbox' ? checked : type === 'number' ? (parseInt(value, 10) || 0) : value }
     }));
   };
 
@@ -318,33 +240,19 @@ export default function SajuCalculator() {
     try {
       setLoading(true);
       const locData = GLOBAL_LOCATIONS.find(loc => loc.id === formData.birthPlace);
-      const payload = { 
-        ...formData, 
-        q1_trait: rectifyData.q1, 
-        q2_time: rectifyData.q2, 
-        longitude: locData.lon, 
-        timezone: locData.tz 
-      };
+      const payload = { ...formData, q1_trait: rectifyData.q1, q2_time: rectifyData.q2, longitude: locData.lon, timezone: locData.tz };
       const response = await axios.post('https://saju-backend-ffum.onrender.com/api/rectify_time', payload);
       setFormData(prev => ({ ...prev, hour: response.data.estimated_hour, minute: 30 }));
-      setIsTimeUnknown(false); 
-      setShowRectifyModal(false);
+      setIsTimeUnknown(false); setShowRectifyModal(false);
       alert(`🔮 역산 결과: ${response.data.estimated_pillar}시로 추정되었습니다.\n\n${response.data.reason}\n\n입력창에 시간이 자동 적용되었습니다.`);
-    } catch (err) { 
-      alert("생시 역산 중 오류가 발생했습니다."); 
-    } finally { 
-      setLoading(false); 
-    }
+    } catch (err) { alert("생시 역산 중 오류가 발생했습니다."); } finally { setLoading(false); }
   };
 
   const openModal = (keyword) => {
     if (!keyword) return;
     let lookupKeyword = keyword.includes('합화') ? '천간합화(合化)' : keyword.includes('천간합') ? '천간합(기반)' : keyword;
-    if (TERMS_DICT[lookupKeyword]) {
-      setModalInfo({ title: lookupKeyword, desc: TERMS_DICT[lookupKeyword] });
-    } else {
-      setModalInfo({ title: keyword, desc: "해당 단어의 상세 사전 데이터가 준비 중입니다." });
-    }
+    if (TERMS_DICT[lookupKeyword]) setModalInfo({ title: lookupKeyword, desc: TERMS_DICT[lookupKeyword] });
+    else setModalInfo({ title: keyword, desc: "해당 단어의 상세 사전 데이터가 준비 중입니다." });
   };
 
   const groupedDynamic = result?.dynamic_relations ? Object.values(result.dynamic_relations.reduce((acc, rel) => {
@@ -361,8 +269,6 @@ export default function SajuCalculator() {
       {/* 🌟 명리-PRO 사이드바 메뉴 🌟 */}
       <div className={`menu-overlay ${isMenuOpen ? 'open' : ''}`} onClick={() => setIsMenuOpen(false)}></div>
       <div className={`side-menu ${isMenuOpen ? 'open' : ''}`}>
-        
-        {/* 헤더 */}
         <div className="menu-header">
           <h2 style={{ margin: 0, fontSize: '1.5em', color: '#1C2536', fontWeight: '900' }}>명리<span style={{ color: '#B59960' }}>-PRO</span></h2>
           <button onClick={() => setIsMenuOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
@@ -373,7 +279,6 @@ export default function SajuCalculator() {
           </button>
         </div>
 
-        {/* 목차 (네비게이션) */}
         <div style={{ paddingBottom: '5px' }}>
           <button className="menu-nav-btn" onClick={() => { setActiveTab('saju'); setIsMenuOpen(false); }}>
             <span style={{ fontSize: '1.2em' }}>👤</span> 개인 사주 분석
@@ -384,7 +289,6 @@ export default function SajuCalculator() {
         </div>
 
         <div className="menu-content">
-          {/* 아코디언 토글: Why 명리-PRO? */}
           <div className="menu-box">
             <h4 className="accordion-title" onClick={() => setIsWhyProOpen(!isWhyProOpen)}>
               <span>🔍 Why 명리-PRO?</span>
@@ -392,7 +296,6 @@ export default function SajuCalculator() {
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </h4>
-            
             {isWhyProOpen && (
               <ul className="feature-list fade-in">
                 <li><strong>진태양시 정밀 적용:</strong> 글로벌 출생지의 경도(Longitude)를 계산하여 시차와 1분 1초의 오차까지 완벽하게 보정합니다.</li>
@@ -402,7 +305,6 @@ export default function SajuCalculator() {
             )}
           </div>
 
-          {/* 구독 서비스 배너 */}
           <div className="subscribe-banner">
             <span className="subscribe-tag">COMING SOON</span>
             <h4 style={{ margin: '0 0 8px 0', color: '#0369A1', fontSize: '1em' }}>매일 운세 무료 구독 💌</h4>
@@ -413,7 +315,6 @@ export default function SajuCalculator() {
           </div>
         </div>
 
-        {/* 정보 및 문의 푸터 */}
         <div className="menu-footer">
           <div style={{ fontWeight: '700', color: '#4B5563', marginBottom: '12px' }}>플랫폼 제공 및 문의</div>
           <div className="contact-item"><span>📧</span> abc@gmail.com</div>
@@ -448,16 +349,10 @@ export default function SajuCalculator() {
         
         {/* 탭 버튼 */}
         <div style={{ display: 'flex', backgroundColor: '#EFECE6', borderRadius: '12px', padding: '6px', marginBottom: '20px' }}>
-          <button 
-            onClick={() => {setActiveTab('saju'); setError('');}} 
-            style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', fontSize: '1em', backgroundColor: activeTab === 'saju' ? '#FFFFFF' : 'transparent', color: activeTab === 'saju' ? '#1C2536' : '#9CA3AF', boxShadow: activeTab === 'saju' ? '0 2px 8px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.3s' }}
-          >
+          <button onClick={() => {setActiveTab('saju'); setError('');}} style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', fontSize: '1em', backgroundColor: activeTab === 'saju' ? '#FFFFFF' : 'transparent', color: activeTab === 'saju' ? '#1C2536' : '#9CA3AF', boxShadow: activeTab === 'saju' ? '0 2px 8px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.3s' }}>
             👤 개인 사주 분석
           </button>
-          <button 
-            onClick={() => {setActiveTab('gunghap'); setError('');}} 
-            style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', fontSize: '1em', backgroundColor: activeTab === 'gunghap' ? '#FFFFFF' : 'transparent', color: activeTab === 'gunghap' ? '#B59960' : '#9CA3AF', boxShadow: activeTab === 'gunghap' ? '0 2px 8px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.3s' }}
-          >
+          <button onClick={() => {setActiveTab('gunghap'); setError('');}} style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', fontSize: '1em', backgroundColor: activeTab === 'gunghap' ? '#FFFFFF' : 'transparent', color: activeTab === 'gunghap' ? '#B59960' : '#9CA3AF', boxShadow: activeTab === 'gunghap' ? '0 2px 8px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.3s' }}>
             💑 프리미엄 궁합
           </button>
         </div>
@@ -469,64 +364,40 @@ export default function SajuCalculator() {
         )}
 
         {/* ========================================================
-            [1] 개인 사주 탭 
+            [1] 개인 사주 탭
         ======================================================== */}
         {activeTab === 'saju' && (
           <div className="fade-in">
             <form onSubmit={handleSajuSubmit} className="premium-card">
               
-              <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
-                <div style={{ flex: 1 }}>
+              {/* 🚨 오버플로우 방지: flexWrap 추가 */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '15px' }}>
+                <div style={{ flex: '1 1 140px' }}>
                   <label className="label-text">이름 (닉네임)</label>
-                  <input 
-                    type="text" 
-                    className="input-field" 
-                    placeholder="홍길동" 
-                    value={formData.name} 
-                    onChange={(e) => setFormData({...formData, name: e.target.value})} 
-                  />
+                  <input type="text" className="input-field" placeholder="홍길동" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
                 </div>
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: '1 1 140px' }}>
                   <label className="label-text">성별</label>
                   <div style={{ display: 'flex', gap: '5px', height: '49px' }}>
-                    <button 
-                      type="button" 
-                      onClick={() => setFormData({...formData, gender: 'M'})} 
-                      style={{ flex: 1, borderRadius: '8px', border: formData.gender === 'M' ? '2px solid #1C2536' : '1px solid #E2DED5', background: formData.gender === 'M' ? '#F3F4F6' : '#FAFAFA', fontWeight: formData.gender === 'M' ? '700' : '500', color: formData.gender === 'M' ? '#1C2536' : '#9CA3AF', cursor: 'pointer' }}
-                    >
-                      남성
-                    </button>
-                    <button 
-                      type="button" 
-                      onClick={() => setFormData({...formData, gender: 'F'})} 
-                      style={{ flex: 1, borderRadius: '8px', border: formData.gender === 'F' ? '2px solid #1C2536' : '1px solid #E2DED5', background: formData.gender === 'F' ? '#F3F4F6' : '#FAFAFA', fontWeight: formData.gender === 'F' ? '700' : '500', color: formData.gender === 'F' ? '#1C2536' : '#9CA3AF', cursor: 'pointer' }}
-                    >
-                      여성
-                    </button>
+                    <button type="button" onClick={() => setFormData({...formData, gender: 'M'})} style={{ flex: 1, borderRadius: '8px', border: formData.gender === 'M' ? '2px solid #1C2536' : '1px solid #E2DED5', background: formData.gender === 'M' ? '#F3F4F6' : '#FAFAFA', fontWeight: formData.gender === 'M' ? '700' : '500', color: formData.gender === 'M' ? '#1C2536' : '#9CA3AF', cursor: 'pointer' }}>남성</button>
+                    <button type="button" onClick={() => setFormData({...formData, gender: 'F'})} style={{ flex: 1, borderRadius: '8px', border: formData.gender === 'F' ? '2px solid #1C2536' : '1px solid #E2DED5', background: formData.gender === 'F' ? '#F3F4F6' : '#FAFAFA', fontWeight: formData.gender === 'F' ? '700' : '500', color: formData.gender === 'F' ? '#1C2536' : '#9CA3AF', cursor: 'pointer' }}>여성</button>
                   </div>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
-                <div style={{ flex: 1 }}>
+              {/* 🚨 오버플로우 방지: flexWrap 추가 */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '15px' }}>
+                <div style={{ flex: '1 1 100px' }}>
                   <label className="label-text">역법 (양/음력)</label>
-                  <select 
-                    className="input-field" 
-                    onChange={(e) => setFormData({ ...formData, is_lunar: e.target.value.includes('lunar'), is_leap_month: e.target.value === 'lunar_leap' })} 
-                    value={!formData.is_lunar ? 'solar' : formData.is_leap_month ? 'lunar_leap' : 'lunar'}
-                  >
+                  <select className="input-field" onChange={(e) => setFormData({ ...formData, is_lunar: e.target.value.includes('lunar'), is_leap_month: e.target.value === 'lunar_leap' })} value={!formData.is_lunar ? 'solar' : formData.is_leap_month ? 'lunar_leap' : 'lunar'}>
                     <option value="solar">양력</option>
                     <option value="lunar">음력 (평달)</option>
                     <option value="lunar_leap">음력 (윤달)</option>
                   </select>
                 </div>
-                <div style={{ flex: 2 }}>
-                  <label className="label-text">출생 국가/도시 (경도 자동반영)</label>
-                  <select 
-                    className="input-field" 
-                    value={formData.birthPlace} 
-                    onChange={(e) => setFormData({...formData, birthPlace: e.target.value})}
-                  >
+                <div style={{ flex: '2 1 180px' }}>
+                  <label className="label-text">국가/도시 (경도 자동반영)</label>
+                  <select className="input-field" value={formData.birthPlace} onChange={(e) => setFormData({...formData, birthPlace: e.target.value})}>
                     {GLOBAL_LOCATIONS.map(loc => (
                       <option key={loc.id} value={loc.id}>{loc.label}</option>
                     ))}
@@ -534,34 +405,19 @@ export default function SajuCalculator() {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
-                <div style={{ flex: '1.2' }}>
+              {/* 🚨 시간 입력칸 모바일 화면 이탈 수정 완료 (flexWrap 적용) */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '20px' }}>
+                <div style={{ flex: '1 1 140px' }}>
                   <label className="label-text">생년월일</label>
-                  <input 
-                    type="date" 
-                    className="input-field" 
-                    required 
-                    value={formatDate(formData.year, formData.month, formData.day)} 
-                    onChange={(e) => {
-                      if(!e.target.value) return; 
-                      const [y, m, d] = e.target.value.split('-'); 
-                      setFormData({...formData, year: parseInt(y), month: parseInt(m), day: parseInt(d)});
-                    }} 
-                  />
+                  <input type="date" className="input-field" required value={formatDate(formData.year, formData.month, formData.day)} onChange={(e) => {
+                    if(!e.target.value) return; const [y, m, d] = e.target.value.split('-'); setFormData({...formData, year: parseInt(y), month: parseInt(m), day: parseInt(d)});
+                  }} />
                 </div>
-                <div style={{ flex: '1', opacity: isTimeUnknown ? 0.4 : 1, transition: 'opacity 0.3s' }}>
+                <div style={{ flex: '1 1 120px', opacity: isTimeUnknown ? 0.4 : 1, transition: 'opacity 0.3s' }}>
                   <label className="label-text">태어난 시간</label>
-                  <input 
-                    type="time" 
-                    className="input-field" 
-                    disabled={isTimeUnknown} 
-                    value={formatTime(formData.hour, formData.minute)} 
-                    onChange={(e) => {
-                      if(!e.target.value) return; 
-                      const [h, min] = e.target.value.split(':'); 
-                      setFormData({...formData, hour: parseInt(h), minute: parseInt(min)});
-                    }} 
-                  />
+                  <input type="time" className="input-field" disabled={isTimeUnknown} value={formatTime(formData.hour, formData.minute)} onChange={(e) => {
+                    if(!e.target.value) return; const [h, min] = e.target.value.split(':'); setFormData({...formData, hour: parseInt(h), minute: parseInt(min)});
+                  }} />
                 </div>
               </div>
 
@@ -580,7 +436,7 @@ export default function SajuCalculator() {
               </button>
             </form>
 
-            {/* 🌟 개인 사주 결과 렌더링 (원본 800줄 로직 완벽 복구/유지) 🌟 */}
+            {/* 🌟 개인 사주 결과 렌더링 (800줄 로직 완벽 복원) 🌟 */}
             {result && (
               <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 
@@ -614,19 +470,15 @@ export default function SajuCalculator() {
                       return (
                         <div key={pillarKey} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#FDFCFB', padding: '20px 5px', borderRadius: '12px', border: '1px solid #EFECE6', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)' }}>
                           <div style={{ fontSize: '0.8em', color: '#9CA3AF', fontWeight: '700', marginBottom: '12px' }}>{pillarKey}</div>
-                          
                           <div style={{ textAlign: 'center', marginBottom: '15px' }}>
                             <div onClick={() => !isUnknown && openModal(data.ganji[0])} style={{ fontSize: '2em', fontWeight: '900', color: getElementColor(data.ganji[0]), cursor: isUnknown ? 'default' : 'pointer', lineHeight: '1.1' }}>{data.ganji[0]}</div>
                             <div onClick={() => !isUnknown && openModal(data.sipseong[0])} style={{ fontSize: '0.8em', color: '#6B7280', cursor: isUnknown ? 'default' : 'pointer', marginTop: '6px' }}>{data.sipseong[0]}</div>
                           </div>
-                          
                           <div style={{ width: '40px', height: '1px', backgroundColor: '#E5E0D8', margin: '5px 0 15px 0' }} />
-                          
                           <div style={{ textAlign: 'center', marginBottom: '15px' }}>
                             <div onClick={() => !isUnknown && openModal(data.ganji[1])} style={{ fontSize: '2em', fontWeight: '900', color: data.is_gongmang ? '#EF4444' : getElementColor(data.ganji[1]), cursor: isUnknown ? 'default' : 'pointer', lineHeight: '1.1' }}>{data.ganji[1]}</div>
                             <div onClick={() => !isUnknown && openModal(data.sipseong[1])} style={{ fontSize: '0.8em', color: '#6B7280', cursor: isUnknown ? 'default' : 'pointer', marginTop: '6px' }}>{data.sipseong[1]}</div>
                           </div>
-                          
                           {!isUnknown && (
                             <div style={{ display: 'flex', gap: '4px', justifyContent: 'center', marginBottom: '10px', cursor: 'pointer' }} title="지장간">
                               <span style={{ fontSize: '0.65em', color: '#94A3B8' }} onClick={() => openModal("지장간")}>[</span>
@@ -636,7 +488,6 @@ export default function SajuCalculator() {
                               <span style={{ fontSize: '0.65em', color: '#94A3B8' }} onClick={() => openModal("지장간")}>]</span>
                             </div>
                           )}
-                          
                           {!isUnknown && (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%', alignItems: 'center' }}>
                               {data.shipi && data.shipi !== "-" && (
@@ -664,8 +515,6 @@ export default function SajuCalculator() {
                 {/* 3️⃣ 오행 분포도 & 격국/용신 */}
                 <div className="premium-card">
                   <h3 style={{ margin: '0 0 15px 0', fontSize: '1.2em', color: '#1C2536' }}>📊 오행 밸런스 및 타고난 그릇</h3>
-                  
-                  {/* 오행 그래프 */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '25px' }}>
                     {Object.entries(result.elements_ratio).map(([element, ratio]) => (
                       <div key={element} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -677,8 +526,6 @@ export default function SajuCalculator() {
                       </div>
                     ))}
                   </div>
-
-                  {/* 격국 */}
                   <div style={{ backgroundColor: '#FDFBFB', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '20px', marginBottom: '15px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                       <span style={{ fontSize: '0.9em', fontWeight: 'bold', color: '#64748B' }}>타고난 그릇 (격국)</span>
@@ -686,59 +533,38 @@ export default function SajuCalculator() {
                     </div>
                     <p style={{ margin: 0, fontSize: '0.95em', color: '#334155', lineHeight: '1.5' }}>{result.gyeokguk.description}</p>
                   </div>
-
-                  {/* 🚨 특수 용신 (병약/통관) 복원 */}
                   {result.yongshin.special_type && (
                     <div style={{ backgroundColor: '#F5F3FF', border: '1px solid #C4B5FD', borderRadius: '12px', padding: '15px', display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '15px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <span style={{ fontSize: '1.1em' }}>🚨</span>
-                        <span style={{ fontSize: '0.95em', fontWeight: 'bold', color: '#6D28D9', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => openModal(result.yongshin.special_type)}>
-                          {result.yongshin.special_type} 발견!
-                        </span>
+                        <span style={{ fontSize: '0.95em', fontWeight: 'bold', color: '#6D28D9', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => openModal(result.yongshin.special_type)}>{result.yongshin.special_type} 발견!</span>
                       </div>
                       <p style={{ margin: 0, fontSize: '0.85em', color: '#4C1D95', lineHeight: '1.4' }}>{result.yongshin.special_desc}</p>
                     </div>
                   )}
-
-                  {/* 억부 및 조후 용신 */}
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
                     <div style={{ flex: '1 1 45%', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '15px' }}>
                       <h4 style={{ margin: '0 0 10px 0', fontSize: '0.95em', color: '#1E293B' }}>⚖️ 억부 용신 <span style={{ fontSize: '0.75em', color: '#64748B', fontWeight: 'normal' }}>(세력 밸런스)</span></h4>
                       <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
                         <div style={{ flex: 1, backgroundColor: '#F0FDF4', borderRadius: '8px', padding: '10px' }}>
                           <div style={{ fontSize: '0.75em', fontWeight: 'bold', color: '#166534', marginBottom: '5px' }}>용희신</div>
-                          <div style={{ display: 'flex', gap: '5px' }}>
-                            {result.yongshin.yong_hee.map((el, i) => (
-                              <span key={i} onClick={() => openModal(el)} style={{ cursor: 'pointer', fontWeight: 'bold', color: getElementColor(el), fontSize: '1.1em' }}>{el}</span>
-                            ))}
-                          </div>
+                          <div style={{ display: 'flex', gap: '5px' }}>{result.yongshin.yong_hee.map((el, i) => <span key={i} onClick={() => openModal(el)} style={{ cursor: 'pointer', fontWeight: 'bold', color: getElementColor(el), fontSize: '1.1em' }}>{el}</span>)}</div>
                         </div>
                         <div style={{ flex: 1, backgroundColor: '#FEF2F2', borderRadius: '8px', padding: '10px' }}>
                           <div style={{ fontSize: '0.75em', fontWeight: 'bold', color: '#991B1B', marginBottom: '5px' }}>기구신</div>
-                          <div style={{ display: 'flex', gap: '5px' }}>
-                            {result.yongshin.gi_gu.map((el, i) => (
-                              <span key={i} onClick={() => openModal(el)} style={{ cursor: 'pointer', fontWeight: 'bold', color: getElementColor(el), fontSize: '1.1em' }}>{el}</span>
-                            ))}
-                          </div>
+                          <div style={{ display: 'flex', gap: '5px' }}>{result.yongshin.gi_gu.map((el, i) => <span key={i} onClick={() => openModal(el)} style={{ cursor: 'pointer', fontWeight: 'bold', color: getElementColor(el), fontSize: '1.1em' }}>{el}</span>)}</div>
                         </div>
                       </div>
                       <div style={{ fontSize: '0.85em', color: '#475569', lineHeight: '1.4' }}>
                         <strong onClick={() => openModal(result.yongshin.strength)} style={{ cursor: 'pointer', textDecoration: 'underline' }}>{result.yongshin.strength}</strong>: {result.yongshin.description}
                       </div>
                     </div>
-                    
                     <div style={{ flex: '1 1 45%', backgroundColor: '#FFF7ED', border: '1px solid #FFEDD5', borderRadius: '12px', padding: '15px' }}>
                       <h4 style={{ margin: '0 0 10px 0', fontSize: '0.95em', color: '#9A3412' }}>🌡️ 조후 용신 <span style={{ fontSize: '0.75em', color: '#FDBA74', fontWeight: 'normal' }}>(온도 밸런스)</span></h4>
                       <div style={{ backgroundColor: '#FFEDD5', borderRadius: '8px', padding: '10px', marginBottom: '10px' }}>
                         <div style={{ fontSize: '0.75em', fontWeight: 'bold', color: '#9A3412', marginBottom: '5px' }}>조후 용희신</div>
                         <div style={{ display: 'flex', gap: '5px' }}>
-                          {result.johu.yong_hee.length > 0 ? (
-                            result.johu.yong_hee.map((el, i) => (
-                              <span key={i} onClick={() => openModal(el)} style={{ cursor: 'pointer', fontWeight: 'bold', color: getElementColor(el), fontSize: '1.1em' }}>{el}</span>
-                            ))
-                          ) : (
-                            <span style={{ fontSize: '0.9em', color: '#EA580C' }}>산출 불가</span>
-                          )}
+                          {result.johu.yong_hee.length > 0 ? (result.johu.yong_hee.map((el, i) => <span key={i} onClick={() => openModal(el)} style={{ cursor: 'pointer', fontWeight: 'bold', color: getElementColor(el), fontSize: '1.1em' }}>{el}</span>)) : (<span style={{ fontSize: '0.9em', color: '#EA580C' }}>산출 불가</span>)}
                         </div>
                       </div>
                       <p style={{ margin: 0, fontSize: '0.85em', color: '#9A3412', lineHeight: '1.4' }}>{result.johu.description}</p>
@@ -749,19 +575,14 @@ export default function SajuCalculator() {
                 {/* 4️⃣ 심층 스토리텔링 및 개운법 */}
                 <div className="premium-card">
                   <h3 style={{ margin: '0 0 20px 0', fontSize: '1.2em', color: '#1C2536', borderBottom: '2px solid #F0ECE1', paddingBottom: '10px' }}>📖 심층 스토리텔링</h3>
-                  
                   <div style={{ marginBottom: '20px' }}>
                     <h4 style={{ margin: '0 0 8px 0', color: '#B59960', fontSize: '1em' }}>타고난 성향과 에너지</h4>
                     <p style={{ margin: 0, fontSize: '0.95em', color: '#4B5563', lineHeight: '1.7' }}>{result.interpretation.five_elements_desc}</p>
                   </div>
-                  
                   <div style={{ marginBottom: '20px' }}>
                     <h4 style={{ margin: '0 0 8px 0', color: '#B59960', fontSize: '1em' }}>활동성과 직업/재물운</h4>
-                    <p style={{ margin: 0, fontSize: '0.95em', color: '#4B5563', lineHeight: '1.7' }}>
-                      {result.interpretation.movement_luck} <br/><br/> {result.interpretation.job_wealth_desc}
-                    </p>
+                    <p style={{ margin: 0, fontSize: '0.95em', color: '#4B5563', lineHeight: '1.7' }}>{result.interpretation.movement_luck} <br/><br/> {result.interpretation.job_wealth_desc}</p>
                   </div>
-
                   <div style={{ backgroundColor: '#F9F8F6', padding: '16px', borderRadius: '12px', borderLeft: '4px solid #B59960' }}>
                     <h4 style={{ margin: '0 0 8px 0', color: '#1C2536', fontSize: '0.95em' }}>🍀 나만의 행운 솔루션</h4>
                     <p style={{ margin: 0, fontSize: '0.9em', color: '#4B5563', lineHeight: '1.6' }}>
@@ -775,7 +596,6 @@ export default function SajuCalculator() {
                 {/* 5️⃣ 상호작용 및 다이내믹 운세 (알림) */}
                 <div className="premium-card">
                   <h3 style={{ margin: '0 0 15px 0', fontSize: '1.2em', color: '#1C2536' }}>⚡ 원국 내 상호작용 및 주의할 운세</h3>
-                  
                   <div style={{ marginBottom: '20px' }}>
                     {result.relations && result.relations.length > 0 ? (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -828,7 +648,6 @@ export default function SajuCalculator() {
                 <div className="premium-card">
                   <h3 style={{ margin: '0 0 20px 0', fontSize: '1.2em', color: '#1C2536' }}>🛤️ 운명의 흐름 (대/세/월운)</h3>
                   
-                  {/* 월운 */}
                   {result.wolun && (
                     <div style={{ marginBottom: '20px' }}>
                       <h4 style={{ margin: '0 0 10px 0', fontSize: '1em', color: '#4B5563' }}>🌙 이달의 운세 (올해의 월운)</h4>
@@ -839,9 +658,7 @@ export default function SajuCalculator() {
                             <div onClick={() => openModal(wun.ganji[0])} style={{ fontSize: '1.2em', fontWeight: 'bold', color: getElementColor(wun.ganji[0]), cursor: 'pointer' }}>{wun.ganji[0]}</div>
                             <div onClick={() => openModal(wun.ganji[1])} style={{ fontSize: '1.2em', fontWeight: 'bold', color: wun.is_gongmang ? '#EF4444' : getElementColor(wun.ganji[1]), cursor: 'pointer', marginBottom: '4px' }}>{wun.ganji[1]}</div>
                             <div style={{ display: 'flex', gap: '4px', justifyContent: 'center', marginBottom: '6px' }}>
-                              {wun.jijanggan?.map((gan, i) => (
-                                <span key={i} onClick={() => openModal(gan)} style={{ fontSize: '0.65em', color: '#9CA3AF', cursor: 'pointer' }}>{gan}</span>
-                              ))}
+                              {wun.jijanggan?.map((gan, i) => <span key={i} onClick={() => openModal(gan)} style={{ fontSize: '0.65em', color: '#9CA3AF', cursor: 'pointer' }}>{gan}</span>)}
                             </div>
                             <div onClick={() => openModal(wun.shipi)} style={{ fontSize: '0.7em', color: '#6B7280', cursor: 'pointer' }}>{wun.shipi}</div>
                           </div>
@@ -850,7 +667,6 @@ export default function SajuCalculator() {
                     </div>
                   )}
                   
-                  {/* 세운 */}
                   <div style={{ marginBottom: '20px' }}>
                     <h4 style={{ margin: '0 0 10px 0', fontSize: '1em', color: '#4B5563' }}>📅 1년 단위 현실 (세운)</h4>
                     <div className="horizontal-scroll">
@@ -863,9 +679,7 @@ export default function SajuCalculator() {
                             <div onClick={() => openModal(wun.ganji[0])} style={{ fontSize: '1.2em', fontWeight: 'bold', color: getElementColor(wun.ganji[0]), cursor: 'pointer' }}>{wun.ganji[0]}</div>
                             <div onClick={() => openModal(wun.ganji[1])} style={{ fontSize: '1.2em', fontWeight: 'bold', color: wun.is_gongmang ? '#EF4444' : getElementColor(wun.ganji[1]), cursor: 'pointer', marginBottom: '4px' }}>{wun.ganji[1]}</div>
                             <div style={{ display: 'flex', gap: '4px', justifyContent: 'center', marginBottom: '6px' }}>
-                              {wun.jijanggan?.map((gan, i) => (
-                                <span key={i} onClick={() => openModal(gan)} style={{ fontSize: '0.65em', color: '#9CA3AF', cursor: 'pointer' }}>{gan}</span>
-                              ))}
+                              {wun.jijanggan?.map((gan, i) => <span key={i} onClick={() => openModal(gan)} style={{ fontSize: '0.65em', color: '#9CA3AF', cursor: 'pointer' }}>{gan}</span>)}
                             </div>
                             <div onClick={() => openModal(wun.shipi)} style={{ fontSize: '0.7em', color: '#6B7280', cursor: 'pointer' }}>{wun.shipi}</div>
                           </div>
@@ -874,7 +688,6 @@ export default function SajuCalculator() {
                     </div>
                   </div>
 
-                  {/* 대운 */}
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                       <h4 style={{ margin: 0, fontSize: '1em', color: '#4B5563' }}>🛤️ 10년 단위 큰 환경 (대운)</h4>
@@ -889,9 +702,7 @@ export default function SajuCalculator() {
                             <div onClick={() => openModal(wun.ganji[0])} style={{ fontSize: '1.2em', fontWeight: 'bold', color: getElementColor(wun.ganji[0]), cursor: 'pointer' }}>{wun.ganji[0]}</div>
                             <div onClick={() => openModal(wun.ganji[1])} style={{ fontSize: '1.2em', fontWeight: 'bold', color: wun.is_gongmang ? '#EF4444' : getElementColor(wun.ganji[1]), cursor: 'pointer', marginBottom: '4px' }}>{wun.ganji[1]}</div>
                             <div style={{ display: 'flex', gap: '4px', justifyContent: 'center', marginBottom: '6px' }}>
-                              {wun.jijanggan?.map((gan, i) => (
-                                <span key={i} onClick={() => openModal(gan)} style={{ fontSize: '0.65em', color: '#9CA3AF', cursor: 'pointer' }}>{gan}</span>
-                              ))}
+                              {wun.jijanggan?.map((gan, i) => <span key={i} onClick={() => openModal(gan)} style={{ fontSize: '0.65em', color: '#9CA3AF', cursor: 'pointer' }}>{gan}</span>)}
                             </div>
                             <div onClick={() => openModal(wun.shipi)} style={{ fontSize: '0.7em', color: '#6B7280', cursor: 'pointer', marginBottom: '8px' }}>{wun.shipi}</div>
                             <div style={{ fontSize: '0.65em', color: '#4338CA', backgroundColor: '#E0E7FF', padding: '4px', borderRadius: '4px' }} title="대운 진입(교운기) 날짜">
@@ -920,12 +731,13 @@ export default function SajuCalculator() {
               <div style={{ backgroundColor: '#F9F8F6', padding: '20px', borderRadius: '12px', marginBottom: '20px', border: '1px solid #EFECE6' }}>
                 <h4 style={{ margin: '0 0 15px 0', color: '#1C2536', fontSize: '1.1em' }}>👤 나의 정보</h4>
                 
-                <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
-                  <div style={{ flex: 1 }}>
+                {/* 🚨 오버플로우 방지: flexWrap 추가 */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '15px' }}>
+                  <div style={{ flex: '1 1 140px' }}>
                     <label className="label-text">이름 (닉네임)</label>
                     <input type="text" className="input-field" placeholder="내 이름" name="name" value={gunghapData.me.name} onChange={(e) => handleGunghapChange('me', e)} />
                   </div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: '1 1 140px' }}>
                     <label className="label-text">성별</label>
                     <select className="input-field" name="gender" value={gunghapData.me.gender} onChange={(e) => handleGunghapChange('me', e)}>
                       <option value="M">남성</option>
@@ -934,8 +746,8 @@ export default function SajuCalculator() {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
-                  <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '15px' }}>
+                  <div style={{ flex: '1 1 100px' }}>
                     <label className="label-text">역법 (양/음력)</label>
                     <select className="input-field" onChange={(e) => {
                       const val = e.target.value;
@@ -946,8 +758,9 @@ export default function SajuCalculator() {
                       <option value="lunar_leap">음력(윤달)</option>
                     </select>
                   </div>
-                  <div style={{ flex: 2 }}>
-                    <label className="label-text">출생 국가/도시 (경도 자동반영)</label>
+                  <div style={{ flex: '2 1 180px' }}>
+                    {/* 🚨 '출생' 단어 삭제 및 드롭다운 유지 */}
+                    <label className="label-text">국가/도시 (경도 자동반영)</label>
                     <select className="input-field" value={gunghapData.me.birthPlace} onChange={(e) => setGunghapData(prev => ({...prev, me: {...prev.me, birthPlace: e.target.value}}))}>
                       {GLOBAL_LOCATIONS.map(loc => (
                         <option key={loc.id} value={loc.id}>{loc.label}</option>
@@ -956,8 +769,9 @@ export default function SajuCalculator() {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-                  <div style={{ flex: '1.2' }}>
+                {/* 🚨 시간 오버플로우 방지 */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
+                  <div style={{ flex: '1 1 140px' }}>
                     <label className="label-text">생년월일</label>
                     <input type="date" className="input-field" value={formatDate(gunghapData.me.year, gunghapData.me.month, gunghapData.me.day)} onChange={(e) => {
                       if(!e.target.value) return; 
@@ -965,7 +779,7 @@ export default function SajuCalculator() {
                       setGunghapData(prev => ({...prev, me: {...prev.me, year: parseInt(y), month: parseInt(m), day: parseInt(d)}}));
                     }} />
                   </div>
-                  <div style={{ flex: 1, opacity: gunghapData.me.is_time_unknown ? 0.4 : 1 }}>
+                  <div style={{ flex: '1 1 120px', opacity: gunghapData.me.is_time_unknown ? 0.4 : 1 }}>
                     <label className="label-text">태어난 시간</label>
                     <input type="time" className="input-field" disabled={gunghapData.me.is_time_unknown} value={formatTime(gunghapData.me.hour, gunghapData.me.minute)} onChange={(e) => {
                       if(!e.target.value) return; 
@@ -985,12 +799,12 @@ export default function SajuCalculator() {
               <div style={{ backgroundColor: '#FFF5F7', padding: '20px', borderRadius: '12px', marginBottom: '25px', border: '1px solid #FCE7F3' }}>
                 <h4 style={{ margin: '0 0 15px 0', color: '#BE185D', fontSize: '1.1em' }}>💖 상대방 정보</h4>
                 
-                <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
-                  <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '15px' }}>
+                  <div style={{ flex: '1 1 140px' }}>
                     <label className="label-text">이름 (닉네임)</label>
                     <input type="text" className="input-field" style={{ borderColor: '#FBCFE8' }} placeholder="상대방 이름" name="name" value={gunghapData.partner.name} onChange={(e) => handleGunghapChange('partner', e)} />
                   </div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: '1 1 140px' }}>
                     <label className="label-text">성별</label>
                     <select className="input-field" style={{ borderColor: '#FBCFE8' }} name="gender" value={gunghapData.partner.gender} onChange={(e) => handleGunghapChange('partner', e)}>
                       <option value="F">여성</option>
@@ -999,8 +813,8 @@ export default function SajuCalculator() {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
-                  <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '15px' }}>
+                  <div style={{ flex: '1 1 100px' }}>
                     <label className="label-text">역법 (양/음력)</label>
                     <select className="input-field" style={{ borderColor: '#FBCFE8' }} onChange={(e) => {
                       const val = e.target.value;
@@ -1011,8 +825,9 @@ export default function SajuCalculator() {
                       <option value="lunar_leap">음력(윤달)</option>
                     </select>
                   </div>
-                  <div style={{ flex: 2 }}>
-                    <label className="label-text">출생 국가/도시 (경도 자동반영)</label>
+                  <div style={{ flex: '2 1 180px' }}>
+                    {/* 🚨 '출생' 단어 삭제 및 드롭다운 유지 */}
+                    <label className="label-text">국가/도시 (경도 자동반영)</label>
                     <select className="input-field" style={{ borderColor: '#FBCFE8' }} value={gunghapData.partner.birthPlace} onChange={(e) => setGunghapData(prev => ({...prev, partner: {...prev.partner, birthPlace: e.target.value}}))}>
                       {GLOBAL_LOCATIONS.map(loc => (
                         <option key={loc.id} value={loc.id}>{loc.label}</option>
@@ -1021,8 +836,8 @@ export default function SajuCalculator() {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-                  <div style={{ flex: '1.2' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
+                  <div style={{ flex: '1 1 140px' }}>
                     <label className="label-text">생년월일</label>
                     <input type="date" className="input-field" style={{ borderColor: '#FBCFE8' }} value={formatDate(gunghapData.partner.year, gunghapData.partner.month, gunghapData.partner.day)} onChange={(e) => {
                       if(!e.target.value) return; 
@@ -1030,7 +845,7 @@ export default function SajuCalculator() {
                       setGunghapData(prev => ({...prev, partner: {...prev.partner, year: parseInt(y), month: parseInt(m), day: parseInt(d)}}));
                     }} />
                   </div>
-                  <div style={{ flex: 1, opacity: gunghapData.partner.is_time_unknown ? 0.4 : 1 }}>
+                  <div style={{ flex: '1 1 120px', opacity: gunghapData.partner.is_time_unknown ? 0.4 : 1 }}>
                     <label className="label-text">태어난 시간</label>
                     <input type="time" className="input-field" style={{ borderColor: '#FBCFE8' }} disabled={gunghapData.partner.is_time_unknown} value={formatTime(gunghapData.partner.hour, gunghapData.partner.minute)} onChange={(e) => {
                       if(!e.target.value) return; 
