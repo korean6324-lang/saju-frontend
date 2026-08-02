@@ -15,33 +15,130 @@ const TERMS_DICT = {
 };
 
 const getElementColor = (text) => {
-  if (['목','갑','을','인','묘'].includes(text)) return '#10b981'; 
-  if (['화','병','정','사','오'].includes(text)) return '#ef4444'; 
-  if (['토','무','기','진','술','축','미'].includes(text)) return '#f59e0b'; 
-  if (['금','경','신','유'].includes(text)) return '#94a3b8'; 
-  if (['수','임','계','자','해'].includes(text)) return '#3b82f6'; 
+  if (['목','갑','을','인','묘'].includes(text)) return '#10b981'; // 청량한 그린
+  if (['화','병','정','사','오'].includes(text)) return '#ef4444'; // 열정의 레드
+  if (['토','무','기','진','술','축','미'].includes(text)) return '#d97706'; // 묵직한 골드브라운
+  if (['금','경','신','유'].includes(text)) return '#64748b'; // 세련된 스틸그레이
+  if (['수','임','계','자','해'].includes(text)) return '#3b82f6'; // 깊은 블루
   if (text === '?') return '#cbd5e1'; 
   return '#333';
 };
 
-// 💡 날짜와 시간을 HTML date/time input 형식(YYYY-MM-DD, HH:MM)으로 맞춰주는 헬퍼 함수
 const formatDate = (y, m, d) => `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 const formatTime = (h, m) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+
+// 🌟 프리미엄 글로벌 CSS 스타일링 내장
+const globalStyles = `
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+  
+  body {
+    background-color: #F8F7F4; /* 따뜻하고 고급스러운 아이보리 배경 */
+    margin: 0;
+    font-family: 'Pretendard', -apple-system, sans-serif;
+    color: #2C303A;
+  }
+  
+  /* 부드러운 등장 애니메이션 */
+  .fade-in {
+    animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* 고급스러운 카드 UI */
+  .premium-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    border: 1px solid #EFECE6;
+    margin-bottom: 20px;
+  }
+
+  /* 모바일 최적화 큼직한 인풋 창 */
+  .input-field {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #E2DED5;
+    border-radius: 10px;
+    font-size: 16px; /* iOS 자동확대 방지 */
+    background-color: #FAFAFA;
+    transition: all 0.2s;
+    box-sizing: border-box;
+  }
+  .input-field:focus {
+    border-color: #B59960;
+    background-color: #FFF;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(181, 153, 96, 0.15);
+  }
+
+  /* 라벨 텍스트 */
+  .label-text {
+    font-size: 0.85em;
+    color: #6B7280;
+    margin-bottom: 6px;
+    display: block;
+    font-weight: 600;
+  }
+
+  /* 프리미엄 골드/네이비 버튼 */
+  .btn-primary {
+    background: linear-gradient(135deg, #1C2536 0%, #111827 100%);
+    color: #F3E8D0;
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1em;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s;
+    box-shadow: 0 4px 15px rgba(17, 24, 39, 0.2);
+  }
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+  .btn-primary:disabled {
+    background: #9CA3AF;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  /* 로딩 스피너 */
+  .spinner {
+    border: 3px solid rgba(243, 232, 208, 0.3);
+    border-top-color: #F3E8D0;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+`;
 
 export default function SajuCalculator() {
   const [activeTab, setActiveTab] = useState('saju');
 
-  // 1. 개인 사주 상태
+  // 1. 개인 사주 상태 (이름, 출생지 추가)
   const [formData, setFormData] = useState({ 
+    name: '', birthPlace: '대한민국 (서울 기준)',
     year: 1990, month: 5, day: 15, hour: 14, minute: 30, gender: 'M', is_lunar: false, is_leap_month: false 
   });
   const [isTimeUnknown, setIsTimeUnknown] = useState(false);
   const [result, setResult] = useState(null);
   
-  // 2. 궁합 상태
+  // 2. 궁합 상태 (이름, 출생지 추가)
   const [gunghapData, setGunghapData] = useState({
-    me: { year: 1990, month: 5, day: 15, hour: 14, minute: 30, gender: 'M', is_lunar: false, is_leap_month: false, is_time_unknown: false },
-    partner: { year: 1995, month: 8, day: 20, hour: 10, minute: 0, gender: 'F', is_lunar: false, is_leap_month: false, is_time_unknown: false }
+    me: { name: '', birthPlace: '대한민국', year: 1990, month: 5, day: 15, hour: 14, minute: 30, gender: 'M', is_lunar: false, is_leap_month: false, is_time_unknown: false },
+    partner: { name: '', birthPlace: '대한민국', year: 1995, month: 8, day: 20, hour: 10, minute: 0, gender: 'F', is_lunar: false, is_leap_month: false, is_time_unknown: false }
   });
   const [gunghapResult, setGunghapResult] = useState(null);
 
@@ -54,14 +151,14 @@ export default function SajuCalculator() {
 
   const currentYear = new Date().getFullYear();
 
-  // === 이벤트 핸들러 ===
+  // === API 통신 핸들러 ===
   const handleSajuSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); 
-    setError(''); 
-    setResult(null);
+    setLoading(true); setError(''); setResult(null);
     try {
-      const response = await axios.post('https://saju-backend-ffum.onrender.com/api/saju', { ...formData, is_time_unknown: isTimeUnknown });
+      // 🚀 변경사항: 백엔드로 보낼 때 name, birthPlace 데이터를 함께 묶어서 전송 (미래 백엔드 확장 대비)
+      const payload = { ...formData, is_time_unknown: isTimeUnknown };
+      const response = await axios.post('https://saju-backend-ffum.onrender.com/api/saju', payload);
       setResult(response.data);
     } catch (err) { 
       setError(err.response?.data?.detail || '서버 연결 에러가 발생했습니다.'); 
@@ -72,9 +169,7 @@ export default function SajuCalculator() {
 
   const handleGunghapSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); 
-    setError(''); 
-    setGunghapResult(null);
+    setLoading(true); setError(''); setGunghapResult(null);
     try {
       const response = await axios.post('https://saju-backend-ffum.onrender.com/api/gunghap', gunghapData);
       setGunghapResult(response.data);
@@ -85,15 +180,25 @@ export default function SajuCalculator() {
     }
   };
 
+  const handleGunghapChange = (person, e) => {
+    const { name, value, type, checked } = e.target;
+    setGunghapData(prev => ({
+      ...prev,
+      [person]: { 
+        ...prev[person], 
+        [name]: type === 'checkbox' ? checked : type === 'number' ? (parseInt(value, 10) || 0) : value 
+      }
+    }));
+  };
+
   const handleRectifySubmit = async () => {
     try {
       setLoading(true);
       const payload = { ...formData, q1_trait: rectifyData.q1, q2_time: rectifyData.q2 };
       const response = await axios.post('https://saju-backend-ffum.onrender.com/api/rectify_time', payload);
       setFormData(prev => ({ ...prev, hour: response.data.estimated_hour, minute: 30 }));
-      setIsTimeUnknown(false); 
-      setShowRectifyModal(false);
-      alert(`🔮 역산 결과: ${response.data.estimated_pillar}시로 추정되었습니다.\n\n${response.data.reason}\n\n입력창에 시간이 자동 적용되었습니다. '사주 분석하기'를 눌러주세요.`);
+      setIsTimeUnknown(false); setShowRectifyModal(false);
+      alert(`🔮 역산 결과: ${response.data.estimated_pillar}시로 추정되었습니다.\n\n${response.data.reason}\n\n입력창에 시간이 자동 적용되었습니다.`);
     } catch (err) { 
       alert("생시 역산 중 오류가 발생했습니다."); 
     } finally { 
@@ -104,697 +209,293 @@ export default function SajuCalculator() {
   const openModal = (keyword) => {
     if (!keyword) return;
     let lookupKeyword = keyword.includes('합화') ? '천간합화(合化)' : keyword.includes('천간합') ? '천간합(기반)' : keyword;
-    if (TERMS_DICT[lookupKeyword]) {
-      setModalInfo({ title: lookupKeyword, desc: TERMS_DICT[lookupKeyword] });
-    } else {
-      setModalInfo({ title: keyword, desc: "명리학적 상호작용 기운입니다. (해당 단어의 상세 사전 데이터가 준비 중입니다.)" });
-    }
+    if (TERMS_DICT[lookupKeyword]) setModalInfo({ title: lookupKeyword, desc: TERMS_DICT[lookupKeyword] });
+    else setModalInfo({ title: keyword, desc: "해당 단어의 상세 사전 데이터가 준비 중입니다." });
   };
 
-  const groupedDynamic = result?.dynamic_relations ? Object.values(result.dynamic_relations.reduce((acc, rel) => {
-    const key = `${rel.name}_${rel.target_pillar}`;
-    if (!acc[key]) acc[key] = { ...rel, un_types: [rel.un_type] };
-    else if (!acc[key].un_types.includes(rel.un_type)) acc[key].un_types.push(rel.un_type);
-    return acc;
-  }, {})) : [];
-
   return (
-    <div style={{ maxWidth: '720px', margin: '0 auto', padding: '20px', fontFamily: "'Pretendard', sans-serif", color: '#1e293b' }}>
-      
-      {/* 🌟 헤더 및 탭 전환 */}
-      <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-        <h2 style={{ margin: 0, fontSize: '1.8em', color: '#0f172a', fontWeight: '800' }}>초정밀 사주 엔진 PRO</h2>
-        <p style={{ margin: '5px 0 20px', color: '#64748b', fontSize: '0.9em' }}>직업 재물 통변 & 파트너 궁합 분석</p>
+    <>
+      {/* 스타일 주입 */}
+      <style>{globalStyles}</style>
+
+      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px', paddingBottom: '60px' }}>
         
-        <div style={{ display: 'flex', backgroundColor: '#f1f5f9', borderRadius: '12px', padding: '5px', gap: '5px' }}>
-          <button 
-            onClick={() => {setActiveTab('saju'); setError('');}} 
-            style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', backgroundColor: activeTab === 'saju' ? '#ffffff' : 'transparent', color: activeTab === 'saju' ? '#0f172a' : '#64748b', boxShadow: activeTab === 'saju' ? '0 2px 4px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.2s' }}
-          >
-            👤 개인 사주 분석
-          </button>
-          <button 
-            onClick={() => {setActiveTab('gunghap'); setError('');}} 
-            style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', backgroundColor: activeTab === 'gunghap' ? '#ffffff' : 'transparent', color: activeTab === 'gunghap' ? '#ec4899' : '#64748b', boxShadow: activeTab === 'gunghap' ? '0 2px 4px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.2s' }}
-          >
-            💑 궁합 보기
-          </button>
+        {/* 🌟 프리미엄 헤더 영역 */}
+        <div style={{ textAlign: 'center', marginBottom: '30px', marginTop: '10px' }}>
+          <h2 style={{ margin: 0, fontSize: '2em', color: '#1C2536', fontWeight: '800', letterSpacing: '-0.5px' }}>
+            운명의 <span style={{ color: '#B59960' }}>나침반</span>
+          </h2>
+          <p style={{ margin: '8px 0 20px', color: '#6B7280', fontSize: '0.95em' }}>
+            글로벌 초정밀 사주 & 궁합 분석 엔진
+          </p>
+          
+          {/* 모던 탭 버튼 */}
+          <div style={{ display: 'flex', backgroundColor: '#EFECE6', borderRadius: '12px', padding: '6px' }}>
+            <button 
+              onClick={() => {setActiveTab('saju'); setError('');}} 
+              style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', fontSize: '1em', backgroundColor: activeTab === 'saju' ? '#FFFFFF' : 'transparent', color: activeTab === 'saju' ? '#1C2536' : '#9CA3AF', boxShadow: activeTab === 'saju' ? '0 2px 8px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.3s' }}
+            >
+              👤 개인 사주 분석
+            </button>
+            <button 
+              onClick={() => {setActiveTab('gunghap'); setError('');}} 
+              style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', fontSize: '1em', backgroundColor: activeTab === 'gunghap' ? '#FFFFFF' : 'transparent', color: activeTab === 'gunghap' ? '#B59960' : '#9CA3AF', boxShadow: activeTab === 'gunghap' ? '0 2px 8px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.3s' }}
+            >
+              💑 프리미엄 궁합
+            </button>
+          </div>
         </div>
-      </div>
 
-      {error && <div style={{ padding: '12px', backgroundColor: '#fef2f2', color: '#b91c1c', borderRadius: '8px', marginBottom: '20px', textAlign: 'center' }}>{error}</div>}
+        {error && <div className="fade-in" style={{ padding: '16px', backgroundColor: '#FEF2F2', borderLeft: '4px solid #EF4444', color: '#991B1B', borderRadius: '8px', marginBottom: '20px', fontWeight: '600' }}>{error}</div>}
 
-      {/* ===================== [1. 개인 사주 탭 영역] ===================== */}
-      {activeTab === 'saju' && (
-        <>
-          <form onSubmit={handleSajuSubmit} style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', marginBottom: '30px' }}>
-            
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', marginBottom: '15px' }}>
-              <div style={{ flex: '1 1 45%', display: 'flex', alignItems: 'center', backgroundColor: '#f8fafc', padding: '8px 12px', borderRadius: '8px' }}>
-                <span style={{ fontWeight: '600', marginRight: '15px', fontSize: '0.9em' }}>성별</span>
-                <label style={{ marginRight: '10px', fontSize: '0.9em', cursor: 'pointer' }}>
-                  <input type="radio" name="gender" value="M" checked={formData.gender === 'M'} onChange={(e)=>setFormData({...formData, gender: e.target.value})} /> 남
-                </label>
-                <label style={{ fontSize: '0.9em', cursor: 'pointer' }}>
-                  <input type="radio" name="gender" value="F" checked={formData.gender === 'F'} onChange={(e)=>setFormData({...formData, gender: e.target.value})} /> 여
-                </label>
-              </div>
-              <div style={{ flex: '1 1 45%', display: 'flex', alignItems: 'center', backgroundColor: '#f8fafc', padding: '8px 12px', borderRadius: '8px' }}>
-                <span style={{ fontWeight: '600', marginRight: '15px', fontSize: '0.9em' }}>역법</span>
-                <select 
-                  style={{ padding: '4px 8px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.9em', flex: 1 }} 
-                  onChange={(e) => setFormData({ ...formData, is_lunar: e.target.value.includes('lunar'), is_leap_month: e.target.value === 'lunar_leap' })} 
-                  value={!formData.is_lunar ? 'solar' : formData.is_leap_month ? 'lunar_leap' : 'lunar'}
-                >
-                  <option value="solar">양력</option>
-                  <option value="lunar">음력 (평달)</option>
-                  <option value="lunar_leap">음력 (윤달)</option>
-                </select>
-              </div>
-            </div>
-
-            {/* 🚀 모바일 터치 최적화: 날짜 및 시간 입력 (개인 사주) */}
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-              <div style={{ flex: '1 1 50%', minWidth: '120px', display: 'flex', flexDirection: 'column' }}>
-                <label style={{ fontSize: '0.75em', color: '#64748b', marginBottom: '4px' }}>생년월일</label>
-                <input 
-                  type="date" 
-                  value={formatDate(formData.year, formData.month, formData.day)} 
-                  onChange={(e) => {
-                    if(!e.target.value) return;
-                    const [y, m, d] = e.target.value.split('-');
-                    setFormData({...formData, year: parseInt(y), month: parseInt(m), day: parseInt(d)});
-                  }} 
-                  required 
-                  style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '1em', textAlign: 'center', width: '100%', boxSizing: 'border-box' }} 
-                />
-              </div>
-              <div style={{ flex: '1 1 40%', minWidth: '100px', display: 'flex', flexDirection: 'column', opacity: isTimeUnknown ? 0.4 : 1 }}>
-                <label style={{ fontSize: '0.75em', color: '#64748b', marginBottom: '4px' }}>태어난 시간</label>
-                <input 
-                  type="time" 
-                  value={formatTime(formData.hour, formData.minute)} 
-                  onChange={(e) => {
-                    if(!e.target.value) return;
-                    const [h, min] = e.target.value.split(':');
-                    setFormData({...formData, hour: parseInt(h), minute: parseInt(min)});
-                  }} 
-                  disabled={isTimeUnknown} 
-                  style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '1em', textAlign: 'center', width: '100%', boxSizing: 'border-box' }} 
-                />
-              </div>
-            </div>
-
-            <div style={{ marginTop: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
-              <button type="button" onClick={() => setShowRectifyModal(true)} style={{ padding: '8px 12px', backgroundColor: '#ede9fe', color: '#6d28d9', border: '1px solid #c4b5fd', borderRadius: '6px', fontSize: '0.85em', fontWeight: 'bold', cursor: 'pointer' }}>🔮 생시 역추적하기</button>
-              <label style={{ fontSize: '0.85em', color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <input type="checkbox" checked={isTimeUnknown} onChange={(e) => setIsTimeUnknown(e.target.checked)} /> 시간 모름
-              </label>
-            </div>
-
-            <button type="submit" disabled={loading} style={{ width: '100%', padding: '14px', marginTop: '15px', backgroundColor: '#0f172a', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '1em', fontWeight: '600' }}>
-              {loading ? '운명 분석 중...' : '개인 사주 분석하기'}
-            </button>
-          </form>
-
-          {/* 개인 사주 분석 결과 렌더링 (변경 없음) */}
-          {result && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        {/* ===================== [1. 개인 사주 탭] ===================== */}
+        {activeTab === 'saju' && (
+          <div className="fade-in">
+            <form onSubmit={handleSajuSubmit} className="premium-card">
               
-              {/* 일진 */}
-              <div style={{ backgroundColor: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: '12px', padding: '20px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div>
-                  <div style={{ fontSize: '0.85em', fontWeight: 'bold', color: '#0369a1', marginBottom: '4px', cursor: 'pointer' }} onClick={() => openModal("일진")}>📅 오늘의 운세 (일진)</div>
-                  <div style={{ fontSize: '1.2em', fontWeight: '800', color: '#0f172a' }}>{result.iljin.date}</div>
+              {/* 이름 및 출생지 (글로벌 확장) */}
+              <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                <div style={{ flex: 1 }}>
+                  <label className="label-text">이름 (닉네임)</label>
+                  <input type="text" className="input-field" placeholder="홍길동" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <div onClick={() => openModal(result.iljin.ganji[0])} style={{ fontSize: '1.6em', fontWeight: '900', color: getElementColor(result.iljin.ganji[0]), cursor: 'pointer', lineHeight: '1.2' }}>{result.iljin.ganji[0]}</div>
-                    <div onClick={() => openModal(result.iljin.sipseong[0])} style={{ fontSize: '0.75em', color: '#64748b', cursor: 'pointer' }}>{result.iljin.sipseong[0]}</div>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <div onClick={() => openModal(result.iljin.ganji[1])} style={{ fontSize: '1.6em', fontWeight: '900', color: result.iljin.is_gongmang ? '#ef4444' : getElementColor(result.iljin.ganji[1]), cursor: 'pointer', lineHeight: '1.2' }}>{result.iljin.ganji[1]}</div>
-                    <div onClick={() => openModal(result.iljin.sipseong[1])} style={{ fontSize: '0.75em', color: '#64748b', cursor: 'pointer' }}>{result.iljin.sipseong[1]}</div>
+                <div style={{ flex: 1 }}>
+                  <label className="label-text">성별</label>
+                  <div style={{ display: 'flex', gap: '5px', height: '49px' }}>
+                    <button type="button" onClick={() => setFormData({...formData, gender: 'M'})} style={{ flex: 1, borderRadius: '8px', border: formData.gender === 'M' ? '2px solid #1C2536' : '1px solid #E2DED5', background: formData.gender === 'M' ? '#F3F4F6' : '#FAFAFA', fontWeight: formData.gender === 'M' ? '700' : '500', color: formData.gender === 'M' ? '#1C2536' : '#9CA3AF', cursor: 'pointer' }}>남성</button>
+                    <button type="button" onClick={() => setFormData({...formData, gender: 'F'})} style={{ flex: 1, borderRadius: '8px', border: formData.gender === 'F' ? '2px solid #1C2536' : '1px solid #E2DED5', background: formData.gender === 'F' ? '#F3F4F6' : '#FAFAFA', fontWeight: formData.gender === 'F' ? '700' : '500', color: formData.gender === 'F' ? '#1C2536' : '#9CA3AF', cursor: 'pointer' }}>여성</button>
                   </div>
                 </div>
               </div>
 
-              {/* 격국 및 용신 블록 */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                <div style={{ background: 'linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                    <span style={{ fontSize: '0.85em', fontWeight: 'bold', color: '#64748b' }}>타고난 그릇 (격국)</span>
-                    <span style={{ fontSize: '1.2em', fontWeight: '800', color: '#d97706' }}>{result.gyeokguk.name}</span>
+              <div style={{ marginBottom: '15px' }}>
+                <label className="label-text">태어난 국가/도시 (경도 보정용)</label>
+                <input type="text" className="input-field" placeholder="예: 대한민국 서울, 미국 뉴욕" value={formData.birthPlace} onChange={(e) => setFormData({...formData, birthPlace: e.target.value})} />
+              </div>
+
+              {/* 생년월일 & 시간 (모바일 최적화 터치 휠) */}
+              <div style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
+                <div style={{ flex: '1.2' }}>
+                  <label className="label-text">생년월일</label>
+                  <input 
+                    type="date" className="input-field" required
+                    value={formatDate(formData.year, formData.month, formData.day)} 
+                    onChange={(e) => {
+                      if(!e.target.value) return;
+                      const [y, m, d] = e.target.value.split('-');
+                      setFormData({...formData, year: parseInt(y), month: parseInt(m), day: parseInt(d)});
+                    }} 
+                  />
+                </div>
+                <div style={{ flex: '1', opacity: isTimeUnknown ? 0.4 : 1, transition: 'opacity 0.3s' }}>
+                  <label className="label-text">태어난 시간</label>
+                  <input 
+                    type="time" className="input-field" disabled={isTimeUnknown}
+                    value={formatTime(formData.hour, formData.minute)} 
+                    onChange={(e) => {
+                      if(!e.target.value) return;
+                      const [h, min] = e.target.value.split(':');
+                      setFormData({...formData, hour: parseInt(h), minute: parseInt(min)});
+                    }} 
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', padding: '12px', backgroundColor: '#F9F8F6', borderRadius: '10px' }}>
+                <label style={{ fontSize: '0.9em', color: '#4B5563', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500' }}>
+                  <input type="checkbox" style={{ width: '18px', height: '18px', accentColor: '#B59960' }} checked={isTimeUnknown} onChange={(e) => setIsTimeUnknown(e.target.checked)} /> 
+                  시간을 정확히 모릅니다
+                </label>
+                <button type="button" onClick={() => setShowRectifyModal(true)} style={{ padding: '8px 16px', backgroundColor: '#FFF', color: '#B59960', border: '1px solid #D4AF37', borderRadius: '8px', fontSize: '0.85em', fontWeight: '700', cursor: 'pointer', boxShadow: '0 2px 5px rgba(212,175,55,0.1)' }}>
+                  🔮 생시 추론하기
+                </button>
+              </div>
+
+              <button type="submit" className="btn-primary" disabled={loading}>
+                {loading ? <><div className="spinner"></div> 운명을 해독하는 중...</> : '내 사주 원국 분석하기'}
+              </button>
+            </form>
+
+            {/* 결과 화면 렌더링 (애니메이션 적용) */}
+            {result && (
+              <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                
+                {/* 📌 사주 팔자 (원국) 카드 */}
+                <div className="premium-card">
+                  <h3 style={{ margin: '0 0 20px 0', fontSize: '1.2em', color: '#1C2536', borderBottom: '2px solid #F0ECE1', paddingBottom: '10px' }}>
+                    <span style={{ color: '#B59960' }}>{formData.name || '고객'}</span>님의 사주 원국표
+                  </h3>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between' }}>
+                    {['년주', '월주', '일주', '시주'].map((pillarKey) => {
+                      const data = result.pillars[pillarKey];
+                      const isUnknown = data.ganji[0] === '?';
+                      return (
+                        <div key={pillarKey} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#FDFCFB', padding: '20px 5px', borderRadius: '12px', border: '1px solid #EFECE6', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)' }}>
+                          <div style={{ fontSize: '0.8em', color: '#9CA3AF', fontWeight: '700', marginBottom: '12px' }}>{pillarKey}</div>
+                          <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+                            <div onClick={() => !isUnknown && openModal(data.ganji[0])} style={{ fontSize: '2em', fontWeight: '900', color: getElementColor(data.ganji[0]), cursor: isUnknown ? 'default' : 'pointer', lineHeight: '1.1' }}>{data.ganji[0]}</div>
+                            <div onClick={() => !isUnknown && openModal(data.sipseong[0])} style={{ fontSize: '0.8em', color: '#6B7280', cursor: isUnknown ? 'default' : 'pointer', marginTop: '6px' }}>{data.sipseong[0]}</div>
+                          </div>
+                          <div style={{ width: '40px', height: '1px', backgroundColor: '#E5E0D8', margin: '5px 0 15px 0' }} />
+                          <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+                            <div onClick={() => !isUnknown && openModal(data.ganji[1])} style={{ fontSize: '2em', fontWeight: '900', color: data.is_gongmang ? '#EF4444' : getElementColor(data.ganji[1]), cursor: isUnknown ? 'default' : 'pointer', lineHeight: '1.1' }}>{data.ganji[1]}</div>
+                            <div onClick={() => !isUnknown && openModal(data.sipseong[1])} style={{ fontSize: '0.8em', color: '#6B7280', cursor: isUnknown ? 'default' : 'pointer', marginTop: '6px' }}>{data.sipseong[1]}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                  <p style={{ margin: 0, fontSize: '0.95em', color: '#334155', lineHeight: '1.5' }}>{result.gyeokguk.description}</p>
                 </div>
 
-                {/* 특수 용신 (병약/통관) UI */}
-                {result.yongshin.special_type && (
-                  <div style={{ backgroundColor: '#f5f3ff', border: '1px solid #c4b5fd', borderRadius: '12px', padding: '15px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '1.1em' }}>🚨</span>
-                      <span style={{ fontSize: '0.95em', fontWeight: 'bold', color: '#6d28d9', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => openModal(result.yongshin.special_type)}>
-                        {result.yongshin.special_type} 발견!
-                      </span>
-                    </div>
-                    <p style={{ margin: 0, fontSize: '0.85em', color: '#4c1d95', lineHeight: '1.4' }}>{result.yongshin.special_desc}</p>
-                  </div>
-                )}
-
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
-                  {/* 억부 용신 */}
-                  <div style={{ flex: '1 1 45%', backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '15px' }}>
-                    <h4 style={{ margin: '0 0 10px 0', fontSize: '0.95em', color: '#1e293b' }}>⚖️ 억부 용신 <span style={{ fontSize: '0.75em', color: '#64748b', fontWeight: 'normal' }}>(세력 밸런스)</span></h4>
-                    <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-                      <div style={{ flex: 1, backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '10px' }}>
-                        <div style={{ fontSize: '0.75em', fontWeight: 'bold', color: '#166534', marginBottom: '5px' }}>용희신</div>
-                        <div style={{ display: 'flex', gap: '5px' }}>
-                          {result.yongshin.yong_hee.map((el, i) => <span key={i} onClick={() => openModal(el)} style={{ cursor: 'pointer', fontWeight: 'bold', color: getElementColor(el), fontSize: '1.1em' }}>{el}</span>)}
-                        </div>
-                      </div>
-                      <div style={{ flex: 1, backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px' }}>
-                        <div style={{ fontSize: '0.75em', fontWeight: 'bold', color: '#991b1b', marginBottom: '5px' }}>기구신</div>
-                        <div style={{ display: 'flex', gap: '5px' }}>
-                          {result.yongshin.gi_gu.map((el, i) => <span key={i} onClick={() => openModal(el)} style={{ cursor: 'pointer', fontWeight: 'bold', color: getElementColor(el), fontSize: '1.1em' }}>{el}</span>)}
-                        </div>
-                      </div>
-                    </div>
-                    <div style={{ fontSize: '0.85em', color: '#475569', lineHeight: '1.4' }}>
-                      <strong onClick={() => openModal(result.yongshin.strength)} style={{ cursor: 'pointer', textDecoration: 'underline', color: '#1e293b' }}>{result.yongshin.strength}</strong>: {result.yongshin.description}
-                    </div>
+                {/* 📖 심층 스토리텔링 카드 */}
+                <div className="premium-card">
+                  <h3 style={{ margin: '0 0 20px 0', fontSize: '1.2em', color: '#1C2536', borderBottom: '2px solid #F0ECE1', paddingBottom: '10px' }}>📖 심층 스토리텔링</h3>
+                  
+                  <div style={{ marginBottom: '20px' }}>
+                    <h4 style={{ margin: '0 0 8px 0', color: '#B59960', fontSize: '1em' }}>타고난 성향과 에너지</h4>
+                    <p style={{ margin: 0, fontSize: '0.95em', color: '#4B5563', lineHeight: '1.7' }}>{result.interpretation.five_elements_desc}</p>
                   </div>
                   
-                  {/* 조후 용신 */}
-                  <div style={{ flex: '1 1 45%', backgroundColor: '#fff7ed', border: '1px solid #ffedd5', borderRadius: '12px', padding: '15px' }}>
-                    <h4 style={{ margin: '0 0 10px 0', fontSize: '0.95em', color: '#9a3412' }}>🌡️ 조후 용신 <span style={{ fontSize: '0.75em', color: '#fdba74', fontWeight: 'normal' }}>(온도 밸런스)</span></h4>
-                    <div style={{ backgroundColor: '#ffedd5', borderRadius: '8px', padding: '10px', marginBottom: '10px' }}>
-                      <div style={{ fontSize: '0.75em', fontWeight: 'bold', color: '#9a3412', marginBottom: '5px' }}>조후 용희신</div>
-                      <div style={{ display: 'flex', gap: '5px' }}>
-                        {result.johu.yong_hee.length > 0 ? (
-                          result.johu.yong_hee.map((el, i) => <span key={i} onClick={() => openModal(el)} style={{ cursor: 'pointer', fontWeight: 'bold', color: getElementColor(el), fontSize: '1.1em' }}>{el}</span>)
-                        ) : (<span style={{ fontSize: '0.9em', color: '#ea580c' }}>산출 불가</span>)}
-                      </div>
-                    </div>
-                    <p style={{ margin: 0, fontSize: '0.85em', color: '#9a3412', lineHeight: '1.4' }}>{result.johu.description}</p>
+                  <div style={{ marginBottom: '20px' }}>
+                    <h4 style={{ margin: '0 0 8px 0', color: '#B59960', fontSize: '1em' }}>직업 및 재물운 흐름</h4>
+                    <p style={{ margin: 0, fontSize: '0.95em', color: '#4B5563', lineHeight: '1.7' }}>{result.interpretation.job_wealth_desc}</p>
+                  </div>
+
+                  <div style={{ backgroundColor: '#F9F8F6', padding: '16px', borderRadius: '12px', borderLeft: '4px solid #B59960' }}>
+                    <h4 style={{ margin: '0 0 8px 0', color: '#1C2536', fontSize: '0.95em' }}>🍀 나만의 행운 솔루션</h4>
+                    <p style={{ margin: 0, fontSize: '0.9em', color: '#4B5563', lineHeight: '1.6' }}>
+                      <strong>행운의 색상:</strong> {result.interpretation.lucky_color} <br/>
+                      <strong>길한 방향:</strong> {result.interpretation.lucky_direction} <br/>
+                      <strong>추천 아이템:</strong> {result.interpretation.lucky_item}
+                    </p>
                   </div>
                 </div>
+
               </div>
+            )}
+          </div>
+        )}
 
-              {/* 맞춤 개운법 */}
-              <div style={{ background: 'linear-gradient(to right, #ecfdf5, #f0fdfa)', padding: '20px', borderRadius: '12px', border: '1px solid #a7f3d0', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                <h3 style={{ margin: '0 0 15px 0', fontSize: '1.1em', display: 'flex', alignItems: 'center', gap: '8px', color: '#047857' }}>
-                  <span style={{ fontSize: '1.2em' }}>🍀</span> 나만의 맞춤 개운법 (행운 팁)
-                </h3>
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  <div style={{ flex: '1 1 30%', backgroundColor: '#ffffff', padding: '12px', borderRadius: '8px', border: '1px solid #d1fae5', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75em', color: '#059669', fontWeight: 'bold', marginBottom: '5px' }}>행운의 컬러 🎨</div>
-                    <div style={{ fontSize: '0.95em', color: '#064e3b', fontWeight: 'bold' }}>{result.interpretation.lucky_color}</div>
-                  </div>
-                  <div style={{ flex: '1 1 30%', backgroundColor: '#ffffff', padding: '12px', borderRadius: '8px', border: '1px solid #d1fae5', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75em', color: '#059669', fontWeight: 'bold', marginBottom: '5px' }}>행운의 방향 🧭</div>
-                    <div style={{ fontSize: '0.95em', color: '#064e3b', fontWeight: 'bold' }}>{result.interpretation.lucky_direction}</div>
-                  </div>
-                  <div style={{ flex: '1 1 100%', backgroundColor: '#ffffff', padding: '12px', borderRadius: '8px', border: '1px solid #d1fae5' }}>
-                    <div style={{ fontSize: '0.75em', color: '#059669', fontWeight: 'bold', marginBottom: '5px' }}>추천하는 행동 & 아이템 ✨</div>
-                    <div style={{ fontSize: '0.95em', color: '#064e3b', fontWeight: '500' }}>{result.interpretation.lucky_item}</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 사주 팔자(원국) */}
-              <div style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                <h3 style={{ margin: '0 0 15px 0', fontSize: '1.1em', display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ fontSize: '1.2em' }}>📌</span> 사주 팔자 (원국)</h3>
-                <div style={{ display: 'flex', gap: '10px', justifyContent: 'space-between' }}>
-                  {['년주', '월주', '일주', '시주'].map((pillarKey) => {
-                    const data = result.pillars[pillarKey];
-                    const isUnknown = data.ganji[0] === '?';
-                    return (
-                      <div key={pillarKey} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#f8fafc', padding: '15px 5px', borderRadius: '8px', border: '1px solid #f1f5f9' }}>
-                        <div style={{ fontSize: '0.75em', color: '#94a3b8', fontWeight: 'bold', marginBottom: '8px' }}>{pillarKey}</div>
-                        <div style={{ textAlign: 'center', marginBottom: '10px' }}>
-                          <div onClick={() => !isUnknown && openModal(data.ganji[0])} style={{ fontSize: '1.8em', fontWeight: '900', color: getElementColor(data.ganji[0]), cursor: isUnknown ? 'default' : 'pointer', lineHeight: '1' }}>{data.ganji[0]}</div>
-                          <div onClick={() => !isUnknown && openModal(data.sipseong[0])} style={{ fontSize: '0.75em', color: '#64748b', cursor: isUnknown ? 'default' : 'pointer', marginTop: '4px' }}>{data.sipseong[0]}</div>
-                        </div>
-                        <div style={{ width: '30px', height: '1px', backgroundColor: '#e2e8f0', margin: '5px 0 10px 0' }} />
-                        <div style={{ textAlign: 'center', marginBottom: '8px' }}>
-                          <div onClick={() => !isUnknown && openModal(data.ganji[1])} style={{ fontSize: '1.8em', fontWeight: '900', color: data.is_gongmang ? '#ef4444' : getElementColor(data.ganji[1]), cursor: isUnknown ? 'default' : 'pointer', lineHeight: '1' }}>{data.ganji[1]}</div>
-                          <div onClick={() => !isUnknown && openModal(data.sipseong[1])} style={{ fontSize: '0.75em', color: '#64748b', cursor: isUnknown ? 'default' : 'pointer', marginTop: '4px' }}>{data.sipseong[1]}</div>
-                        </div>
-                        {!isUnknown && (
-                          <div style={{ display: 'flex', gap: '4px', justifyContent: 'center', marginBottom: '10px', cursor: 'pointer' }} title="지장간">
-                            <span style={{ fontSize: '0.65em', color: '#94a3b8' }} onClick={() => openModal("지장간")}>[</span>
-                            {data.jijanggan?.map((gan, idx) => <span key={idx} onClick={() => openModal(gan)} style={{ fontSize: '0.75em', color: '#64748b', fontWeight: '500' }}>{gan}</span>)}
-                            <span style={{ fontSize: '0.65em', color: '#94a3b8' }} onClick={() => openModal("지장간")}>]</span>
-                          </div>
-                        )}
-                        {!isUnknown && (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%', alignItems: 'center' }}>
-                            {data.shipi && data.shipi !== "-" && <span onClick={() => openModal(data.shipi)} style={{ fontSize: '0.65em', padding: '2px 6px', backgroundColor: '#e0f2fe', color: '#1e3a8a', borderRadius: '4px', cursor: 'pointer', width: 'max-content' }}>{data.shipi}</span>}
-                            {data.is_gongmang && <span onClick={() => openModal("공망")} style={{ fontSize: '0.65em', padding: '2px 6px', backgroundColor: '#fee2e2', color: '#991b1b', borderRadius: '4px', cursor: 'pointer', width: 'max-content' }}>공망</span>}
-                            {data.sinsal.map((sal, idx) => {
-                              let bg = '#f3f4f6', color = '#475569', border = '#e2e8f0';
-                              if (sal.includes('대살') || sal.includes('괴강')) { bg = '#ffebee'; color = '#c62828'; border = '#ffcdd2'; }
-                              else if (sal.includes('천을귀인')) { bg = '#fff8e1'; color = '#f57f17'; border = '#ffecb3'; } 
-                              else if (sal.includes('홍염')) { bg = '#fce4ec'; color = '#c2185b'; border = '#f8bbd0'; } 
-                              return <span key={idx} onClick={() => openModal(sal)} style={{ fontSize: '0.65em', padding: '2px 6px', backgroundColor: bg, color: color, borderRadius: '4px', border: `1px solid ${border}`, cursor: 'pointer', width: 'max-content', textAlign: 'center' }}>{sal}</span>;
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* 오행 분포도 */}
-              <div style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                <h3 style={{ margin: '0 0 15px 0', fontSize: '1.1em', display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ fontSize: '1.2em' }}>📊</span> 오행 분포도</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {Object.entries(result.elements_ratio).map(([element, ratio]) => (
-                    <div key={element} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <strong onClick={() => openModal(element)} style={{ cursor: 'pointer', width: '20px', color: getElementColor(element) }}>{element}</strong>
-                      <div style={{ flex: 1, backgroundColor: '#f1f5f9', height: '10px', borderRadius: '5px', overflow: 'hidden' }}>
-                        <div style={{ width: `${ratio}%`, backgroundColor: getElementColor(element), height: '100%', borderRadius: '5px', transition: 'width 0.5s ease-in-out' }}></div>
-                      </div>
-                      <span style={{ fontSize: '0.85em', color: '#64748b', width: '35px', textAlign: 'right' }}>{ratio}%</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* 스토리텔링 */}
-              <div style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                <h3 style={{ margin: '0 0 5px 0', fontSize: '1.1em', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '1.2em' }}>📖</span> 사주 심층 스토리텔링
-                </h3>
-                <div style={{ backgroundColor: '#f8fafc', padding: '15px', borderRadius: '8px', border: '1px solid #f1f5f9' }}>
-                  <h4 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '0.95em' }}>🔹 타고난 오행의 기운</h4>
-                  <p style={{ lineHeight: '1.6', margin: '0 0 15px 0', fontSize: '0.9em', color: '#475569' }}>{result.interpretation.five_elements_desc}</p>
-                  
-                  <h4 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '0.95em' }}>🔹 활동성과 이동 (역마)</h4>
-                  <p style={{ lineHeight: '1.6', margin: '0 0 15px 0', fontSize: '0.9em', color: '#475569' }}>{result.interpretation.movement_luck}</p>
-
-                  <h4 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '0.95em' }}>💼 직업 및 재물운 분석</h4>
-                  <p style={{ lineHeight: '1.6', margin: 0, fontSize: '0.9em', color: '#475569' }}>{result.interpretation.job_wealth_desc}</p>
-                </div>
-
-                <h4 style={{ margin: '5px 0 5px 0', fontSize: '1em', color: '#334155' }}>⚡ 원국 내 상호작용 (합화/기반 정밀 판별)</h4>
-                {result.relations && result.relations.length > 0 ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {result.relations.map((rel, idx) => {
-                      const isHaphwa = rel.type.includes('합화');
-                      return (
-                        <div key={idx} style={{ borderLeft: `3px solid ${isHaphwa ? '#8b5cf6' : rel.name.includes('합') ? '#10b981' : '#ef4444'}`, padding: '10px 12px', backgroundColor: isHaphwa ? '#f5f3ff' : '#f8fafc', borderRadius: '4px' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                            <strong onClick={() => openModal(rel.type)} style={{ fontSize: '0.95em', color: isHaphwa ? '#5b21b6' : '#1e293b', cursor: 'pointer', textDecoration: 'underline' }}>
-                              {rel.name} <span style={{ fontSize: '0.8em', color: '#64748b', fontWeight: 'normal', textDecoration: 'none' }}>({rel.type})</span>
-                            </strong>
-                            <span style={{ fontSize: '0.85em', color: '#3b82f6', fontWeight: '600' }}>[{rel.positions.join(' ↔ ')}]</span>
-                          </div>
-                          <p style={{ margin: 0, fontSize: '0.85em', color: '#475569', lineHeight: '1.4' }}>{rel.description}</p>
-                        </div>
-                      )
-                    })}
-                  </div>
-                ) : (<p style={{ margin: 0, fontSize: '0.9em', color: '#94a3b8' }}>뚜렷한 상호작용이 없습니다.</p>)}
-              </div>
-
-              {/* 운세 변화 알림 */}
-              {groupedDynamic.length > 0 && (
-                <div style={{ backgroundColor: '#fffbeb', border: '1px solid #fcd34d', borderRadius: '12px', padding: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                  <h3 style={{ margin: '0 0 15px 0', fontSize: '1.1em', color: '#b45309', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    🔔 지금 주목해야 할 운세 변화
-                  </h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {groupedDynamic.map((rel, idx) => {
-                      const hasIljin = rel.un_types.includes('오늘 일진');
-                      const hasWolun = rel.un_types.includes('이달의 월운');
-                      const isHighlight = hasIljin || hasWolun;
-                      return (
-                        <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px', backgroundColor: isHighlight ? '#eff6ff' : 'rgba(255,255,255,0.7)', border: isHighlight ? '1px solid #bfdbfe' : 'none', padding: '12px', borderRadius: '8px' }}>
-                          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                            <span onClick={() => openModal(rel.type)} style={{ fontSize: '0.85em', fontWeight: 'bold', color: isHighlight ? '#0369a1' : '#92400e', cursor: 'pointer', textDecoration: 'underline' }}>{rel.name}</span>
-                            <span style={{ fontSize: '0.7em', padding: '2px 6px', backgroundColor: isHighlight ? '#dbeafe' : '#fef3c7', color: isHighlight ? '#1d4ed8' : '#b45309', borderRadius: '4px', border: `1px solid ${isHighlight ? '#93c5fd' : '#fde68a'}` }}>
-                              {rel.un_types.join(' & ')}
-                            </span>
-                          </div>
-                          <p style={{ margin: 0, fontSize: '0.9em', color: '#451a03', lineHeight: '1.4' }}>
-                            <strong style={{ color: isHighlight ? '#0284c7' : '#d97706' }}>[{rel.target_pillar}]</strong> {rel.description}
-                          </p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* 운세 흐름 (월운/세운/대운) */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', backgroundColor: '#ffffff', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                {/* 월운 */}
-                {result.wolun && (
-                  <div>
-                    <h3 style={{ margin: '0 0 10px 0', fontSize: '1em', color: '#334155' }}>🌙 이달의 운세 (올해의 월운)</h3>
-                    <div style={{ display: 'flex', overflowX: 'auto', gap: '8px', paddingBottom: '10px', scrollbarWidth: 'thin' }}>
-                      {result.wolun.map((wun, idx) => (
-                        <div key={idx} style={{ minWidth: '55px', padding: '10px 4px', border: wun.is_current ? '2px solid #8b5cf6' : '1px solid #e2e8f0', borderRadius: '8px', textAlign: 'center', backgroundColor: wun.is_current ? '#f5f3ff' : '#ffffff' }}>
-                          <div style={{ fontSize: '0.7em', color: '#64748b', marginBottom: '6px', fontWeight: wun.is_current ? 'bold' : 'normal' }}>{wun.month}월</div>
-                          <div onClick={() => openModal(wun.ganji[0])} style={{ fontSize: '1.1em', fontWeight: 'bold', color: getElementColor(wun.ganji[0]), cursor: 'pointer' }}>{wun.ganji[0]}</div>
-                          <div onClick={() => openModal(wun.ganji[1])} style={{ fontSize: '1.1em', fontWeight: 'bold', color: wun.is_gongmang ? '#ef4444' : getElementColor(wun.ganji[1]), cursor: 'pointer', marginBottom: '4px' }}>{wun.ganji[1]}</div>
-                          <div style={{ display: 'flex', gap: '2px', justifyContent: 'center', marginBottom: '4px' }}>
-                            {wun.jijanggan?.map((gan, i) => <span key={i} onClick={() => openModal(gan)} style={{ fontSize: '0.65em', color: '#94a3b8', cursor: 'pointer' }}>{gan}</span>)}
-                          </div>
-                          <div onClick={() => openModal(wun.shipi)} style={{ fontSize: '0.65em', color: '#64748b', cursor: 'pointer' }}>{wun.shipi}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                <hr style={{ margin: '5px 0', border: 'none', borderTop: '1px solid #f1f5f9' }}/>
-
-                {/* 세운 */}
-                <div>
-                  <h3 style={{ margin: '0 0 10px 0', fontSize: '1em', color: '#334155' }}>📅 1년 단위 현실 (세운)</h3>
-                  <div style={{ display: 'flex', overflowX: 'auto', gap: '8px', paddingBottom: '10px', scrollbarWidth: 'thin' }}>
-                    {result.seun.map((wun, idx) => {
-                      const isCurrent = wun.year === currentYear;
-                      return (
-                        <div key={idx} style={{ minWidth: '55px', padding: '10px 4px', border: isCurrent ? '2px solid #10b981' : '1px solid #e2e8f0', borderRadius: '8px', textAlign: 'center', backgroundColor: isCurrent ? '#ecfdf5' : '#ffffff' }}>
-                          <div style={{ fontSize: '0.7em', color: '#64748b', marginBottom: '2px' }}>{wun.year}</div>
-                          <div style={{ fontSize: '0.8em', fontWeight: 'bold', color: '#ef4444', marginBottom: '6px' }}>{wun.age}세</div>
-                          <div onClick={() => openModal(wun.ganji[0])} style={{ fontSize: '1.1em', fontWeight: 'bold', color: getElementColor(wun.ganji[0]), cursor: 'pointer' }}>{wun.ganji[0]}</div>
-                          <div onClick={() => openModal(wun.ganji[1])} style={{ fontSize: '1.1em', fontWeight: 'bold', color: wun.is_gongmang ? '#ef4444' : getElementColor(wun.ganji[1]), cursor: 'pointer', marginBottom: '4px' }}>{wun.ganji[1]}</div>
-                          <div style={{ display: 'flex', gap: '2px', justifyContent: 'center', marginBottom: '4px' }}>
-                            {wun.jijanggan?.map((gan, i) => <span key={i} onClick={() => openModal(gan)} style={{ fontSize: '0.65em', color: '#94a3b8', cursor: 'pointer' }}>{gan}</span>)}
-                          </div>
-                          <div onClick={() => openModal(wun.shipi)} style={{ fontSize: '0.65em', color: '#64748b', cursor: 'pointer' }}>{wun.shipi}</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <hr style={{ margin: '5px 0', border: 'none', borderTop: '1px solid #f1f5f9' }}/>
-
-                {/* 대운 */}
-                <div>
-                  <h3 style={{ margin: '0 0 10px 0', fontSize: '1em', color: '#334155', display: 'flex', justifyContent: 'space-between' }}>
-                    <span>🛤️ 10년 단위 큰 환경 (대운)</span>
-                    <span style={{ fontSize: '0.75em', color: '#6366f1', fontWeight: 'normal', cursor: 'pointer' }} onClick={() => openModal("교운기")}>💡 교운기란?</span>
-                  </h3>
-                  <div style={{ display: 'flex', overflowX: 'auto', gap: '8px', paddingBottom: '10px', scrollbarWidth: 'thin' }}>
-                    {result.daewun.map((wun, idx) => {
-                      const isCurrent = result.seun.find(s => s.year === currentYear)?.age >= wun.age && result.seun.find(s => s.year === currentYear)?.age < wun.age + 10;
-                      return (
-                        <div key={idx} style={{ minWidth: '60px', padding: '10px 4px', border: isCurrent ? '2px solid #3b82f6' : '1px solid #e2e8f0', borderRadius: '8px', textAlign: 'center', backgroundColor: isCurrent ? '#eff6ff' : '#ffffff', opacity: wun.age > 90 ? 0.6 : 1 }}>
-                          <div style={{ fontSize: '0.75em', fontWeight: 'bold', color: isCurrent ? '#1d4ed8' : '#ef4444', marginBottom: '2px' }}>{wun.age}세</div>
-                          <div onClick={() => openModal(wun.ganji[0])} style={{ fontSize: '1.1em', fontWeight: 'bold', color: getElementColor(wun.ganji[0]), cursor: 'pointer' }}>{wun.ganji[0]}</div>
-                          <div onClick={() => openModal(wun.ganji[1])} style={{ fontSize: '1.1em', fontWeight: 'bold', color: wun.is_gongmang ? '#ef4444' : getElementColor(wun.ganji[1]), cursor: 'pointer', marginBottom: '4px' }}>{wun.ganji[1]}</div>
-                          <div style={{ display: 'flex', gap: '2px', justifyContent: 'center', marginBottom: '4px' }}>
-                            {wun.jijanggan?.map((gan, i) => <span key={i} onClick={() => openModal(gan)} style={{ fontSize: '0.65em', color: '#94a3b8', cursor: 'pointer' }}>{gan}</span>)}
-                          </div>
-                          <div onClick={() => openModal(wun.shipi)} style={{ fontSize: '0.65em', color: '#64748b', cursor: 'pointer', marginBottom: '6px' }}>{wun.shipi}</div>
-                          <div style={{ fontSize: '0.6em', color: '#4338ca', backgroundColor: '#e0e7ff', padding: '2px', borderRadius: '4px' }} title="대운 진입(교운기) 날짜">
-                            {wun.start_date.substring(2)}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          )}
-        </>
-      )}
-
-      {/* ===================== [2. 궁합 보기 탭 영역] ===================== */}
-      {activeTab === 'gunghap' && (
-        <>
-          <form onSubmit={handleGunghapSubmit} style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', marginBottom: '30px' }}>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+        {/* ===================== [2. 궁합 보기 탭] ===================== */}
+        {activeTab === 'gunghap' && (
+          <div className="fade-in">
+            <form onSubmit={handleGunghapSubmit} className="premium-card">
               
-              {/* 👤 나의 정보 입력 */}
-              <div style={{ flex: '1 1 45%', minWidth: '280px', backgroundColor: '#f8fafc', padding: '15px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                <h4 style={{ margin: '0 0 15px 0', color: '#334155' }}>👤 나의 정보</h4>
-                
-                <div style={{ display: 'flex', gap: '5px', marginBottom: '10px' }}>
-                  <select 
-                    style={{ flex: 1, padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85em' }} 
-                    name="gender" 
-                    value={gunghapData.me.gender} 
-                    onChange={(e) => handleGunghapChange('me', e)}
-                  >
-                    <option value="M">남성</option>
-                    <option value="F">여성</option>
-                  </select>
-                  <select 
-                    style={{ flex: 1, padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85em' }} 
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setGunghapData(prev => ({...prev, me: {...prev.me, is_lunar: val.includes('lunar'), is_leap_month: val === 'lunar_leap'}}))
-                    }} 
-                    value={!gunghapData.me.is_lunar ? 'solar' : gunghapData.me.is_leap_month ? 'lunar_leap' : 'lunar'}
-                  >
-                    <option value="solar">양력</option>
-                    <option value="lunar">음력(평달)</option>
-                    <option value="lunar_leap">음력(윤달)</option>
-                  </select>
-                </div>
-
-                {/* 🚀 모바일 터치 최적화 (궁합 - 나의 정보) */}
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'flex-end', marginBottom: '10px' }}>
-                  <div style={{ flex: '1 1 50%', minWidth: '120px', display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ fontSize: '0.7em', color: '#64748b', marginBottom: '2px' }}>생년월일</span>
-                    <input 
-                      type="date" 
-                      value={formatDate(gunghapData.me.year, gunghapData.me.month, gunghapData.me.day)} 
-                      onChange={(e) => {
-                        if(!e.target.value) return;
-                        const [y, m, d] = e.target.value.split('-');
-                        setGunghapData(prev => ({...prev, me: {...prev.me, year: parseInt(y), month: parseInt(m), day: parseInt(d)}}));
-                      }} 
-                      style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', textAlign: 'center', width: '100%', boxSizing: 'border-box' }} 
-                    />
-                  </div>
-                  <div style={{ flex: '1 1 40%', minWidth: '90px', display: 'flex', flexDirection: 'column', opacity: gunghapData.me.is_time_unknown ? 0.4 : 1 }}>
-                    <span style={{ fontSize: '0.7em', color: '#64748b', marginBottom: '2px' }}>태어난 시간</span>
-                    <input 
-                      type="time" 
-                      value={formatTime(gunghapData.me.hour, gunghapData.me.minute)} 
-                      onChange={(e) => {
-                        if(!e.target.value) return;
-                        const [h, min] = e.target.value.split(':');
-                        setGunghapData(prev => ({...prev, me: {...prev.me, hour: parseInt(h), minute: parseInt(min)}}));
-                      }} 
-                      disabled={gunghapData.me.is_time_unknown} 
-                      style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', textAlign: 'center', width: '100%', boxSizing: 'border-box' }} 
-                    />
+              {/* 👤 나의 정보 */}
+              <div style={{ backgroundColor: '#F9F8F6', padding: '20px', borderRadius: '12px', marginBottom: '20px', border: '1px solid #EFECE6' }}>
+                <h4 style={{ margin: '0 0 15px 0', color: '#1C2536', fontSize: '1.1em' }}>👤 나의 정보</h4>
+                <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                  <div style={{ flex: 1 }}><input type="text" className="input-field" placeholder="내 이름" name="name" value={gunghapData.me.name} onChange={(e) => handleGunghapChange('me', e)} /></div>
+                  <div style={{ flex: 1 }}>
+                    <select className="input-field" name="gender" value={gunghapData.me.gender} onChange={(e) => handleGunghapChange('me', e)}>
+                      <option value="M">남성</option>
+                      <option value="F">여성</option>
+                    </select>
                   </div>
                 </div>
-                
-                <div style={{ textAlign: 'right' }}>
-                  <label style={{ fontSize: '0.8em', color: '#64748b', cursor: 'pointer' }}>
-                    <input 
-                      type="checkbox" 
-                      name="is_time_unknown" 
-                      checked={gunghapData.me.is_time_unknown} 
-                      onChange={(e) => handleGunghapChange('me', e)} 
-                    /> 시간 모름 (삼주육자)
-                  </label>
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                  <input type="date" className="input-field" style={{ flex: '1.2' }} value={formatDate(gunghapData.me.year, gunghapData.me.month, gunghapData.me.day)} onChange={(e) => {
+                    if(!e.target.value) return; const [y, m, d] = e.target.value.split('-');
+                    setGunghapData(prev => ({...prev, me: {...prev.me, year: parseInt(y), month: parseInt(m), day: parseInt(d)}}));
+                  }} />
+                  <input type="time" className="input-field" style={{ flex: 1 }} value={formatTime(gunghapData.me.hour, gunghapData.me.minute)} onChange={(e) => {
+                    if(!e.target.value) return; const [h, min] = e.target.value.split(':');
+                    setGunghapData(prev => ({...prev, me: {...prev.me, hour: parseInt(h), minute: parseInt(min)}}));
+                  }} />
                 </div>
               </div>
 
-              {/* 💖 상대방 정보 입력 */}
-              <div style={{ flex: '1 1 45%', minWidth: '280px', backgroundColor: '#fff1f2', padding: '15px', borderRadius: '10px', border: '1px solid #fce7f3' }}>
-                <h4 style={{ margin: '0 0 15px 0', color: '#be185d' }}>💖 상대방 정보</h4>
-                
-                <div style={{ display: 'flex', gap: '5px', marginBottom: '10px' }}>
-                  <select 
-                    style={{ flex: 1, padding: '8px', border: '1px solid #fbcfe8', borderRadius: '6px', fontSize: '0.85em' }} 
-                    name="gender" 
-                    value={gunghapData.partner.gender} 
-                    onChange={(e) => handleGunghapChange('partner', e)}
-                  >
-                    <option value="F">여성</option>
-                    <option value="M">남성</option>
-                  </select>
-                  <select 
-                    style={{ flex: 1, padding: '8px', border: '1px solid #fbcfe8', borderRadius: '6px', fontSize: '0.85em' }} 
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setGunghapData(prev => ({...prev, partner: {...prev.partner, is_lunar: val.includes('lunar'), is_leap_month: val === 'lunar_leap'}}))
-                    }} 
-                    value={!gunghapData.partner.is_lunar ? 'solar' : gunghapData.partner.is_leap_month ? 'lunar_leap' : 'lunar'}
-                  >
-                    <option value="solar">양력</option>
-                    <option value="lunar">음력(평달)</option>
-                    <option value="lunar_leap">음력(윤달)</option>
-                  </select>
-                </div>
-
-                {/* 🚀 모바일 터치 최적화 (궁합 - 상대방 정보) */}
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'flex-end', marginBottom: '10px' }}>
-                  <div style={{ flex: '1 1 50%', minWidth: '120px', display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ fontSize: '0.7em', color: '#9d174d', marginBottom: '2px' }}>생년월일</span>
-                    <input 
-                      type="date" 
-                      value={formatDate(gunghapData.partner.year, gunghapData.partner.month, gunghapData.partner.day)} 
-                      onChange={(e) => {
-                        if(!e.target.value) return;
-                        const [y, m, d] = e.target.value.split('-');
-                        setGunghapData(prev => ({...prev, partner: {...prev.partner, year: parseInt(y), month: parseInt(m), day: parseInt(d)}}));
-                      }} 
-                      style={{ padding: '8px', border: '1px solid #fbcfe8', borderRadius: '6px', textAlign: 'center', width: '100%', boxSizing: 'border-box' }} 
-                    />
-                  </div>
-                  <div style={{ flex: '1 1 40%', minWidth: '90px', display: 'flex', flexDirection: 'column', opacity: gunghapData.partner.is_time_unknown ? 0.4 : 1 }}>
-                    <span style={{ fontSize: '0.7em', color: '#9d174d', marginBottom: '2px' }}>태어난 시간</span>
-                    <input 
-                      type="time" 
-                      value={formatTime(gunghapData.partner.hour, gunghapData.partner.minute)} 
-                      onChange={(e) => {
-                        if(!e.target.value) return;
-                        const [h, min] = e.target.value.split(':');
-                        setGunghapData(prev => ({...prev, partner: {...prev.partner, hour: parseInt(h), minute: parseInt(min)}}));
-                      }} 
-                      disabled={gunghapData.partner.is_time_unknown} 
-                      style={{ padding: '8px', border: '1px solid #fbcfe8', borderRadius: '6px', textAlign: 'center', width: '100%', boxSizing: 'border-box' }} 
-                    />
+              {/* 💖 상대방 정보 */}
+              <div style={{ backgroundColor: '#FFF5F7', padding: '20px', borderRadius: '12px', marginBottom: '25px', border: '1px solid #FCE7F3' }}>
+                <h4 style={{ margin: '0 0 15px 0', color: '#BE185D', fontSize: '1.1em' }}>💖 상대방 정보</h4>
+                <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                  <div style={{ flex: 1 }}><input type="text" className="input-field" style={{ borderColor: '#FBCFE8' }} placeholder="상대방 이름" name="name" value={gunghapData.partner.name} onChange={(e) => handleGunghapChange('partner', e)} /></div>
+                  <div style={{ flex: 1 }}>
+                    <select className="input-field" style={{ borderColor: '#FBCFE8' }} name="gender" value={gunghapData.partner.gender} onChange={(e) => handleGunghapChange('partner', e)}>
+                      <option value="F">여성</option>
+                      <option value="M">남성</option>
+                    </select>
                   </div>
                 </div>
-                
-                <div style={{ textAlign: 'right' }}>
-                  <label style={{ fontSize: '0.8em', color: '#9d174d', cursor: 'pointer' }}>
-                    <input 
-                      type="checkbox" 
-                      name="is_time_unknown" 
-                      checked={gunghapData.partner.is_time_unknown} 
-                      onChange={(e) => handleGunghapChange('partner', e)} 
-                    /> 시간 모름 (삼주육자)
-                  </label>
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                  <input type="date" className="input-field" style={{ flex: '1.2', borderColor: '#FBCFE8' }} value={formatDate(gunghapData.partner.year, gunghapData.partner.month, gunghapData.partner.day)} onChange={(e) => {
+                    if(!e.target.value) return; const [y, m, d] = e.target.value.split('-');
+                    setGunghapData(prev => ({...prev, partner: {...prev.partner, year: parseInt(y), month: parseInt(m), day: parseInt(d)}}));
+                  }} />
+                  <input type="time" className="input-field" style={{ flex: 1, borderColor: '#FBCFE8' }} value={formatTime(gunghapData.partner.hour, gunghapData.partner.minute)} onChange={(e) => {
+                    if(!e.target.value) return; const [h, min] = e.target.value.split(':');
+                    setGunghapData(prev => ({...prev, partner: {...prev.partner, hour: parseInt(h), minute: parseInt(min)}}));
+                  }} />
                 </div>
               </div>
 
-            </div>
-            
-            <button type="submit" disabled={loading} style={{ width: '100%', padding: '14px', marginTop: '20px', backgroundColor: '#db2777', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1em' }}>
-              {loading ? '궁합 연결 중...' : '궁합 점수 확인하기'}
-            </button>
-          </form>
+              <button type="submit" className="btn-primary" style={{ background: 'linear-gradient(135deg, #BE185D 0%, #9D174D 100%)', color: '#FFF' }} disabled={loading}>
+                {loading ? <><div className="spinner" style={{ borderColor: 'rgba(255,255,255,0.3)', borderTopColor: '#FFF' }}></div> 인연의 끈 분석 중...</> : '궁합 점수 확인하기'}
+              </button>
+            </form>
 
-          {/* 🌟 궁합 결과 렌더링 (변경 없음) 🌟 */}
-          {gunghapResult && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              
-              {/* 점수 요약 카드 */}
-              <div style={{ backgroundColor: '#ffffff', border: '2px solid #fbcfe8', borderRadius: '16px', padding: '30px 20px', textAlign: 'center', boxShadow: '0 4px 15px rgba(219,39,119,0.1)' }}>
-                <h3 style={{ margin: '0 0 10px 0', color: '#831843', fontSize: '1.2em' }}>두 사람의 찰떡 궁합도는?</h3>
-                <div style={{ fontSize: '4em', fontWeight: '900', color: '#db2777', textShadow: '2px 2px 0px #fce7f3' }}>
-                  {gunghapResult.score}<span style={{ fontSize: '0.5em', color: '#f472b6' }}>점</span>
+            {gunghapResult && (
+              <div className="fade-in premium-card" style={{ textAlign: 'center', borderColor: '#FCE7F3', boxShadow: '0 10px 30px rgba(190,24,93,0.05)' }}>
+                <h3 style={{ margin: '0 0 10px 0', color: '#831843', fontSize: '1.3em' }}>두 사람의 찰떡 궁합도는?</h3>
+                <div style={{ fontSize: '5em', fontWeight: '900', color: '#DB2777', textShadow: '2px 2px 0px #FDF2F8' }}>
+                  {gunghapResult.score}<span style={{ fontSize: '0.4em', color: '#F472B6' }}>점</span>
                 </div>
-                <div style={{ marginTop: '15px', backgroundColor: '#fdf2f8', padding: '15px', borderRadius: '8px', color: '#9d174d', fontWeight: 'bold', lineHeight: '1.5' }}>
+                <div style={{ marginTop: '20px', backgroundColor: '#FDF2F8', padding: '20px', borderRadius: '12px', color: '#9D174D', fontWeight: '600', lineHeight: '1.6' }}>
                   "{gunghapResult.summary}"
                 </div>
               </div>
+            )}
+          </div>
+        )}
 
-              {/* 세부 분석 카드 */}
-              <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                <div style={{ padding: '20px', borderBottom: '1px solid #f1f5f9' }}>
-                  <h4 style={{ margin: '0 0 10px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{fontSize:'1.2em'}}>☯️</span> 기운의 조화 (오행 보완)
-                  </h4>
-                  <p style={{ margin: 0, fontSize: '0.95em', color: '#475569', lineHeight: '1.6' }}>
-                    {gunghapResult.element_complement}
-                  </p>
-                </div>
-                <div style={{ padding: '20px', borderBottom: '1px solid #f1f5f9', backgroundColor: '#f8fafc' }}>
-                  <h4 style={{ margin: '0 0 10px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{fontSize:'1.2em'}}>🧠</span> 마음과 생각의 끌림 (천간)
-                  </h4>
-                  <p style={{ margin: 0, fontSize: '0.95em', color: '#475569', lineHeight: '1.6' }}>
-                    {gunghapResult.heavenly_desc}
-                  </p>
-                </div>
-                <div style={{ padding: '20px' }}>
-                  <h4 style={{ margin: '0 0 10px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{fontSize:'1.2em'}}>🏡</span> 현실적 환경과 속궁합 (지지)
-                  </h4>
-                  <p style={{ margin: 0, fontSize: '0.95em', color: '#475569', lineHeight: '1.6' }}>
-                    {gunghapResult.earthly_desc}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-        </>
-      )}
+      </div>
 
-      {/* ===================== [공통 모달창 영역] ===================== */}
-      
-      {/* 🔮 생시 역추적 모달 (변경 없음) */}
+      {/* 🔮 생시 역추적 모달 (생략 없이 유지) */}
       {showRectifyModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(3px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1100, padding: '20px', boxSizing: 'border-box' }}>
-          <div style={{ backgroundColor: '#fff', padding: '25px', borderRadius: '16px', maxWidth: '400px', width: '100%', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
-            <h3 style={{ margin: '0 0 10px 0', color: '#4c1d95', fontSize: '1.3em' }}>🔮 생시 역추적 시스템</h3>
-            <p style={{ margin: '0 0 20px 0', fontSize: '0.9em', color: '#64748b', lineHeight: '1.5' }}>
-              태어난 연/월/일을 기반으로, 고객님의 평소 성향과 바이오리듬을 분석하여 가장 확률이 높은 시간을 찾아냅니다.
-            </p>
+        <div className="fade-in" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(17, 24, 39, 0.8)', backdropFilter: 'blur(5px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1100, padding: '20px' }}>
+          <div style={{ backgroundColor: '#FFF', padding: '30px', borderRadius: '20px', maxWidth: '400px', width: '100%' }}>
+            <h3 style={{ margin: '0 0 15px 0', color: '#B59960', fontSize: '1.3em' }}>🔮 생시 추론 시스템</h3>
+            <p style={{ margin: '0 0 25px 0', fontSize: '0.95em', color: '#6B7280', lineHeight: '1.5' }}>성향과 에너지 사이클을 분석하여 가장 확률이 높은 태어난 시간을 찾아냅니다.</p>
             
             <div style={{ marginBottom: '20px' }}>
-              <strong style={{ display: 'block', marginBottom: '10px', color: '#1e293b', fontSize: '0.95em' }}>Q1. 평소 성향이나 추구하는 삶의 방향은?</strong>
-              <select value={rectifyData.q1} onChange={(e) => setRectifyData({...rectifyData, q1: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.9em' }}>
-                <option value="A">독립심이 강하고 내 방식대로 하는 게 편하다 (주체성)</option>
-                <option value="B">무언가를 만들고 표현하며 베푸는 것을 좋아한다 (창의성)</option>
-                <option value="C">현실적이고 결과와 재물을 중시한다 (현실성)</option>
-                <option value="D">원칙과 규칙을 중시하며 명예를 중요하게 생각한다 (책임감)</option>
-                <option value="E">생각이 깊고 직관력이 뛰어나며 공부/사색을 즐긴다 (수용성)</option>
+              <label className="label-text" style={{ color: '#1C2536' }}>Q1. 당신의 핵심 성향은?</label>
+              <select value={rectifyData.q1} onChange={(e) => setRectifyData({...rectifyData, q1: e.target.value})} className="input-field">
+                <option value="A">독립적이고 주관이 뚜렷하다</option>
+                <option value="B">창의적이고 표현하기를 좋아한다</option>
+                <option value="C">현실적이고 결과/재물을 중시한다</option>
+                <option value="D">원칙과 명예, 책임감을 중시한다</option>
+                <option value="E">직관력이 뛰어나고 생각이 깊다</option>
               </select>
             </div>
-
-            <div style={{ marginBottom: '25px' }}>
-              <strong style={{ display: 'block', marginBottom: '10px', color: '#1e293b', fontSize: '0.95em' }}>Q2. 하루 중 에너지가 가장 넘치거나 편안한 시간은?</strong>
-              <select value={rectifyData.q2} onChange={(e) => setRectifyData({...rectifyData, q2: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.9em' }}>
+            <div style={{ marginBottom: '30px' }}>
+              <label className="label-text" style={{ color: '#1C2536' }}>Q2. 하루 중 가장 에너지가 넘치는 시간은?</label>
+              <select value={rectifyData.q2} onChange={(e) => setRectifyData({...rectifyData, q2: e.target.value})} className="input-field">
                 <option value="A">새벽 ~ 아침 (03시 ~ 09시)</option>
                 <option value="B">낮 ~ 늦은 오후 (09시 ~ 15시)</option>
                 <option value="C">해 질 녘 ~ 초저녁 (15시 ~ 21시)</option>
                 <option value="D">늦은 밤 ~ 심야 (21시 ~ 03시)</option>
               </select>
             </div>
-
             <div style={{ display: 'flex', gap: '10px' }}>
-              <button 
-                onClick={() => setShowRectifyModal(false)} 
-                style={{ flex: 1, padding: '12px', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
-              >
-                취소
-              </button>
-              <button 
-                onClick={handleRectifySubmit} 
-                disabled={loading} 
-                style={{ flex: 2, padding: '12px', backgroundColor: '#6d28d9', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
-              >
-                {loading ? '역산 중...' : '생시 추정하기'}
-              </button>
+              <button onClick={() => setShowRectifyModal(false)} style={{ flex: 1, padding: '14px', backgroundColor: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: '10px', fontWeight: 'bold' }}>취소</button>
+              <button onClick={handleRectifySubmit} disabled={loading} style={{ flex: 2, padding: '14px', backgroundColor: '#B59960', color: '#FFF', border: 'none', borderRadius: '10px', fontWeight: 'bold' }}>{loading ? '분석 중...' : '시간 추론하기'}</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ℹ️ 용어 설명 팝업 모달 (변경 없음) */}
+      {/* ℹ️ 용어 설명 모달 */}
       {modalInfo && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(2px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px', boxSizing: 'border-box' }} onClick={() => setModalInfo(null)}>
-          <div style={{ backgroundColor: '#fff', padding: '25px', borderRadius: '16px', maxWidth: '320px', width: '100%', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #f1f5f9', paddingBottom: '10px', marginBottom: '15px' }}>
-              <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.3em', fontWeight: '800' }}>{modalInfo.title}</h3>
-              <button onClick={() => setModalInfo(null)} style={{ background: 'none', border: 'none', fontSize: '1.5em', cursor: 'pointer', color: '#94a3b8' }}>&times;</button>
+        <div className="fade-in" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(17, 24, 39, 0.6)', backdropFilter: 'blur(3px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }} onClick={() => setModalInfo(null)}>
+          <div style={{ backgroundColor: '#FFF', padding: '30px', borderRadius: '20px', maxWidth: '340px', width: '100%', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #F0ECE1', paddingBottom: '12px', marginBottom: '16px' }}>
+              <h3 style={{ margin: 0, color: '#1C2536', fontSize: '1.4em', fontWeight: '800' }}>{modalInfo.title}</h3>
+              <button onClick={() => setModalInfo(null)} style={{ background: 'none', border: 'none', fontSize: '1.5em', cursor: 'pointer', color: '#9CA3AF' }}>&times;</button>
             </div>
-            <p style={{ margin: 0, lineHeight: '1.6', color: '#475569', fontSize: '0.95em', wordBreak: 'keep-all' }}>{modalInfo.desc}</p>
+            <p style={{ margin: 0, lineHeight: '1.7', color: '#4B5563', fontSize: '1em', wordBreak: 'keep-all' }}>{modalInfo.desc}</p>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
