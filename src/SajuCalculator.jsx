@@ -15,11 +15,11 @@ const TERMS_DICT = {
 };
 
 const getElementColor = (text) => {
-  if (['목','갑','을','인','묘'].includes(text)) return '#10b981'; // 청량한 그린
-  if (['화','병','정','사','오'].includes(text)) return '#ef4444'; // 열정의 레드
-  if (['토','무','기','진','술','축','미'].includes(text)) return '#d97706'; // 묵직한 골드브라운
-  if (['금','경','신','유'].includes(text)) return '#64748b'; // 세련된 스틸그레이
-  if (['수','임','계','자','해'].includes(text)) return '#3b82f6'; // 깊은 블루
+  if (['목','갑','을','인','묘'].includes(text)) return '#10b981'; // 그린
+  if (['화','병','정','사','오'].includes(text)) return '#ef4444'; // 레드
+  if (['토','무','기','진','술','축','미'].includes(text)) return '#d97706'; // 골드브라운
+  if (['금','경','신','유'].includes(text)) return '#64748b'; // 스틸그레이
+  if (['수','임','계','자','해'].includes(text)) return '#3b82f6'; // 블루
   if (text === '?') return '#cbd5e1'; 
   return '#333';
 };
@@ -136,7 +136,7 @@ const globalStyles = `
 export default function SajuCalculator() {
   const [activeTab, setActiveTab] = useState('saju');
 
-  // 1. 개인 사주 상태
+  // 1. 개인 사주 상태 (이름, 출생지, 양음력 복구 완비)
   const [formData, setFormData] = useState({ 
     name: '', birthPlace: '대한민국 (서울 기준)',
     year: 1990, month: 5, day: 15, hour: 14, minute: 30, gender: 'M', is_lunar: false, is_leap_month: false 
@@ -144,10 +144,10 @@ export default function SajuCalculator() {
   const [isTimeUnknown, setIsTimeUnknown] = useState(false);
   const [result, setResult] = useState(null);
   
-  // 2. 궁합 상태
+  // 2. 궁합 상태 (상대방 출생지, 양음력 복구 완비)
   const [gunghapData, setGunghapData] = useState({
-    me: { name: '', birthPlace: '대한민국', year: 1990, month: 5, day: 15, hour: 14, minute: 30, gender: 'M', is_lunar: false, is_leap_month: false, is_time_unknown: false },
-    partner: { name: '', birthPlace: '대한민국', year: 1995, month: 8, day: 20, hour: 10, minute: 0, gender: 'F', is_lunar: false, is_leap_month: false, is_time_unknown: false }
+    me: { name: '', birthPlace: '대한민국 (서울 기준)', year: 1990, month: 5, day: 15, hour: 14, minute: 30, gender: 'M', is_lunar: false, is_leap_month: false, is_time_unknown: false },
+    partner: { name: '', birthPlace: '대한민국 (서울 기준)', year: 1995, month: 8, day: 20, hour: 10, minute: 0, gender: 'F', is_lunar: false, is_leap_month: false, is_time_unknown: false }
   });
   const [gunghapResult, setGunghapResult] = useState(null);
 
@@ -220,7 +220,7 @@ export default function SajuCalculator() {
     else setModalInfo({ title: keyword, desc: "해당 단어의 상세 사전 데이터가 준비 중입니다." });
   };
 
-  // 운세 변화 그룹핑 (기존 로직 복구)
+  // 운세 변화 그룹핑
   const groupedDynamic = result?.dynamic_relations ? Object.values(result.dynamic_relations.reduce((acc, rel) => {
     const key = `${rel.name}_${rel.target_pillar}`;
     if (!acc[key]) acc[key] = { ...rel, un_types: [rel.un_type] };
@@ -249,7 +249,9 @@ export default function SajuCalculator() {
 
         {error && <div className="fade-in" style={{ padding: '16px', backgroundColor: '#FEF2F2', borderLeft: '4px solid #EF4444', color: '#991B1B', borderRadius: '8px', marginBottom: '20px', fontWeight: '600' }}>{error}</div>}
 
-        {/* 1. 개인 사주 탭 */}
+        {/* ========================================================
+            [1] 개인 사주 탭
+        ======================================================== */}
         {activeTab === 'saju' && (
           <div className="fade-in">
             <form onSubmit={handleSajuSubmit} className="premium-card">
@@ -268,9 +270,24 @@ export default function SajuCalculator() {
                 </div>
               </div>
 
-              <div style={{ marginBottom: '15px' }}>
-                <label className="label-text">태어난 국가/도시 (경도 보정용)</label>
-                <input type="text" className="input-field" placeholder="예: 대한민국 서울, 미국 뉴욕" value={formData.birthPlace} onChange={(e) => setFormData({...formData, birthPlace: e.target.value})} />
+              {/* 🚨 복구 완료: 양/음력 선택 및 국가/도시 (경도) 입력 */}
+              <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                <div style={{ flex: 1 }}>
+                  <label className="label-text">역법 (양/음력)</label>
+                  <select 
+                    className="input-field" 
+                    onChange={(e) => setFormData({ ...formData, is_lunar: e.target.value.includes('lunar'), is_leap_month: e.target.value === 'lunar_leap' })} 
+                    value={!formData.is_lunar ? 'solar' : formData.is_leap_month ? 'lunar_leap' : 'lunar'}
+                  >
+                    <option value="solar">양력</option>
+                    <option value="lunar">음력 (평달)</option>
+                    <option value="lunar_leap">음력 (윤달)</option>
+                  </select>
+                </div>
+                <div style={{ flex: 2 }}>
+                  <label className="label-text">태어난 국가/도시 (경도 보정용)</label>
+                  <input type="text" className="input-field" placeholder="예: 대한민국 서울, 미국 뉴욕" value={formData.birthPlace} onChange={(e) => setFormData({...formData, birthPlace: e.target.value})} />
+                </div>
               </div>
 
               <div style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
@@ -302,7 +319,7 @@ export default function SajuCalculator() {
               </button>
             </form>
 
-            {/* 🌟 결과 화면 렌더링 (삭제되었던 300줄 완전 복구) 🌟 */}
+            {/* 🌟 개인 사주 결과 렌더링 🌟 */}
             {result && (
               <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 
@@ -462,7 +479,6 @@ export default function SajuCalculator() {
                 <div className="premium-card">
                   <h3 style={{ margin: '0 0 15px 0', fontSize: '1.2em', color: '#1C2536' }}>⚡ 원국 내 상호작용 및 주의할 운세</h3>
                   
-                  {/* 원국 내 합/충 */}
                   <div style={{ marginBottom: '20px' }}>
                     {result.relations && result.relations.length > 0 ? (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -484,7 +500,6 @@ export default function SajuCalculator() {
                     ) : (<p style={{ margin: 0, fontSize: '0.9em', color: '#9CA3AF' }}>뚜렷한 상호작용이 없습니다.</p>)}
                   </div>
 
-                  {/* 다이내믹 운세 변화 */}
                   {groupedDynamic.length > 0 && (
                     <div style={{ backgroundColor: '#FFFBEB', border: '1px solid #FCD34D', borderRadius: '12px', padding: '16px' }}>
                       <h4 style={{ margin: '0 0 10px 0', fontSize: '1em', color: '#B45309', display: 'flex', alignItems: 'center', gap: '6px' }}>🔔 지금 주목해야 할 운세 변화</h4>
@@ -589,54 +604,128 @@ export default function SajuCalculator() {
           </div>
         )}
 
-        {/* 2. 궁합 보기 탭 */}
+        {/* ========================================================
+            [2] 궁합 보기 탭 
+        ======================================================== */}
         {activeTab === 'gunghap' && (
           <div className="fade-in">
             <form onSubmit={handleGunghapSubmit} className="premium-card">
               
               <div style={{ backgroundColor: '#F9F8F6', padding: '20px', borderRadius: '12px', marginBottom: '20px', border: '1px solid #EFECE6' }}>
                 <h4 style={{ margin: '0 0 15px 0', color: '#1C2536', fontSize: '1.1em' }}>👤 나의 정보</h4>
+                
                 <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
-                  <div style={{ flex: 1 }}><input type="text" className="input-field" placeholder="내 이름" name="name" value={gunghapData.me.name} onChange={(e) => handleGunghapChange('me', e)} /></div>
                   <div style={{ flex: 1 }}>
+                    <label className="label-text">이름 (닉네임)</label>
+                    <input type="text" className="input-field" placeholder="내 이름" name="name" value={gunghapData.me.name} onChange={(e) => handleGunghapChange('me', e)} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <label className="label-text">성별</label>
                     <select className="input-field" name="gender" value={gunghapData.me.gender} onChange={(e) => handleGunghapChange('me', e)}>
                       <option value="M">남성</option>
                       <option value="F">여성</option>
                     </select>
                   </div>
                 </div>
+
+                {/* 🚨 복구 완료: 나의 양음력/출생지 (궁합) */}
+                <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                  <div style={{ flex: 1 }}>
+                    <label className="label-text">역법 (양/음력)</label>
+                    <select className="input-field" onChange={(e) => {
+                      const val = e.target.value;
+                      setGunghapData(prev => ({...prev, me: {...prev.me, is_lunar: val.includes('lunar'), is_leap_month: val === 'lunar_leap'}}))
+                    }} value={!gunghapData.me.is_lunar ? 'solar' : gunghapData.me.is_leap_month ? 'lunar_leap' : 'lunar'}>
+                      <option value="solar">양력</option>
+                      <option value="lunar">음력(평달)</option>
+                      <option value="lunar_leap">음력(윤달)</option>
+                    </select>
+                  </div>
+                  <div style={{ flex: 2 }}>
+                    <label className="label-text">태어난 국가/도시 (경도)</label>
+                    <input type="text" className="input-field" placeholder="출생 지역" name="birthPlace" value={gunghapData.me.birthPlace} onChange={(e) => handleGunghapChange('me', e)} />
+                  </div>
+                </div>
+
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-                  <input type="date" className="input-field" style={{ flex: '1.2' }} value={formatDate(gunghapData.me.year, gunghapData.me.month, gunghapData.me.day)} onChange={(e) => {
-                    if(!e.target.value) return; const [y, m, d] = e.target.value.split('-');
-                    setGunghapData(prev => ({...prev, me: {...prev.me, year: parseInt(y), month: parseInt(m), day: parseInt(d)}}));
-                  }} />
-                  <input type="time" className="input-field" style={{ flex: 1 }} value={formatTime(gunghapData.me.hour, gunghapData.me.minute)} onChange={(e) => {
-                    if(!e.target.value) return; const [h, min] = e.target.value.split(':');
-                    setGunghapData(prev => ({...prev, me: {...prev.me, hour: parseInt(h), minute: parseInt(min)}}));
-                  }} />
+                  <div style={{ flex: '1.2' }}>
+                    <label className="label-text">생년월일</label>
+                    <input type="date" className="input-field" value={formatDate(gunghapData.me.year, gunghapData.me.month, gunghapData.me.day)} onChange={(e) => {
+                      if(!e.target.value) return; const [y, m, d] = e.target.value.split('-');
+                      setGunghapData(prev => ({...prev, me: {...prev.me, year: parseInt(y), month: parseInt(m), day: parseInt(d)}}));
+                    }} />
+                  </div>
+                  <div style={{ flex: 1, opacity: gunghapData.me.is_time_unknown ? 0.4 : 1 }}>
+                    <label className="label-text">태어난 시간</label>
+                    <input type="time" className="input-field" disabled={gunghapData.me.is_time_unknown} value={formatTime(gunghapData.me.hour, gunghapData.me.minute)} onChange={(e) => {
+                      if(!e.target.value) return; const [h, min] = e.target.value.split(':');
+                      setGunghapData(prev => ({...prev, me: {...prev.me, hour: parseInt(h), minute: parseInt(min)}}));
+                    }} />
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <label style={{ fontSize: '0.85em', color: '#4B5563', cursor: 'pointer', fontWeight: '500' }}>
+                    <input type="checkbox" name="is_time_unknown" checked={gunghapData.me.is_time_unknown} onChange={(e) => handleGunghapChange('me', e)} style={{ accentColor: '#B59960' }} /> 시간을 정확히 모름
+                  </label>
                 </div>
               </div>
 
               <div style={{ backgroundColor: '#FFF5F7', padding: '20px', borderRadius: '12px', marginBottom: '25px', border: '1px solid #FCE7F3' }}>
                 <h4 style={{ margin: '0 0 15px 0', color: '#BE185D', fontSize: '1.1em' }}>💖 상대방 정보</h4>
+                
                 <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
-                  <div style={{ flex: 1 }}><input type="text" className="input-field" style={{ borderColor: '#FBCFE8' }} placeholder="상대방 이름" name="name" value={gunghapData.partner.name} onChange={(e) => handleGunghapChange('partner', e)} /></div>
                   <div style={{ flex: 1 }}>
+                    <label className="label-text">이름 (닉네임)</label>
+                    <input type="text" className="input-field" style={{ borderColor: '#FBCFE8' }} placeholder="상대방 이름" name="name" value={gunghapData.partner.name} onChange={(e) => handleGunghapChange('partner', e)} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <label className="label-text">성별</label>
                     <select className="input-field" style={{ borderColor: '#FBCFE8' }} name="gender" value={gunghapData.partner.gender} onChange={(e) => handleGunghapChange('partner', e)}>
                       <option value="F">여성</option>
                       <option value="M">남성</option>
                     </select>
                   </div>
                 </div>
+
+                {/* 🚨 복구 완료: 상대방 양음력/출생지 (궁합) */}
+                <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                  <div style={{ flex: 1 }}>
+                    <label className="label-text">역법 (양/음력)</label>
+                    <select className="input-field" style={{ borderColor: '#FBCFE8' }} onChange={(e) => {
+                      const val = e.target.value;
+                      setGunghapData(prev => ({...prev, partner: {...prev.partner, is_lunar: val.includes('lunar'), is_leap_month: val === 'lunar_leap'}}))
+                    }} value={!gunghapData.partner.is_lunar ? 'solar' : gunghapData.partner.is_leap_month ? 'lunar_leap' : 'lunar'}>
+                      <option value="solar">양력</option>
+                      <option value="lunar">음력(평달)</option>
+                      <option value="lunar_leap">음력(윤달)</option>
+                    </select>
+                  </div>
+                  <div style={{ flex: 2 }}>
+                    <label className="label-text">태어난 국가/도시 (경도)</label>
+                    <input type="text" className="input-field" style={{ borderColor: '#FBCFE8' }} placeholder="출생 지역" name="birthPlace" value={gunghapData.partner.birthPlace} onChange={(e) => handleGunghapChange('partner', e)} />
+                  </div>
+                </div>
+
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-                  <input type="date" className="input-field" style={{ flex: '1.2', borderColor: '#FBCFE8' }} value={formatDate(gunghapData.partner.year, gunghapData.partner.month, gunghapData.partner.day)} onChange={(e) => {
-                    if(!e.target.value) return; const [y, m, d] = e.target.value.split('-');
-                    setGunghapData(prev => ({...prev, partner: {...prev.partner, year: parseInt(y), month: parseInt(m), day: parseInt(d)}}));
-                  }} />
-                  <input type="time" className="input-field" style={{ flex: 1, borderColor: '#FBCFE8' }} value={formatTime(gunghapData.partner.hour, gunghapData.partner.minute)} onChange={(e) => {
-                    if(!e.target.value) return; const [h, min] = e.target.value.split(':');
-                    setGunghapData(prev => ({...prev, partner: {...prev.partner, hour: parseInt(h), minute: parseInt(min)}}));
-                  }} />
+                  <div style={{ flex: '1.2' }}>
+                    <label className="label-text">생년월일</label>
+                    <input type="date" className="input-field" style={{ borderColor: '#FBCFE8' }} value={formatDate(gunghapData.partner.year, gunghapData.partner.month, gunghapData.partner.day)} onChange={(e) => {
+                      if(!e.target.value) return; const [y, m, d] = e.target.value.split('-');
+                      setGunghapData(prev => ({...prev, partner: {...prev.partner, year: parseInt(y), month: parseInt(m), day: parseInt(d)}}));
+                    }} />
+                  </div>
+                  <div style={{ flex: 1, opacity: gunghapData.partner.is_time_unknown ? 0.4 : 1 }}>
+                    <label className="label-text">태어난 시간</label>
+                    <input type="time" className="input-field" style={{ borderColor: '#FBCFE8' }} disabled={gunghapData.partner.is_time_unknown} value={formatTime(gunghapData.partner.hour, gunghapData.partner.minute)} onChange={(e) => {
+                      if(!e.target.value) return; const [h, min] = e.target.value.split(':');
+                      setGunghapData(prev => ({...prev, partner: {...prev.partner, hour: parseInt(h), minute: parseInt(min)}}));
+                    }} />
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <label style={{ fontSize: '0.85em', color: '#BE185D', cursor: 'pointer', fontWeight: '500' }}>
+                    <input type="checkbox" name="is_time_unknown" checked={gunghapData.partner.is_time_unknown} onChange={(e) => handleGunghapChange('partner', e)} style={{ accentColor: '#BE185D' }} /> 시간을 정확히 모름
+                  </label>
                 </div>
               </div>
 
@@ -645,6 +734,7 @@ export default function SajuCalculator() {
               </button>
             </form>
 
+            {/* 궁합 결과 렌더링 */}
             {gunghapResult && (
               <div className="fade-in premium-card" style={{ textAlign: 'center', borderColor: '#FCE7F3', boxShadow: '0 10px 30px rgba(190,24,93,0.05)' }}>
                 <h3 style={{ margin: '0 0 10px 0', color: '#831843', fontSize: '1.3em' }}>두 사람의 찰떡 궁합도는?</h3>
@@ -654,11 +744,26 @@ export default function SajuCalculator() {
                 <div style={{ marginTop: '20px', backgroundColor: '#FDF2F8', padding: '20px', borderRadius: '12px', color: '#9D174D', fontWeight: '600', lineHeight: '1.6' }}>
                   "{gunghapResult.summary}"
                 </div>
+                
+                {/* 궁합 디테일 설명 (이전 로직 복구) */}
+                <div style={{ marginTop: '25px', textAlign: 'left', borderTop: '1px solid #FBCFE8', paddingTop: '20px' }}>
+                  <div style={{ marginBottom: '15px' }}>
+                    <h4 style={{ margin: '0 0 8px 0', color: '#9D174D', fontSize: '1.05em' }}>☯️ 오행 조화</h4>
+                    <p style={{ margin: 0, fontSize: '0.9em', color: '#4B5563', lineHeight: '1.6' }}>{gunghapResult.element_complement}</p>
+                  </div>
+                  <div style={{ marginBottom: '15px' }}>
+                    <h4 style={{ margin: '0 0 8px 0', color: '#9D174D', fontSize: '1.05em' }}>🧠 마음의 끌림 (천간)</h4>
+                    <p style={{ margin: 0, fontSize: '0.9em', color: '#4B5563', lineHeight: '1.6' }}>{gunghapResult.heavenly_desc}</p>
+                  </div>
+                  <div>
+                    <h4 style={{ margin: '0 0 8px 0', color: '#9D174D', fontSize: '1.05em' }}>🏡 현실과 속궁합 (지지)</h4>
+                    <p style={{ margin: 0, fontSize: '0.9em', color: '#4B5563', lineHeight: '1.6' }}>{gunghapResult.earthly_desc}</p>
+                  </div>
+                </div>
               </div>
             )}
           </div>
         )}
-
       </div>
 
       {/* 🔮 생시 역추적 모달 */}
