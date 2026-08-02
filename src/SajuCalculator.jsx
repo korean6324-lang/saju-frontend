@@ -7,7 +7,7 @@ const TERMS_DICT = {
   "목": "성장과 추진력, 창조적인 에너지를 상징하며, 어질고(仁) 위로 곧게 뻗어나가는 기운입니다.", "화": "열정과 명랑함, 확산하는 에너지를 상징하며, 예의(禮)를 중시하고 타오르는 불의 기운입니다.", "토": "중재와 포용력, 안정감을 상징하며, 신용(信)을 바탕으로 만물을 품는 대지의 기운입니다.", "금": "결단력과 원칙, 맺고 끊음을 상징하며, 의리(義)를 중시하고 단단하게 결실을 맺는 기운입니다.", "수": "지혜와 유연성, 수용력을 상징하며, 상황에 맞게 대처하고 만물을 적셔주는(智) 물의 기운입니다.",
   "갑": "큰 나무(陽木). 강한 생명력과 추진력, 리더십과 우두머리 기질을 상징합니다.", "을": "화초나 덩굴(陰木). 유연함과 환경 적응력, 끈질긴 생명력과 사교성을 상징합니다.", "병": "태양(陽火). 밝고 화려하며, 열정적이고 명랑하게 만물을 비추는 기운을 상징합니다.", "정": "촛불, 달빛(陰火). 은은한 온기와 희생정신, 섬세하고 따뜻한 감수성을 상징합니다.", "무": "큰 산(陽土). 듬직하고 포용력이 넓으며, 만물을 중재하고 믿음을 주는 기운입니다.", "기": "평야, 논밭(陰土). 어머니 같은 수용력, 실속을 챙기며 다정다감한 기운입니다.", "경": "바위, 무쇠(陽金). 원칙과 결단력, 강한 의리와 카리스마를 상징합니다.", "신": "보석, 정밀한 칼(陰金). 예민한 감수성과 정교함, 완벽주의와 날카로움을 상징합니다.", "임": "바다, 강물(陽水). 지혜롭고 융통성이 뛰어나며, 모든 것을 포용하는 넓은 스케일을 의미합니다.", "계": "이슬비, 옹달샘(陰水). 부드럽고 다정하며, 섬세한 지혜와 기획력을 상징합니다.",
   "자": "쥐(수). 어둠 속의 비밀스러운 활동, 강한 번식력과 뛰어난 지혜를 의미합니다.", "축": "소(토). 묵묵한 끈기와 성실함, 속을 알 수 없는 뚝심을 의미합니다.", "인": "호랑이(목). 강한 독립심과 개척 정신, 명예욕과 권력을 향한 의지를 의미합니다.", "묘": "토끼(목). 부드럽고 다정함, 섬세한 감수성과 예술적 재능을 의미합니다.", "진": "용(토). 이상향과 야망, 스케일이 크고 변화무쌍한 에너지를 의미합니다.", "사": "뱀(화). 강한 집념과 열정, 화려함과 빠른 두뇌 회전을 의미합니다.", "오": "말(화). 활달하고 진취적이며, 솔직하고 사교적인 확산의 에너지를 의미합니다.", "미": "양(토). 온순해 보이나 강한 고집, 희생정신과 철학/예술적 성향을 의미합니다.", "신": "원숭이(금). 다재다능하고 재주가 많으며, 임기응변과 결단력이 뛰어납니다.", "유": "닭(금). 섬세하고 예민하며, 맺고 끊음이 정확한 완벽주의 성향을 의미합니다.", "술": "개(토). 충직함과 강한 책임감, 직관력이 뛰어나고 방어적인 성향을 의미합니다.", "해": "돼지(수). 온화함과 넓은 포용력, 풍요로움과 지적 호기심을 의미합니다.",
-  "지살": "새로운 시작, 이동, 개척을 의미합니다.", "년살(도화살)": "매력과 인기, 사교성을 상징합니다.", "월살": "메마르고 막힌 환경, 또는 뜻밖의 상속을 의미합니다.", "망신살": "비밀이 드러나거나 나서다가 실수함을 주의해야 합니다.", "장성살": "무리의 중심이자 리더십, 권위를 상징합니다.", "반안살": "출세와 안정, 편안한 지위를 의미합니다.", "역마살": "이동, 분주함, 통신과 무역, 넓은 활동 반경을 상징합니다.", "육해살": "피곤함이나 스트레스, 영감과 직관력을 의미합니다.", "화개살": "예술, 종교, 철학, 학문적 성취와 침잠을 뜻합니다.", "겁살": "강제적인 압박이나 빼앗김, 강한경쟁심을 요합니다.", "재살": "꾀가 많고 두뇌 회전이 빠르며 위기 대처 능력이 뛰어납니다.", "천살": "불가항력적인 상황이나 높은 이상, 정신적 수양을 상징합니다.",
+  "지살": "새로운 시작, 이동, 개척을 의미합니다.", "년살(도화살)": "매력과 인기, 사교성을 상징합니다.", "월살": "메마르고 막힌 환경, 또는 뜻밖의 상속을 의미합니다.", "망신살": "비밀이 드러나거나 나서다가 실수함을 주의해야 합니다.", "장성살": "무리의 중심이자 리더십, 권위를 상징합니다.", "반안살": "출세와 안정, 편안한 지위를 의미합니다.", "역마살": "이동, 분주함, 통신과 무역, 넓은 활동 반경을 상징합니다.", "육해살": "피곤함이나 스트레스, 영감과 직관력을 의미합니다.", "화개살": "예술, 종교, 철학, 학문적 성취와 침잠을 뜻합니다.", "겁살": "강제적인 압박이나 빼앗김, 강한 경쟁심을 요합니다.", "재살": "꾀가 많고 두뇌 회전이 빠르며 위기 대처 능력이 뛰어납니다.", "천살": "불가항력적인 상황이나 높은 이상, 정신적 수양을 상징합니다.",
   "백호대살": "강렬하고 폭발적인 에너지, 강한 프로 의식을 의미합니다.", "괴강살": "우두머리 기질, 카리스마, 강한 돌파력을 상징합니다.", "천을귀인": "명리학 최고의 길신(수호천사)입니다. 흉살을 길하게 변화시키며 위기에서 구합니다.", "홍염살": "타인에게 은근하고 친근한 매력을 발산하여 호감을 주는 기운입니다.",
   "공망": "천간과 지지의 짝이 맞지 않아 비어있음을 뜻합니다. 작용력이 반감됩니다.", "장생": "탄생, 후원, 순수함, 길한 시작 에너지입니다.", "목욕": "호기심, 멋내기, 불안정하고 반복적인 변화입니다.", "관대": "제복, 고집, 독립, 뻗어나가는 힘입니다.", "건록": "자수성가, 안정, 독립적 실행력입니다.", "제왕": "절정, 카리스마, 독단성, 가장 강한 에너지입니다.", "쇠": "노련함, 보수성, 물러남의 기운입니다.", "병": "예민함, 동정심, 감수성입니다.", "사": "정지, 사색, 한 가지에 몰두하는 에너지입니다.", "묘": "저축, 은둔, 안정적인 추구입니다.", "절": "단절, 무(無)의 상태, 극단적 변화입니다.", "태": "잉태, 조심스럽지만 무한한 가능성입니다.", "양": "양육, 보호, 길러지는 기운입니다.",
   "신강(身强)": "나를 돕는 기운이 커서 주관이 뚜렷하고 추진력이 강한 상태입니다.", "신약(身弱)": "나의 기운이 약해 환경에 순응력이 좋으나 휘둘리기 쉬운 상태입니다.", "용희신": "내 사주의 불균형을 해소하고 나에게 이로움을 주는 긍정적인 운입니다.", "기구신": "내 사주의 불균형을 심화시키고 나에게 불리하게 작용하는 주의할 운입니다.", "지장간": "지지에 숨겨진 천간으로, 사람의 내면적 잠재력, 속마음을 나타냅니다.", "일진": "오늘 하루의 운세를 나타내는 기운으로 원국과 상호작용합니다.", "미상": "태어난 시간을 알 수 없어 파악할 수 없습니다.", "?": "태어난 시간 미상",
@@ -27,7 +27,7 @@ const getElementColor = (text) => {
 const formatDate = (y, m, d) => `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 const formatTime = (h, m) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 
-// 🌟 프리미엄 글로벌 CSS 스타일링 & 슬라이드 메뉴 애니메이션
+// 🌟 프리미엄 글로벌 CSS 스타일링 & 메뉴 애니메이션
 const globalStyles = `
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
   
@@ -39,74 +39,40 @@ const globalStyles = `
     overflow-x: hidden;
   }
   
-  .fade-in {
-    animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
+  .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(15px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
   .premium-card {
-    background: #FFFFFF;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-    border: 1px solid #EFECE6;
-    margin-bottom: 20px;
+    background: #FFFFFF; border-radius: 16px; padding: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03); border: 1px solid #EFECE6; margin-bottom: 20px;
   }
 
   .input-field {
-    width: 100%;
-    padding: 14px 16px;
-    border: 1px solid #E2DED5;
-    border-radius: 10px;
-    font-size: 16px;
-    background-color: #FAFAFA;
-    transition: all 0.2s;
-    box-sizing: border-box;
+    width: 100%; padding: 14px 16px; border: 1px solid #E2DED5; border-radius: 10px;
+    font-size: 16px; background-color: #FAFAFA; transition: all 0.2s; box-sizing: border-box;
   }
   .input-field:focus {
-    border-color: #B59960;
-    background-color: #FFF;
-    outline: none;
+    border-color: #B59960; background-color: #FFF; outline: none;
     box-shadow: 0 0 0 3px rgba(181, 153, 96, 0.15);
   }
 
-  .label-text {
-    font-size: 0.85em;
-    color: #6B7280;
-    margin-bottom: 6px;
-    display: block;
-    font-weight: 600;
-  }
+  .label-text { font-size: 0.85em; color: #6B7280; margin-bottom: 6px; display: block; font-weight: 600; }
 
   .btn-primary {
-    background: linear-gradient(135deg, #1C2536 0%, #111827 100%);
-    color: #F3E8D0;
-    padding: 16px;
-    border: none;
-    border-radius: 12px;
-    font-size: 1.1em;
-    font-weight: 700;
-    cursor: pointer;
-    width: 100%;
-    transition: all 0.2s;
-    box-shadow: 0 4px 15px rgba(17, 24, 39, 0.2);
+    background: linear-gradient(135deg, #1C2536 0%, #111827 100%); color: #F3E8D0;
+    padding: 16px; border: none; border-radius: 12px; font-size: 1.1em; font-weight: 700;
+    cursor: pointer; width: 100%; transition: all 0.2s; box-shadow: 0 4px 15px rgba(17, 24, 39, 0.2);
   }
   .btn-primary:active { transform: scale(0.98); }
   .btn-primary:disabled { background: #9CA3AF; box-shadow: none; cursor: not-allowed; }
 
   .spinner {
-    border: 3px solid rgba(243, 232, 208, 0.3);
-    border-top-color: #F3E8D0;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    animation: spin 1s linear infinite;
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 8px;
+    border: 3px solid rgba(243, 232, 208, 0.3); border-top-color: #F3E8D0; border-radius: 50%;
+    width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block;
+    vertical-align: middle; margin-right: 8px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
   
@@ -116,34 +82,72 @@ const globalStyles = `
   .horizontal-scroll::-webkit-scrollbar { height: 6px; }
   .horizontal-scroll::-webkit-scrollbar-thumb { background-color: #CBD5E1; border-radius: 10px; }
 
-  /* ☰ 메뉴바 애니메이션 및 스타일 */
+  /* ☰ 메뉴바 정밀 구조화 CSS */
   .menu-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0,0,0,0.5); z-index: 2000;
+    background-color: rgba(17, 24, 39, 0.6); backdrop-filter: blur(2px); z-index: 2000;
     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
   }
   .menu-overlay.open { opacity: 1; pointer-events: auto; }
 
   .side-menu {
-    position: fixed; top: 0; right: -300px; width: 280px; height: 100%;
-    background-color: #F8F7F4; z-index: 2100; box-shadow: -5px 0 25px rgba(0,0,0,0.1);
+    position: fixed; top: 0; right: -320px; width: 300px; height: 100%;
+    background-color: #FFFFFF; z-index: 2100; box-shadow: -5px 0 30px rgba(0,0,0,0.15);
     transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    display: flex; flexDirection: column; padding: 25px 20px; box-sizing: border-box;
+    display: flex; flex-direction: column; padding: 0; box-sizing: border-box;
     overflow-y: auto;
   }
   .side-menu.open { right: 0; }
   
-  .menu-header { display: flex; justify-content: space-between; alignItems: center; margin-bottom: 30px; }
-  .menu-section { background: #FFF; padding: 15px; borderRadius: 12px; margin-bottom: 15px; border: 1px solid #EFECE6; }
-  .menu-title { font-size: 1em; color: #1C2536; font-weight: 800; margin: 0 0 10px 0; display: flex; align-items: center; gap: 6px; }
-  .menu-text { font-size: 0.85em; color: #4B5563; line-height: 1.6; margin: 0; word-break: keep-all; }
+  .menu-header { 
+    display: flex; justify-content: space-between; align-items: center; 
+    padding: 25px 20px; border-bottom: 1px solid #EFECE6; background-color: #F8F7F4;
+  }
+  
+  /* 네비게이션 목차 버튼 */
+  .menu-nav-btn {
+    display: flex; align-items: center; gap: 12px; width: 100%; padding: 18px 20px;
+    background: none; border: none; border-bottom: 1px solid #F3F4F6;
+    font-size: 1.05em; font-weight: 700; color: #1C2536; cursor: pointer; text-align: left;
+    transition: background-color 0.2s;
+  }
+  .menu-nav-btn:hover { background-color: #F9FAFB; color: #B59960; }
+  
+  /* 소개 및 기능 리스트 영역 */
+  .menu-content { padding: 20px; flex-grow: 1; }
+  .menu-box { margin-bottom: 25px; }
+  .menu-box-title { font-size: 0.9em; color: #6B7280; margin: 0 0 12px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  
+  .feature-list { list-style: none; padding: 0; margin: 0; }
+  .feature-list li { 
+    position: relative; padding-left: 20px; margin-bottom: 10px; font-size: 0.9em; color: #4B5563; line-height: 1.5;
+  }
+  .feature-list li::before { 
+    content: '•'; position: absolute; left: 0; top: 0; color: #B59960; font-size: 1.2em; font-weight: bold; 
+  }
+
+  /* 구독 배너 */
+  .subscribe-banner {
+    background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+    border: 1px solid #BAE6FD; border-radius: 12px; padding: 16px; margin-bottom: 20px;
+  }
+  .subscribe-tag { 
+    display: inline-block; background-color: #0284C7; color: white; 
+    font-size: 0.7em; padding: 3px 8px; border-radius: 20px; font-weight: bold; margin-bottom: 8px;
+  }
+
+  /* 하단 연락처 (Footer) */
+  .menu-footer { 
+    background-color: #F8FAFC; padding: 20px; border-top: 1px solid #EFECE6; font-size: 0.85em; color: #6B7280;
+  }
+  .contact-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 `;
 
 export default function SajuCalculator() {
   const [activeTab, setActiveTab] = useState('saju');
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // 🚨 메뉴 토글 상태 추가
+  const [isMenuOpen, setIsMenuOpen] = useState(false); 
 
-  // 1. 개인 사주 상태
+  // 1. 개인 사주 상태 
   const [formData, setFormData] = useState({ 
     name: '', birthPlace: '대한민국 (서울 기준)',
     year: 1990, month: 5, day: 15, hour: 14, minute: 30, gender: 'M', is_lunar: false, is_leap_month: false 
@@ -151,7 +155,7 @@ export default function SajuCalculator() {
   const [isTimeUnknown, setIsTimeUnknown] = useState(false);
   const [result, setResult] = useState(null);
   
-  // 2. 궁합 상태
+  // 2. 궁합 상태 
   const [gunghapData, setGunghapData] = useState({
     me: { name: '', birthPlace: '대한민국 (서울 기준)', year: 1990, month: 5, day: 15, hour: 14, minute: 30, gender: 'M', is_lunar: false, is_leap_month: false, is_time_unknown: false },
     partner: { name: '', birthPlace: '대한민국 (서울 기준)', year: 1995, month: 8, day: 20, hour: 10, minute: 0, gender: 'F', is_lunar: false, is_leap_month: false, is_time_unknown: false }
@@ -220,62 +224,84 @@ export default function SajuCalculator() {
     <>
       <style>{globalStyles}</style>
 
-      {/* 🌟 사이드바 슬라이드 메뉴 (명리-PRO 브랜드 및 문의 정보) */}
+      {/* 🌟 명리-PRO 사이드바 메뉴 (구조 및 디자인 개선판) 🌟 */}
       <div className={`menu-overlay ${isMenuOpen ? 'open' : ''}`} onClick={() => setIsMenuOpen(false)}></div>
       <div className={`side-menu ${isMenuOpen ? 'open' : ''}`}>
+        
+        {/* 헤더 */}
         <div className="menu-header">
           <h2 style={{ margin: 0, fontSize: '1.5em', color: '#1C2536', fontWeight: '900' }}>명리<span style={{ color: '#B59960' }}>-PRO</span></h2>
-          <button onClick={() => setIsMenuOpen(false)} style={{ background: 'none', border: 'none', fontSize: '1.5em', cursor: 'pointer', color: '#9CA3AF' }}>&times;</button>
+          <button onClick={() => setIsMenuOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+            {/* 닫기 아이콘 SVG */}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
 
-        <div className="menu-section">
-          <h4 className="menu-title">🔍 초정밀 명리사주풀이 원리</h4>
-          <p className="menu-text">
-            명리-PRO는 단순 생년월일을 넘어, <strong>태어난 국가와 도시의 경도(Longitude)를 계산하여 진태양시(True Solar Time)를 적용</strong>합니다. 1분 1초의 오차까지 보정하는 초정밀 알고리즘을 기반으로 합니다.
-          </p>
+        {/* 목차 (네비게이션) */}
+        <div style={{ paddingBottom: '10px' }}>
+          <button className="menu-nav-btn" onClick={() => { setActiveTab('saju'); setIsMenuOpen(false); }}>
+            <span style={{ fontSize: '1.2em' }}>👤</span> 개인 사주 분석
+          </button>
+          <button className="menu-nav-btn" onClick={() => { setActiveTab('gunghap'); setIsMenuOpen(false); }}>
+            <span style={{ fontSize: '1.2em' }}>💑</span> 프리미엄 궁합
+          </button>
         </div>
 
-        <div className="menu-section">
-          <h4 className="menu-title">🏆 타사와의 차별점 (장점)</h4>
-          <p className="menu-text">
-            일반 사주 앱에서는 놓치기 쉬운 <strong>'합화(合化)와 기반'의 정밀 판별, '통관/병약 용신' 분석</strong> 등 전문가 수준의 심층 엔진(800줄 이상의 핵심 로직)을 탑재하여 압도적인 정확도를 자랑합니다.
-          </p>
+        <div className="menu-content">
+          {/* 브랜드 특징 (리스트 형태) */}
+          <div className="menu-box">
+            <h4 className="menu-box-title">Why 명리-PRO?</h4>
+            <ul className="feature-list">
+              <li><strong>진태양시 적용:</strong> 출생지(해외 포함) 경도 좌표계산으로 1분 오차까지 보정</li>
+              <li><strong>합화/기반 정밀 판별:</strong> 단순 글자 합이 아닌 계절을 반영한 완벽한 변화 예측</li>
+              <li><strong>통관/병약 용신:</strong> 사주 내 병(病)과 약(藥)을 파악하는 최상위 전문가 로직 탑재</li>
+            </ul>
+          </div>
+
+          {/* 구독 서비스 배너 */}
+          <div className="subscribe-banner">
+            <span className="subscribe-tag">COMING SOON</span>
+            <h4 style={{ margin: '0 0 8px 0', color: '#0369A1', fontSize: '1em' }}>매일 운세 무료 구독 💌</h4>
+            <p style={{ margin: 0, fontSize: '0.85em', color: '#0F172A', lineHeight: '1.5' }}>
+              오늘의 운세와 이달의 운세를 매일 아침 전송해 드립니다. <br/>
+              <strong>👉 카카오톡 / 텔레그램 연동 예정</strong>
+            </p>
+          </div>
         </div>
 
-        <div className="menu-section" style={{ backgroundColor: '#F0F9FF', border: '1px solid #BAE6FD' }}>
-          <h4 className="menu-title" style={{ color: '#0369A1' }}>💌 매일 운세 구독 서비스</h4>
-          <p className="menu-text" style={{ color: '#0F172A' }}>
-            나만의 <strong>'오늘의 운세'와 '이달의 운세'를 카카오톡과 텔레그램으로 매일 아침 전송</strong>해 드립니다. <br/>
-            <span style={{ fontSize: '0.9em', color: '#0284C7', fontWeight: 'bold' }}>* 현재 연동 서비스 개발 중 (오픈 예정 🚀)</span>
-          </p>
-        </div>
-
-        <div className="menu-section" style={{ border: 'none', background: 'transparent', padding: '0 5px' }}>
-          <h4 className="menu-title">🏢 플랫폼 제공자 및 문의</h4>
-          <p className="menu-text" style={{ fontSize: '0.8em', color: '#6B7280' }}>
-            <strong>이메일 문의:</strong> abc@gmail.com <br/>
-            <strong>광고 문의 (카카오톡):</strong> myeongri_pro <br/>
-            <strong>광고 문의 (텔레그램):</strong> @myeongri_pro
-          </p>
+        {/* 정보 및 문의 푸터 */}
+        <div className="menu-footer">
+          <div style={{ fontWeight: '700', color: '#4B5563', marginBottom: '12px' }}>플랫폼 제공 및 문의</div>
+          <div className="contact-item"><span>📧</span> abc@gmail.com</div>
+          <div className="contact-item"><span>💬</span> 카카오톡: myeongri_pro</div>
+          <div className="contact-item"><span>✈️</span> 텔레그램: @myeongri_pro</div>
         </div>
       </div>
-      {/* 🌟 사이드바 끝 */}
+      {/* 🌟 사이드바 끝 🌟 */}
 
 
       <div style={{ maxWidth: '640px', margin: '0 auto', padding: '20px', paddingBottom: '60px' }}>
         
-        {/* 헤더 & 햄버거 메뉴 버튼 */}
+        {/* 메인 화면 상단 헤더 & 햄버거 메뉴 버튼 */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: '10px', marginBottom: '25px' }}>
-          <div style={{ flex: 1 }}></div> {/* 좌측 여백용 */}
+          <div style={{ flex: 1 }}></div>
           <div style={{ textAlign: 'center', flex: 2 }}>
             <h2 style={{ margin: 0, fontSize: '2em', color: '#1C2536', fontWeight: '900', letterSpacing: '-0.5px' }}>
               명리<span style={{ color: '#B59960' }}>-PRO</span>
             </h2>
             <p style={{ margin: '8px 0 0', color: '#6B7280', fontSize: '0.85em', fontWeight: '600' }}>글로벌 초정밀 사주 & 궁합 엔진</p>
           </div>
-          <div style={{ flex: 1, textAlign: 'right' }}>
-            <button onClick={() => setIsMenuOpen(true)} style={{ background: 'none', border: 'none', fontSize: '1.8em', cursor: 'pointer', color: '#1C2536', padding: '0' }}>
-              ☰
+          <div style={{ flex: 1, textAlign: 'right', display: 'flex', justifyContent: 'flex-end' }}>
+            <button onClick={() => setIsMenuOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 5px' }}>
+              {/* 고급 햄버거 아이콘 SVG */}
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1C2536" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
             </button>
           </div>
         </div>
@@ -289,7 +315,7 @@ export default function SajuCalculator() {
         {error && <div className="fade-in" style={{ padding: '16px', backgroundColor: '#FEF2F2', borderLeft: '4px solid #EF4444', color: '#991B1B', borderRadius: '8px', marginBottom: '20px', fontWeight: '600' }}>{error}</div>}
 
         {/* ========================================================
-            [1] 개인 사주 탭
+            [1] 개인 사주 탭 (로직 100% 보존)
         ======================================================== */}
         {activeTab === 'saju' && (
           <div className="fade-in">
@@ -750,7 +776,7 @@ export default function SajuCalculator() {
                   <div style={{ flex: 1, opacity: gunghapData.partner.is_time_unknown ? 0.4 : 1 }}>
                     <label className="label-text">태어난 시간</label>
                     <input type="time" className="input-field" style={{ borderColor: '#FBCFE8' }} disabled={gunghapData.partner.is_time_unknown} value={formatTime(gunghapData.partner.hour, gunghapData.partner.minute)} onChange={(e) => {
-                      if(!e.target.value) return; const [h, min] = e.target.value.split('-');
+                      if(!e.target.value) return; const [h, min] = e.target.value.split(':');
                       setGunghapData(prev => ({...prev, partner: {...prev.partner, hour: parseInt(h), minute: parseInt(min)}}));
                     }} />
                   </div>
