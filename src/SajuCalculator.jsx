@@ -24,8 +24,12 @@ const getElementColor = (text) => {
   return '#333';
 };
 
+// 💡 날짜와 시간을 HTML date/time input 형식(YYYY-MM-DD, HH:MM)으로 맞춰주는 헬퍼 함수
+const formatDate = (y, m, d) => `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+const formatTime = (h, m) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+
 export default function SajuCalculator() {
-  const [activeTab, setActiveTab] = useState('saju'); // 'saju' or 'gunghap'
+  const [activeTab, setActiveTab] = useState('saju');
 
   // 1. 개인 사주 상태
   const [formData, setFormData] = useState({ 
@@ -79,17 +83,6 @@ export default function SajuCalculator() {
     } finally { 
       setLoading(false); 
     }
-  };
-
-  const handleGunghapChange = (person, e) => {
-    const { name, value, type, checked } = e.target;
-    setGunghapData(prev => ({
-      ...prev,
-      [person]: { 
-        ...prev[person], 
-        [name]: type === 'checkbox' ? checked : type === 'number' ? (parseInt(value, 10) || 0) : value 
-      }
-    }));
   };
 
   const handleRectifySubmit = async () => {
@@ -180,22 +173,35 @@ export default function SajuCalculator() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-              {['year', 'month', 'day'].map(field => (
-                <div key={field} style={{ flex: '1 1 15%', minWidth: '60px', display: 'flex', flexDirection: 'column' }}>
-                  <label style={{ fontSize: '0.75em', color: '#64748b', marginBottom: '4px' }}>
-                    {field === 'year' ? '년' : field === 'month' ? '월' : '일'}
-                  </label>
-                  <input type="number" name={field} value={formData[field]} onChange={(e) => setFormData({...formData, [field]: parseInt(e.target.value)||0})} required style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.95em', textAlign: 'center', width: '100%', boxSizing: 'border-box' }} />
-                </div>
-              ))}
-              <div style={{ flex: '1 1 15%', minWidth: '60px', display: 'flex', flexDirection: 'column', opacity: isTimeUnknown ? 0.4 : 1 }}>
-                <label style={{ fontSize: '0.75em', color: '#64748b', marginBottom: '4px' }}>시</label>
-                <input type="number" name="hour" value={formData.hour} onChange={(e) => setFormData({...formData, hour: parseInt(e.target.value)||0})} disabled={isTimeUnknown} style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.95em', textAlign: 'center', width: '100%', boxSizing: 'border-box' }} />
+            {/* 🚀 모바일 터치 최적화: 날짜 및 시간 입력 (개인 사주) */}
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+              <div style={{ flex: '1 1 50%', minWidth: '120px', display: 'flex', flexDirection: 'column' }}>
+                <label style={{ fontSize: '0.75em', color: '#64748b', marginBottom: '4px' }}>생년월일</label>
+                <input 
+                  type="date" 
+                  value={formatDate(formData.year, formData.month, formData.day)} 
+                  onChange={(e) => {
+                    if(!e.target.value) return;
+                    const [y, m, d] = e.target.value.split('-');
+                    setFormData({...formData, year: parseInt(y), month: parseInt(m), day: parseInt(d)});
+                  }} 
+                  required 
+                  style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '1em', textAlign: 'center', width: '100%', boxSizing: 'border-box' }} 
+                />
               </div>
-              <div style={{ flex: '1 1 15%', minWidth: '60px', display: 'flex', flexDirection: 'column', opacity: isTimeUnknown ? 0.4 : 1 }}>
-                <label style={{ fontSize: '0.75em', color: '#64748b', marginBottom: '4px' }}>분</label>
-                <input type="number" name="minute" value={formData.minute} onChange={(e) => setFormData({...formData, minute: parseInt(e.target.value)||0})} disabled={isTimeUnknown} style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.95em', textAlign: 'center', width: '100%', boxSizing: 'border-box' }} />
+              <div style={{ flex: '1 1 40%', minWidth: '100px', display: 'flex', flexDirection: 'column', opacity: isTimeUnknown ? 0.4 : 1 }}>
+                <label style={{ fontSize: '0.75em', color: '#64748b', marginBottom: '4px' }}>태어난 시간</label>
+                <input 
+                  type="time" 
+                  value={formatTime(formData.hour, formData.minute)} 
+                  onChange={(e) => {
+                    if(!e.target.value) return;
+                    const [h, min] = e.target.value.split(':');
+                    setFormData({...formData, hour: parseInt(h), minute: parseInt(min)});
+                  }} 
+                  disabled={isTimeUnknown} 
+                  style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '1em', textAlign: 'center', width: '100%', boxSizing: 'border-box' }} 
+                />
               </div>
             </div>
 
@@ -211,7 +217,7 @@ export default function SajuCalculator() {
             </button>
           </form>
 
-          {/* 개인 사주 분석 결과 렌더링 */}
+          {/* 개인 사주 분석 결과 렌더링 (변경 없음) */}
           {result && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               
@@ -558,40 +564,31 @@ export default function SajuCalculator() {
                   </select>
                 </div>
 
-                {/* 🌟 년/월/일/시/분 한 줄(1 Row) 병합 UI 적용 */}
-                <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', alignItems: 'flex-end', marginBottom: '10px' }}>
-                  {['year', 'month', 'day'].map(field => (
-                    <div key={field} style={{ flex: '1 1 15%', minWidth: '40px', display: 'flex', flexDirection: 'column' }}>
-                      <span style={{ fontSize: '0.7em', color: '#64748b', marginBottom: '2px' }}>
-                        {field === 'year' ? '년' : field === 'month' ? '월' : '일'}
-                      </span>
-                      <input 
-                        type="number" 
-                        name={field} 
-                        value={gunghapData.me[field]} 
-                        onChange={(e) => handleGunghapChange('me', e)} 
-                        style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', textAlign: 'center', width: '100%', boxSizing: 'border-box' }} 
-                      />
-                    </div>
-                  ))}
-                  <div style={{ flex: '1 1 15%', minWidth: '40px', display: 'flex', flexDirection: 'column', opacity: gunghapData.me.is_time_unknown ? 0.4 : 1 }}>
-                    <span style={{ fontSize: '0.7em', color: '#64748b', marginBottom: '2px' }}>시</span>
+                {/* 🚀 모바일 터치 최적화 (궁합 - 나의 정보) */}
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'flex-end', marginBottom: '10px' }}>
+                  <div style={{ flex: '1 1 50%', minWidth: '120px', display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ fontSize: '0.7em', color: '#64748b', marginBottom: '2px' }}>생년월일</span>
                     <input 
-                      type="number" 
-                      name="hour" 
-                      value={gunghapData.me.hour} 
-                      onChange={(e) => handleGunghapChange('me', e)} 
-                      disabled={gunghapData.me.is_time_unknown} 
+                      type="date" 
+                      value={formatDate(gunghapData.me.year, gunghapData.me.month, gunghapData.me.day)} 
+                      onChange={(e) => {
+                        if(!e.target.value) return;
+                        const [y, m, d] = e.target.value.split('-');
+                        setGunghapData(prev => ({...prev, me: {...prev.me, year: parseInt(y), month: parseInt(m), day: parseInt(d)}}));
+                      }} 
                       style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', textAlign: 'center', width: '100%', boxSizing: 'border-box' }} 
                     />
                   </div>
-                  <div style={{ flex: '1 1 15%', minWidth: '40px', display: 'flex', flexDirection: 'column', opacity: gunghapData.me.is_time_unknown ? 0.4 : 1 }}>
-                    <span style={{ fontSize: '0.7em', color: '#64748b', marginBottom: '2px' }}>분</span>
+                  <div style={{ flex: '1 1 40%', minWidth: '90px', display: 'flex', flexDirection: 'column', opacity: gunghapData.me.is_time_unknown ? 0.4 : 1 }}>
+                    <span style={{ fontSize: '0.7em', color: '#64748b', marginBottom: '2px' }}>태어난 시간</span>
                     <input 
-                      type="number" 
-                      name="minute" 
-                      value={gunghapData.me.minute} 
-                      onChange={(e) => handleGunghapChange('me', e)} 
+                      type="time" 
+                      value={formatTime(gunghapData.me.hour, gunghapData.me.minute)} 
+                      onChange={(e) => {
+                        if(!e.target.value) return;
+                        const [h, min] = e.target.value.split(':');
+                        setGunghapData(prev => ({...prev, me: {...prev.me, hour: parseInt(h), minute: parseInt(min)}}));
+                      }} 
                       disabled={gunghapData.me.is_time_unknown} 
                       style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', textAlign: 'center', width: '100%', boxSizing: 'border-box' }} 
                     />
@@ -638,40 +635,31 @@ export default function SajuCalculator() {
                   </select>
                 </div>
 
-                {/* 🌟 년/월/일/시/분 한 줄(1 Row) 병합 UI 적용 */}
-                <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', alignItems: 'flex-end', marginBottom: '10px' }}>
-                  {['year', 'month', 'day'].map(field => (
-                    <div key={field} style={{ flex: '1 1 15%', minWidth: '40px', display: 'flex', flexDirection: 'column' }}>
-                      <span style={{ fontSize: '0.7em', color: '#9d174d', marginBottom: '2px' }}>
-                        {field === 'year' ? '년' : field === 'month' ? '월' : '일'}
-                      </span>
-                      <input 
-                        type="number" 
-                        name={field} 
-                        value={gunghapData.partner[field]} 
-                        onChange={(e) => handleGunghapChange('partner', e)} 
-                        style={{ padding: '8px', border: '1px solid #fbcfe8', borderRadius: '6px', textAlign: 'center', width: '100%', boxSizing: 'border-box' }} 
-                      />
-                    </div>
-                  ))}
-                  <div style={{ flex: '1 1 15%', minWidth: '40px', display: 'flex', flexDirection: 'column', opacity: gunghapData.partner.is_time_unknown ? 0.4 : 1 }}>
-                    <span style={{ fontSize: '0.7em', color: '#9d174d', marginBottom: '2px' }}>시</span>
+                {/* 🚀 모바일 터치 최적화 (궁합 - 상대방 정보) */}
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'flex-end', marginBottom: '10px' }}>
+                  <div style={{ flex: '1 1 50%', minWidth: '120px', display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ fontSize: '0.7em', color: '#9d174d', marginBottom: '2px' }}>생년월일</span>
                     <input 
-                      type="number" 
-                      name="hour" 
-                      value={gunghapData.partner.hour} 
-                      onChange={(e) => handleGunghapChange('partner', e)} 
-                      disabled={gunghapData.partner.is_time_unknown} 
+                      type="date" 
+                      value={formatDate(gunghapData.partner.year, gunghapData.partner.month, gunghapData.partner.day)} 
+                      onChange={(e) => {
+                        if(!e.target.value) return;
+                        const [y, m, d] = e.target.value.split('-');
+                        setGunghapData(prev => ({...prev, partner: {...prev.partner, year: parseInt(y), month: parseInt(m), day: parseInt(d)}}));
+                      }} 
                       style={{ padding: '8px', border: '1px solid #fbcfe8', borderRadius: '6px', textAlign: 'center', width: '100%', boxSizing: 'border-box' }} 
                     />
                   </div>
-                  <div style={{ flex: '1 1 15%', minWidth: '40px', display: 'flex', flexDirection: 'column', opacity: gunghapData.partner.is_time_unknown ? 0.4 : 1 }}>
-                    <span style={{ fontSize: '0.7em', color: '#9d174d', marginBottom: '2px' }}>분</span>
+                  <div style={{ flex: '1 1 40%', minWidth: '90px', display: 'flex', flexDirection: 'column', opacity: gunghapData.partner.is_time_unknown ? 0.4 : 1 }}>
+                    <span style={{ fontSize: '0.7em', color: '#9d174d', marginBottom: '2px' }}>태어난 시간</span>
                     <input 
-                      type="number" 
-                      name="minute" 
-                      value={gunghapData.partner.minute} 
-                      onChange={(e) => handleGunghapChange('partner', e)} 
+                      type="time" 
+                      value={formatTime(gunghapData.partner.hour, gunghapData.partner.minute)} 
+                      onChange={(e) => {
+                        if(!e.target.value) return;
+                        const [h, min] = e.target.value.split(':');
+                        setGunghapData(prev => ({...prev, partner: {...prev.partner, hour: parseInt(h), minute: parseInt(min)}}));
+                      }} 
                       disabled={gunghapData.partner.is_time_unknown} 
                       style={{ padding: '8px', border: '1px solid #fbcfe8', borderRadius: '6px', textAlign: 'center', width: '100%', boxSizing: 'border-box' }} 
                     />
@@ -697,7 +685,7 @@ export default function SajuCalculator() {
             </button>
           </form>
 
-          {/* 🌟 궁합 결과 렌더링 🌟 */}
+          {/* 🌟 궁합 결과 렌더링 (변경 없음) 🌟 */}
           {gunghapResult && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               
@@ -746,7 +734,7 @@ export default function SajuCalculator() {
 
       {/* ===================== [공통 모달창 영역] ===================== */}
       
-      {/* 🔮 생시 역추적 모달 */}
+      {/* 🔮 생시 역추적 모달 (변경 없음) */}
       {showRectifyModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(3px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1100, padding: '20px', boxSizing: 'border-box' }}>
           <div style={{ backgroundColor: '#fff', padding: '25px', borderRadius: '16px', maxWidth: '400px', width: '100%', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
@@ -795,7 +783,7 @@ export default function SajuCalculator() {
         </div>
       )}
 
-      {/* ℹ️ 용어 설명 팝업 모달 */}
+      {/* ℹ️ 용어 설명 팝업 모달 (변경 없음) */}
       {modalInfo && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(2px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px', boxSizing: 'border-box' }} onClick={() => setModalInfo(null)}>
           <div style={{ backgroundColor: '#fff', padding: '25px', borderRadius: '16px', maxWidth: '320px', width: '100%', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }} onClick={(e) => e.stopPropagation()}>
