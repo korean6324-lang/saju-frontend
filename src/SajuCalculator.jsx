@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import './App.css'; // 분리된 프리미엄 스타일 적용
+import './App.css';
 
-// 💡 통합 사전 데이터 (기존 로직 완벽 보존)
+// 💡 통합 사전 데이터 (기존 100% 유지)
 const TERMS_DICT = {
   "비견": "독립심, 주체성, 자존심을 상징하며 형제, 친구, 동료와의 동등한 관계를 의미합니다.", "겁재": "경쟁심, 투쟁력, 승부욕을 상징하며 재물을 둘러싼 경쟁이나 대인관계의 뺏고 빼앗김을 의미합니다.", "식신": "창의력, 의식주의 풍요, 전문성, 탐구심을 상징하며 온화하고 베푸는 성향을 의미합니다.", "상관": "뛰어난 표현력, 사교성, 기득권 타파를 상징하며, 틀에 얽매이지 않는 자유로운 발상과 언변을 의미합니다.", "편재": "유동적인 큰 재물, 사업 수완, 공간 지각력, 인맥 관리와 넓은 활동 영역을 의미합니다.", "정재": "고정적이고 안정적인 수입, 성실함, 꼼꼼함, 책임감과 알뜰한 저축심을 의미합니다.", "편관": "카리스마, 권력, 강한 인내심과 돌파력을 상징하며, 위험을 감수하는 리더십과 명예욕을 의미합니다.", "정관": "합리성, 보수적 원칙, 준법정신, 책임감을 상징하며 안정적인 직장과 바른 길을 의미합니다.", "편인": "직관력, 눈치, 특수한 기술이나 예술/종교/철학적 재능, 비대중적인 학문을 의미합니다.", "정인": "학문, 도덕성, 수용력, 인내심을 상징하며 어머니의 사랑과 문서(자격증, 부동산) 운을 의미합니다.", "일간": "사주팔자에서 '나 자신'을 의미하는 기준점입니다.",
   "목": "성장과 추진력, 창조적인 에너지를 상징하며, 어질고(仁) 위로 곧게 뻗어나가는 기운입니다.", "화": "열정과 명랑함, 확산하는 에너지를 상징하며, 예의(禮)를 중시하고 타오르는 불의 기운입니다.", "토": "중재와 포용력, 안정감을 상징하며, 신용(信)을 바탕으로 만물을 품는 대지의 기운입니다.", "금": "결단력과 원칙, 맺고 끊음을 상징하며, 의리(義)를 중시하고 단단하게 결실을 맺는 기운입니다.", "수": "지혜와 유연성, 수용력을 상징하며, 상황에 맞게 대처하고 만물을 적셔주는(智) 물의 기운입니다.",
@@ -28,101 +28,15 @@ const getElementColor = (text) => {
 const formatDate = (y, m, d) => `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 const formatTime = (h, m) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 
-
-// ==========================================
-// 🚀 [신규] 확장성 고려: 광고 배너 컴포넌트
-// ==========================================
+// 확장성: 광고 배너 컴포넌트
 const AdBanner = ({ format = 'horizontal', id }) => {
   return (
     <div className={`ad-wrapper ad-${format}`} data-ad-id={id}>
-      <span className="ad-placeholder-text">Sponsored Ad ({format})</span>
-      {/* 
-        추후 여기에 구글 애드센스 코드를 넣으면 됩니다.
-        예: <ins className="adsbygoogle" style={{ display: 'block' }} data-ad-client="ca-pub-XXX" ...></ins>
-      */}
+      <span className="ad-placeholder-text">Advertisement ({format})</span>
     </div>
   );
 };
 
-
-// ==========================================
-// 🚀 [신규] 2x4 사주 원국표 (바둑판) 컴포넌트
-// ==========================================
-const SajuBoard = ({ pillars, openModal }) => {
-  // 실제 명리학 앱처럼 우측부터 년주->월주->일주->시주 순서로 배치 (전통 방식)
-  const displayOrder = [
-    { key: '시주', label: '시(시간)' },
-    { key: '일주', label: '일(나)' },
-    { key: '월주', label: '월(부모/사회)' },
-    { key: '년주', label: '년(조상/근본)' }
-  ];
-
-  return (
-    <div className="saju-board-container">
-      <div className="saju-board-grid">
-        {displayOrder.map((col, idx) => {
-          const data = pillars[col.key];
-          const isUnknown = data.ganji[0] === '?';
-          
-          return (
-            <div key={idx} className={`saju-pillar-col ${isUnknown ? 'unknown-pillar' : ''}`}>
-              {/* 기둥 라벨 */}
-              <div className="pillar-header">{col.key}</div>
-              
-              {/* 천간 (위) */}
-              <div className="pillar-cell heaven-cell">
-                <div className="sipseong" onClick={() => !isUnknown && openModal(data.sipseong[0])}>
-                  {data.sipseong[0]}
-                </div>
-                <div 
-                  className="hanja" 
-                  style={{ color: getElementColor(data.ganji[0]) }}
-                  onClick={() => !isUnknown && openModal(data.ganji[0])}
-                >
-                  {data.ganji[0]}
-                </div>
-              </div>
-
-              {/* 지지 (아래) */}
-              <div className="pillar-cell earth-cell">
-                <div 
-                  className="hanja" 
-                  style={{ color: data.is_gongmang ? '#ef4444' : getElementColor(data.ganji[1]) }}
-                  onClick={() => !isUnknown && openModal(data.ganji[1])}
-                >
-                  {data.ganji[1]}
-                </div>
-                <div className="sipseong" onClick={() => !isUnknown && openModal(data.sipseong[1])}>
-                  {data.sipseong[1]}
-                </div>
-              </div>
-
-              {/* 부가 정보 (지장간, 십이운성, 신살) */}
-              {!isUnknown && (
-                <div className="pillar-footer">
-                  <div className="jijanggan" onClick={() => openModal("지장간")}>
-                    {data.jijanggan?.map((gan, i) => <span key={i} onClick={(e) => { e.stopPropagation(); openModal(gan); }}>{gan}</span>)}
-                  </div>
-                  {data.shipi && data.shipi !== "-" && (
-                    <span className="shipi-badge" onClick={() => openModal(data.shipi)}>{data.shipi}</span>
-                  )}
-                  {data.is_gongmang && (
-                    <span className="gongmang-badge" onClick={() => openModal("공망")}>공망</span>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
-
-
-// ==========================================
-// 🌟 메인 애플리케이션 (레이아웃 & 로직)
-// ==========================================
 export default function SajuCalculator() {
   const [activeTab, setActiveTab] = useState('saju');
 
@@ -149,7 +63,7 @@ export default function SajuCalculator() {
 
   const currentYear = new Date().getFullYear();
 
-  // === 이벤트 핸들러 ===
+  // API 통신 핸들러
   const handleSajuSubmit = async (e) => {
     e.preventDefault();
     setLoading(true); setError(''); setResult(null);
@@ -175,8 +89,7 @@ export default function SajuCalculator() {
   const handleGunghapChange = (person, e) => {
     const { name, value, type, checked } = e.target;
     setGunghapData(prev => ({
-      ...prev,
-      [person]: { ...prev[person], [name]: type === 'checkbox' ? checked : value }
+      ...prev, [person]: { ...prev[person], [name]: type === 'checkbox' ? checked : value }
     }));
   };
 
@@ -213,39 +126,30 @@ export default function SajuCalculator() {
   return (
     <div className="app-container">
       
-      {/* 🌟 프리미엄 헤더 */}
+      {/* 🌟 헤더 영역 */}
       <header className="header">
-        <h1 className="title-serif">명리(命理) PRO</h1>
-        <p className="subtitle">초정밀 직업·재물·궁합 통변 엔진</p>
+        <h1 className="title-serif">초정밀 사주 엔진 PRO</h1>
+        <p className="subtitle">직업 재물 통변 & 파트너 궁합 분석</p>
       </header>
 
-      {/* 🚀 반응형 대시보드 레이아웃 (PC: 2단 / 모바일: 1단) */}
+      {/* 🚀 반응형 대시보드 레이아웃 (좌: 폼, 우: 결과) */}
       <main className="dashboard-layout">
         
-        {/* =======================================
-            [좌측 패널] 입력 및 컨트롤 (Sticky 고정)
-        ======================================== */}
+        {/* ================= 좌측: 입력 패널 ================= */}
         <aside className="input-panel">
           <div className="panel-inner">
             
-            {/* 탭 전환 */}
+            {/* 탭 버튼 */}
             <div className="tab-container">
-              <button 
-                className={`tab-btn ${activeTab === 'saju' ? 'active saju' : ''}`}
-                onClick={() => {setActiveTab('saju'); setError('');}} 
-              >👤 사주 분석</button>
-              <button 
-                className={`tab-btn ${activeTab === 'gunghap' ? 'active gunghap' : ''}`}
-                onClick={() => {setActiveTab('gunghap'); setError('');}} 
-              >💑 궁합 보기</button>
+              <button className={`tab-btn ${activeTab === 'saju' ? 'active saju' : ''}`} onClick={() => {setActiveTab('saju'); setError('');}}>👤 개인 사주 분석</button>
+              <button className={`tab-btn ${activeTab === 'gunghap' ? 'active gunghap' : ''}`} onClick={() => {setActiveTab('gunghap'); setError('');}}>💑 궁합 보기</button>
             </div>
 
             {error && <div className="error-message">{error}</div>}
 
-            {/* 1. 사주 분석 폼 */}
+            {/* 사주 폼 */}
             {activeTab === 'saju' && (
-              <form onSubmit={handleSajuSubmit} className="input-form fade-in">
-                
+              <form onSubmit={handleSajuSubmit} className="fade-in">
                 <div className="input-row">
                   <div className="input-box">
                     <label>성별</label>
@@ -257,9 +161,7 @@ export default function SajuCalculator() {
                   <div className="input-box">
                     <label>역법</label>
                     <select className="premium-input" onChange={(e) => setFormData({ ...formData, is_lunar: e.target.value.includes('lunar'), is_leap_month: e.target.value === 'lunar_leap' })} value={!formData.is_lunar ? 'solar' : formData.is_leap_month ? 'lunar_leap' : 'lunar'}>
-                      <option value="solar">양력</option>
-                      <option value="lunar">음력 (평달)</option>
-                      <option value="lunar_leap">음력 (윤달)</option>
+                      <option value="solar">양력</option><option value="lunar">음력(평달)</option><option value="lunar_leap">음력(윤달)</option>
                     </select>
                   </div>
                 </div>
@@ -268,38 +170,29 @@ export default function SajuCalculator() {
                   <div className="input-box fill-width">
                     <label>생년월일</label>
                     <input type="date" className="premium-input" required value={formatDate(formData.year, formData.month, formData.day)} onChange={(e) => {
-                      if(!e.target.value) return;
-                      const [y, m, d] = e.target.value.split('-');
-                      setFormData({...formData, year: parseInt(y), month: parseInt(m), day: parseInt(d)});
+                      if(!e.target.value) return; const [y, m, d] = e.target.value.split('-'); setFormData({...formData, year: parseInt(y), month: parseInt(m), day: parseInt(d)});
                     }} />
                   </div>
                   <div className={`input-box fill-width ${isTimeUnknown ? 'disabled' : ''}`}>
                     <label>태어난 시간</label>
                     <input type="time" className="premium-input" disabled={isTimeUnknown} value={formatTime(formData.hour, formData.minute)} onChange={(e) => {
-                      if(!e.target.value) return;
-                      const [h, min] = e.target.value.split(':');
-                      setFormData({...formData, hour: parseInt(h), minute: parseInt(min)});
+                      if(!e.target.value) return; const [h, min] = e.target.value.split(':'); setFormData({...formData, hour: parseInt(h), minute: parseInt(min)});
                     }} />
                   </div>
                 </div>
 
                 <div className="form-options">
                   <button type="button" className="action-btn" onClick={() => setShowRectifyModal(true)}>🔮 생시 역추적하기</button>
-                  <label className="checkbox-label">
-                    <input type="checkbox" checked={isTimeUnknown} onChange={(e) => setIsTimeUnknown(e.target.checked)} /> 시간 모름
-                  </label>
+                  <label className="checkbox-label"><input type="checkbox" checked={isTimeUnknown} onChange={(e) => setIsTimeUnknown(e.target.checked)} /> 시간 모름</label>
                 </div>
 
-                <button type="submit" disabled={loading} className="premium-button">
-                  {loading ? '운명 분석 중...' : '사주 분석하기'}
-                </button>
+                <button type="submit" disabled={loading} className="premium-button">{loading ? '운명 분석 중...' : '개인 사주 분석하기'}</button>
               </form>
             )}
 
-            {/* 2. 궁합 분석 폼 */}
+            {/* 궁합 폼 */}
             {activeTab === 'gunghap' && (
-              <form onSubmit={handleGunghapSubmit} className="input-form fade-in">
-                {/* 👤 나의 정보 */}
+              <form onSubmit={handleGunghapSubmit} className="fade-in">
                 <div className="gunghap-section mine">
                   <h4 className="section-title">👤 나의 정보</h4>
                   <div className="input-row">
@@ -325,9 +218,8 @@ export default function SajuCalculator() {
                   </div>
                 </div>
 
-                {/* 💖 상대방 정보 */}
                 <div className="gunghap-section partner mt-10">
-                  <h4 className="section-title">💖 상대방 정보</h4>
+                  <h4 className="section-title" style={{color: '#be185d'}}>💖 상대방 정보</h4>
                   <div className="input-row">
                     <select className="premium-input partner-input" name="gender" value={gunghapData.partner.gender} onChange={(e) => handleGunghapChange('partner', e)}>
                       <option value="F">여성</option><option value="M">남성</option>
@@ -351,133 +243,368 @@ export default function SajuCalculator() {
                   </div>
                 </div>
 
-                <button type="submit" disabled={loading} className="premium-button gunghap-btn">
+                <button type="submit" disabled={loading} className="premium-button gunghap-btn mt-10">
                   {loading ? '궁합 연결 중...' : '궁합 점수 확인하기'}
                 </button>
               </form>
             )}
 
-            {/* 🚀 광고 배너 (사이드바 고정형) */}
-            <div className="sidebar-ad mt-20">
+            {/* 🚀 광고 배너 (사이드바 폼 고정) */}
+            <div className="mt-20">
               <AdBanner format="rectangle" id="ad-sidebar" />
             </div>
 
           </div>
         </aside>
 
-        {/* =======================================
-            [우측 패널] 결과 출력 및 그리드 (밀도 높음)
-        ======================================== */}
+        {/* ================= 우측: 결과 패널 (모든 디테일 100% 보존) ================= */}
         <section className="result-panel">
           
-          {/* 상태 1: 대기 화면 */}
           {!loading && !result && !gunghapResult && (
             <div className="empty-state fade-in">
               <div className="empty-icon">☯️</div>
               <h3 className="title-serif">당신의 고유한 바코드를 해독합니다</h3>
-              <p>좌측에 정보를 입력하시면, 수천 년간 누적된 명리학 데이터를<br/>바탕으로 당신만의 운명 보고서가 이곳에 펼쳐집니다.</p>
+              <p>수천 년간 누적된 명리학 데이터를 바탕으로<br/>당신만의 운명 보고서가 펼쳐집니다.</p>
             </div>
           )}
 
-          {/* 상태 2: 로딩 중 */}
           {loading && (
             <div className="loading-state fade-in">
               <div className="oriental-spinner"></div>
-              <p className="loading-text">명식과 대운의 흐름을 분석하고 있습니다...</p>
+              <p className="loading-text">운명의 흐름을 읽고 있습니다...</p>
             </div>
           )}
 
-          {/* 🌟 결과 1: 개인 사주 (그리드 레이아웃) */}
+          {/* 🌟 결과 1: 개인 사주 */}
           {!loading && result && activeTab === 'saju' && (
             <div className="result-grid fade-in">
               
-              {/* [카드 1: 사주 원국표 2x4 바둑판] 전체 너비 차지 */}
-              <div className="result-card full-width">
-                <h3 className="card-title title-serif">📌 나의 사주 원국 (팔자)</h3>
-                <SajuBoard pillars={result.pillars} openModal={openModal} />
-              </div>
-
-              {/* [카드 2: 일진 / 오행] */}
-              <div className="result-card">
-                 <h3 className="card-title title-serif">📊 오행 분포도</h3>
-                 <div className="elements-visual">
-                    {Object.entries(result.elements_ratio).map(([element, ratio]) => (
-                      <div key={element} className="element-bar-row">
-                        <strong onClick={() => openModal(element)} style={{ color: getElementColor(element) }}>{element}</strong>
-                        <div className="bar-track">
-                          <div className="bar-fill" style={{ width: `${ratio}%`, backgroundColor: getElementColor(element) }}></div>
-                        </div>
-                        <span>{ratio}%</span>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-
-              <div className="result-card bg-highlight">
-                <h3 className="card-title title-serif">📅 오늘의 운세 (일진)</h3>
-                <div className="iljin-box">
-                  <div className="iljin-date">{result.iljin.date}</div>
-                  <div className="iljin-chars">
-                    <div className="char-col">
-                      <span className="char" style={{ color: getElementColor(result.iljin.ganji[0]) }} onClick={() => openModal(result.iljin.ganji[0])}>{result.iljin.ganji[0]}</span>
-                      <span className="sip" onClick={() => openModal(result.iljin.sipseong[0])}>{result.iljin.sipseong[0]}</span>
-                    </div>
-                    <div className="char-col">
-                      <span className="char" style={{ color: result.iljin.is_gongmang ? '#ef4444' : getElementColor(result.iljin.ganji[1]) }} onClick={() => openModal(result.iljin.ganji[1])}>{result.iljin.ganji[1]}</span>
-                      <span className="sip" onClick={() => openModal(result.iljin.sipseong[1])}>{result.iljin.sipseong[1]}</span>
-                    </div>
+              {/* [기존 코드 1] 일진 */}
+              <div className="result-card full-width" style={{ backgroundColor: '#f0f9ff', border: '1px solid #bae6fd', padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ fontSize: '0.85em', fontWeight: 'bold', color: '#0369a1', marginBottom: '4px', cursor: 'pointer' }} onClick={() => openModal("일진")}>📅 오늘의 운세 (일진)</div>
+                  <div style={{ fontSize: '1.2em', fontWeight: '800', color: '#0f172a' }}>{result.iljin.date}</div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div onClick={() => openModal(result.iljin.ganji[0])} style={{ fontSize: '1.6em', fontWeight: '900', color: getElementColor(result.iljin.ganji[0]), cursor: 'pointer', lineHeight: '1.2' }}>{result.iljin.ganji[0]}</div>
+                    <div onClick={() => openModal(result.iljin.sipseong[0])} style={{ fontSize: '0.75em', color: '#64748b', cursor: 'pointer' }}>{result.iljin.sipseong[0]}</div>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div onClick={() => openModal(result.iljin.ganji[1])} style={{ fontSize: '1.6em', fontWeight: '900', color: result.iljin.is_gongmang ? '#ef4444' : getElementColor(result.iljin.ganji[1]), cursor: 'pointer', lineHeight: '1.2' }}>{result.iljin.ganji[1]}</div>
+                    <div onClick={() => openModal(result.iljin.sipseong[1])} style={{ fontSize: '0.75em', color: '#64748b', cursor: 'pointer' }}>{result.iljin.sipseong[1]}</div>
                   </div>
                 </div>
               </div>
 
-              {/* 🚀 광고 배너 (인피드 가로형) 전체 너비 */}
+              {/* [기존 코드 2] 사주 원국 (바둑판 배열 그대로 보존하되 클래스로 감쌈) */}
+              <div className="result-card full-width">
+                <h3 className="card-title"><span style={{ fontSize: '1.2em' }}>📌</span> 사주 팔자 (원국)</h3>
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'space-between' }}>
+                  {['년주', '월주', '일주', '시주'].map((pillarKey) => {
+                    const data = result.pillars[pillarKey];
+                    const isUnknown = data.ganji[0] === '?';
+                    return (
+                      <div key={pillarKey} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#f8fafc', padding: '15px 5px', borderRadius: '8px', border: '1px solid #f1f5f9' }}>
+                        <div style={{ fontSize: '0.75em', color: '#94a3b8', fontWeight: 'bold', marginBottom: '8px' }}>{pillarKey}</div>
+                        <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+                          <div onClick={() => !isUnknown && openModal(data.ganji[0])} style={{ fontSize: '1.8em', fontWeight: '900', color: getElementColor(data.ganji[0]), cursor: isUnknown ? 'default' : 'pointer', lineHeight: '1' }}>{data.ganji[0]}</div>
+                          <div onClick={() => !isUnknown && openModal(data.sipseong[0])} style={{ fontSize: '0.75em', color: '#64748b', cursor: isUnknown ? 'default' : 'pointer', marginTop: '4px' }}>{data.sipseong[0]}</div>
+                        </div>
+                        <div style={{ width: '30px', height: '1px', backgroundColor: '#e2e8f0', margin: '5px 0 10px 0' }} />
+                        <div style={{ textAlign: 'center', marginBottom: '8px' }}>
+                          <div onClick={() => !isUnknown && openModal(data.ganji[1])} style={{ fontSize: '1.8em', fontWeight: '900', color: data.is_gongmang ? '#ef4444' : getElementColor(data.ganji[1]), cursor: isUnknown ? 'default' : 'pointer', lineHeight: '1' }}>{data.ganji[1]}</div>
+                          <div onClick={() => !isUnknown && openModal(data.sipseong[1])} style={{ fontSize: '0.75em', color: '#64748b', cursor: isUnknown ? 'default' : 'pointer', marginTop: '4px' }}>{data.sipseong[1]}</div>
+                        </div>
+                        {/* 지장간, 십이운성, 신살 완벽 보존 */}
+                        {!isUnknown && (
+                          <div style={{ display: 'flex', gap: '4px', justifyContent: 'center', marginBottom: '10px', cursor: 'pointer' }} title="지장간">
+                            <span style={{ fontSize: '0.65em', color: '#94a3b8' }} onClick={() => openModal("지장간")}>[</span>
+                            {data.jijanggan?.map((gan, idx) => <span key={idx} onClick={() => openModal(gan)} style={{ fontSize: '0.75em', color: '#64748b', fontWeight: '500' }}>{gan}</span>)}
+                            <span style={{ fontSize: '0.65em', color: '#94a3b8' }} onClick={() => openModal("지장간")}>]</span>
+                          </div>
+                        )}
+                        {!isUnknown && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%', alignItems: 'center' }}>
+                            {data.shipi && data.shipi !== "-" && <span onClick={() => openModal(data.shipi)} style={{ fontSize: '0.65em', padding: '2px 6px', backgroundColor: '#e0f2fe', color: '#1e3a8a', borderRadius: '4px', cursor: 'pointer', width: 'max-content' }}>{data.shipi}</span>}
+                            {data.is_gongmang && <span onClick={() => openModal("공망")} style={{ fontSize: '0.65em', padding: '2px 6px', backgroundColor: '#fee2e2', color: '#991b1b', borderRadius: '4px', cursor: 'pointer', width: 'max-content' }}>공망</span>}
+                            {data.sinsal.map((sal, idx) => {
+                              let bg = '#f3f4f6', color = '#475569', border = '#e2e8f0';
+                              if (sal.includes('대살') || sal.includes('괴강')) { bg = '#ffebee'; color = '#c62828'; border = '#ffcdd2'; }
+                              else if (sal.includes('천을귀인')) { bg = '#fff8e1'; color = '#f57f17'; border = '#ffecb3'; } 
+                              else if (sal.includes('홍염')) { bg = '#fce4ec'; color = '#c2185b'; border = '#f8bbd0'; } 
+                              return <span key={idx} onClick={() => openModal(sal)} style={{ fontSize: '0.65em', padding: '2px 6px', backgroundColor: bg, color: color, borderRadius: '4px', border: `1px solid ${border}`, cursor: 'pointer', width: 'max-content', textAlign: 'center' }}>{sal}</span>;
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* [기존 코드 3] 격국 및 용신 블록 */}
+              <div className="result-card full-width" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                <div style={{ background: 'linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <span style={{ fontSize: '0.85em', fontWeight: 'bold', color: '#64748b' }}>타고난 그릇 (격국)</span>
+                    <span style={{ fontSize: '1.2em', fontWeight: '800', color: '#d97706' }}>{result.gyeokguk.name}</span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '0.95em', color: '#334155', lineHeight: '1.5' }}>{result.gyeokguk.description}</p>
+                </div>
+
+                {result.yongshin.special_type && (
+                  <div style={{ backgroundColor: '#f5f3ff', border: '1px solid #c4b5fd', borderRadius: '12px', padding: '15px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '1.1em' }}>🚨</span>
+                      <span style={{ fontSize: '0.95em', fontWeight: 'bold', color: '#6d28d9', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => openModal(result.yongshin.special_type)}>{result.yongshin.special_type} 발견!</span>
+                    </div>
+                    <p style={{ margin: 0, fontSize: '0.85em', color: '#4c1d95', lineHeight: '1.4' }}>{result.yongshin.special_desc}</p>
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
+                  <div style={{ flex: '1 1 45%', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '15px' }}>
+                    <h4 style={{ margin: '0 0 10px 0', fontSize: '0.95em', color: '#1e293b' }}>⚖️ 억부 용신</h4>
+                    <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                      <div style={{ flex: 1, backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '10px' }}>
+                        <div style={{ fontSize: '0.75em', fontWeight: 'bold', color: '#166534', marginBottom: '5px' }}>용희신</div>
+                        <div style={{ display: 'flex', gap: '5px' }}>
+                          {result.yongshin.yong_hee.map((el, i) => <span key={i} onClick={() => openModal(el)} style={{ cursor: 'pointer', fontWeight: 'bold', color: getElementColor(el), fontSize: '1.1em' }}>{el}</span>)}
+                        </div>
+                      </div>
+                      <div style={{ flex: 1, backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px' }}>
+                        <div style={{ fontSize: '0.75em', fontWeight: 'bold', color: '#991b1b', marginBottom: '5px' }}>기구신</div>
+                        <div style={{ display: 'flex', gap: '5px' }}>
+                          {result.yongshin.gi_gu.map((el, i) => <span key={i} onClick={() => openModal(el)} style={{ cursor: 'pointer', fontWeight: 'bold', color: getElementColor(el), fontSize: '1.1em' }}>{el}</span>)}
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ fontSize: '0.85em', color: '#475569', lineHeight: '1.4' }}>
+                      <strong onClick={() => openModal(result.yongshin.strength)} style={{ cursor: 'pointer', textDecoration: 'underline', color: '#1e293b' }}>{result.yongshin.strength}</strong>: {result.yongshin.description}
+                    </div>
+                  </div>
+                  
+                  <div style={{ flex: '1 1 45%', backgroundColor: '#fff7ed', border: '1px solid #ffedd5', borderRadius: '12px', padding: '15px' }}>
+                    <h4 style={{ margin: '0 0 10px 0', fontSize: '0.95em', color: '#9a3412' }}>🌡️ 조후 용신</h4>
+                    <div style={{ backgroundColor: '#ffedd5', borderRadius: '8px', padding: '10px', marginBottom: '10px' }}>
+                      <div style={{ fontSize: '0.75em', fontWeight: 'bold', color: '#9a3412', marginBottom: '5px' }}>조후 용희신</div>
+                      <div style={{ display: 'flex', gap: '5px' }}>
+                        {result.johu.yong_hee.length > 0 ? (
+                          result.johu.yong_hee.map((el, i) => <span key={i} onClick={() => openModal(el)} style={{ cursor: 'pointer', fontWeight: 'bold', color: getElementColor(el), fontSize: '1.1em' }}>{el}</span>)
+                        ) : (<span style={{ fontSize: '0.9em', color: '#ea580c' }}>산출 불가</span>)}
+                      </div>
+                    </div>
+                    <p style={{ margin: 0, fontSize: '0.85em', color: '#9a3412', lineHeight: '1.4' }}>{result.johu.description}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* [기존 코드 4] 맞춤 개운법 (행운 팁) */}
+              <div className="result-card full-width" style={{ background: 'linear-gradient(to right, #ecfdf5, #f0fdfa)', border: '1px solid #a7f3d0' }}>
+                <h3 style={{ margin: '0 0 15px 0', fontSize: '1.1em', display: 'flex', alignItems: 'center', gap: '8px', color: '#047857' }}>
+                  <span style={{ fontSize: '1.2em' }}>🍀</span> 나만의 맞춤 개운법 (행운 팁)
+                </h3>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <div style={{ flex: '1 1 30%', backgroundColor: '#ffffff', padding: '12px', borderRadius: '8px', border: '1px solid #d1fae5', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75em', color: '#059669', fontWeight: 'bold', marginBottom: '5px' }}>행운의 컬러 🎨</div>
+                    <div style={{ fontSize: '0.95em', color: '#064e3b', fontWeight: 'bold' }}>{result.interpretation.lucky_color}</div>
+                  </div>
+                  <div style={{ flex: '1 1 30%', backgroundColor: '#ffffff', padding: '12px', borderRadius: '8px', border: '1px solid #d1fae5', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75em', color: '#059669', fontWeight: 'bold', marginBottom: '5px' }}>행운의 방향 🧭</div>
+                    <div style={{ fontSize: '0.95em', color: '#064e3b', fontWeight: 'bold' }}>{result.interpretation.lucky_direction}</div>
+                  </div>
+                  <div style={{ flex: '1 1 100%', backgroundColor: '#ffffff', padding: '12px', borderRadius: '8px', border: '1px solid #d1fae5' }}>
+                    <div style={{ fontSize: '0.75em', color: '#059669', fontWeight: 'bold', marginBottom: '5px' }}>추천하는 행동 & 아이템 ✨</div>
+                    <div style={{ fontSize: '0.95em', color: '#064e3b', fontWeight: '500' }}>{result.interpretation.lucky_item}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 🚀 광고 배너 (인피드 가로형) */}
               <div className="infeed-ad full-width">
                 <AdBanner format="horizontal" id="ad-infeed" />
               </div>
 
-              {/* [카드 3: 스토리텔링] 전체 너비 */}
-              <div className="result-card full-width storytelling-card">
-                <h3 className="card-title title-serif">📖 심층 운명 분석 스토리</h3>
-                <div className="story-content">
-                  <h4>🔹 타고난 오행의 기운</h4>
-                  <p>{result.interpretation.five_elements_desc}</p>
-                  <h4>🔹 활동성과 이동 (역마)</h4>
-                  <p>{result.interpretation.movement_luck}</p>
-                  <h4>💼 직업 및 재물운 분석</h4>
-                  <p>{result.interpretation.job_wealth_desc}</p>
+              {/* [기존 코드 5] 오행 분포도 */}
+              <div className="result-card">
+                <h3 className="card-title title-serif"><span style={{ fontSize: '1.2em' }}>📊</span> 오행 분포도</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {Object.entries(result.elements_ratio).map(([element, ratio]) => (
+                    <div key={element} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <strong onClick={() => openModal(element)} style={{ cursor: 'pointer', width: '20px', color: getElementColor(element) }}>{element}</strong>
+                      <div style={{ flex: 1, backgroundColor: '#f1f5f9', height: '10px', borderRadius: '5px', overflow: 'hidden' }}>
+                        <div style={{ width: `${ratio}%`, backgroundColor: getElementColor(element), height: '100%', borderRadius: '5px', transition: 'width 0.5s ease-in-out' }}></div>
+                      </div>
+                      <span style={{ fontSize: '0.85em', color: '#64748b', width: '35px', textAlign: 'right' }}>{ratio}%</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
+              {/* [기존 코드 6] 스토리텔링 & 상호작용 */}
+              <div className="result-card">
+                <h3 className="card-title title-serif"><span style={{ fontSize: '1.2em' }}>📖</span> 심층 스토리텔링</h3>
+                <div style={{ backgroundColor: '#f8fafc', padding: '15px', borderRadius: '8px', border: '1px solid #f1f5f9' }}>
+                  <h4 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '0.95em' }}>🔹 타고난 오행의 기운</h4>
+                  <p style={{ lineHeight: '1.6', margin: '0 0 15px 0', fontSize: '0.9em', color: '#475569' }}>{result.interpretation.five_elements_desc}</p>
+                  <h4 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '0.95em' }}>🔹 활동성과 이동 (역마)</h4>
+                  <p style={{ lineHeight: '1.6', margin: '0 0 15px 0', fontSize: '0.9em', color: '#475569' }}>{result.interpretation.movement_luck}</p>
+                  <h4 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '0.95em' }}>💼 직업 및 재물운 분석</h4>
+                  <p style={{ lineHeight: '1.6', margin: 0, fontSize: '0.9em', color: '#475569' }}>{result.interpretation.job_wealth_desc}</p>
+                </div>
+                
+                <h4 style={{ margin: '15px 0 5px 0', fontSize: '1em', color: '#334155' }}>⚡ 원국 내 상호작용 (합화/기반 정밀 판별)</h4>
+                {result.relations && result.relations.length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {result.relations.map((rel, idx) => {
+                      const isHaphwa = rel.type.includes('합화');
+                      return (
+                        <div key={idx} style={{ borderLeft: `3px solid ${isHaphwa ? '#8b5cf6' : rel.name.includes('합') ? '#10b981' : '#ef4444'}`, padding: '10px 12px', backgroundColor: isHaphwa ? '#f5f3ff' : '#f8fafc', borderRadius: '4px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <strong onClick={() => openModal(rel.type)} style={{ fontSize: '0.95em', color: isHaphwa ? '#5b21b6' : '#1e293b', cursor: 'pointer', textDecoration: 'underline' }}>
+                              {rel.name} <span style={{ fontSize: '0.8em', color: '#64748b', fontWeight: 'normal', textDecoration: 'none' }}>({rel.type})</span>
+                            </strong>
+                            <span style={{ fontSize: '0.85em', color: '#3b82f6', fontWeight: '600' }}>[{rel.positions.join(' ↔ ')}]</span>
+                          </div>
+                          <p style={{ margin: 0, fontSize: '0.85em', color: '#475569', lineHeight: '1.4' }}>{rel.description}</p>
+                        </div>
+                      )
+                    })}
+                  </div>
+                ) : (<p style={{ margin: 0, fontSize: '0.9em', color: '#94a3b8' }}>뚜렷한 상호작용이 없습니다.</p>)}
+              </div>
+
+              {/* [기존 코드 7] 운세 변화 알림 */}
+              {groupedDynamic.length > 0 && (
+                <div className="result-card full-width" style={{ backgroundColor: '#fffbeb', border: '1px solid #fcd34d' }}>
+                  <h3 style={{ margin: '0 0 15px 0', fontSize: '1.1em', color: '#b45309', display: 'flex', alignItems: 'center', gap: '6px' }}>🔔 지금 주목해야 할 운세 변화</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {groupedDynamic.map((rel, idx) => {
+                      const hasIljin = rel.un_types.includes('오늘 일진');
+                      const hasWolun = rel.un_types.includes('이달의 월운');
+                      const isHighlight = hasIljin || hasWolun;
+                      return (
+                        <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px', backgroundColor: isHighlight ? '#eff6ff' : 'rgba(255,255,255,0.7)', border: isHighlight ? '1px solid #bfdbfe' : 'none', padding: '12px', borderRadius: '8px' }}>
+                          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <span onClick={() => openModal(rel.type)} style={{ fontSize: '0.85em', fontWeight: 'bold', color: isHighlight ? '#0369a1' : '#92400e', cursor: 'pointer', textDecoration: 'underline' }}>{rel.name}</span>
+                            <span style={{ fontSize: '0.7em', padding: '2px 6px', backgroundColor: isHighlight ? '#dbeafe' : '#fef3c7', color: isHighlight ? '#1d4ed8' : '#b45309', borderRadius: '4px', border: `1px solid ${isHighlight ? '#93c5fd' : '#fde68a'}` }}>
+                              {rel.un_types.join(' & ')}
+                            </span>
+                          </div>
+                          <p style={{ margin: 0, fontSize: '0.9em', color: '#451a03', lineHeight: '1.4' }}>
+                            <strong style={{ color: isHighlight ? '#0284c7' : '#d97706' }}>[{rel.target_pillar}]</strong> {rel.description}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* [기존 코드 8] 운세 흐름 (월운/세운/대운 완벽 보존) */}
+              <div className="result-card full-width" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                {result.wolun && (
+                  <div>
+                    <h3 style={{ margin: '0 0 10px 0', fontSize: '1em', color: '#334155' }}>🌙 이달의 운세 (올해의 월운)</h3>
+                    <div style={{ display: 'flex', overflowX: 'auto', gap: '8px', paddingBottom: '10px', scrollbarWidth: 'thin' }}>
+                      {result.wolun.map((wun, idx) => (
+                        <div key={idx} style={{ minWidth: '55px', padding: '10px 4px', border: wun.is_current ? '2px solid #8b5cf6' : '1px solid #e2e8f0', borderRadius: '8px', textAlign: 'center', backgroundColor: wun.is_current ? '#f5f3ff' : '#ffffff' }}>
+                          <div style={{ fontSize: '0.7em', color: '#64748b', marginBottom: '6px', fontWeight: wun.is_current ? 'bold' : 'normal' }}>{wun.month}월</div>
+                          <div onClick={() => openModal(wun.ganji[0])} style={{ fontSize: '1.1em', fontWeight: 'bold', color: getElementColor(wun.ganji[0]), cursor: 'pointer' }}>{wun.ganji[0]}</div>
+                          <div onClick={() => openModal(wun.ganji[1])} style={{ fontSize: '1.1em', fontWeight: 'bold', color: wun.is_gongmang ? '#ef4444' : getElementColor(wun.ganji[1]), cursor: 'pointer', marginBottom: '4px' }}>{wun.ganji[1]}</div>
+                          <div style={{ display: 'flex', gap: '2px', justifyContent: 'center', marginBottom: '4px' }}>
+                            {wun.jijanggan?.map((gan, i) => <span key={i} onClick={() => openModal(gan)} style={{ fontSize: '0.65em', color: '#94a3b8', cursor: 'pointer' }}>{gan}</span>)}
+                          </div>
+                          <div onClick={() => openModal(wun.shipi)} style={{ fontSize: '0.65em', color: '#64748b', cursor: 'pointer' }}>{wun.shipi}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                <hr style={{ margin: '5px 0', border: 'none', borderTop: '1px solid #f1f5f9' }}/>
+
+                <div>
+                  <h3 style={{ margin: '0 0 10px 0', fontSize: '1em', color: '#334155' }}>📅 1년 단위 현실 (세운)</h3>
+                  <div style={{ display: 'flex', overflowX: 'auto', gap: '8px', paddingBottom: '10px', scrollbarWidth: 'thin' }}>
+                    {result.seun.map((wun, idx) => {
+                      const isCurrent = wun.year === currentYear;
+                      return (
+                        <div key={idx} style={{ minWidth: '55px', padding: '10px 4px', border: isCurrent ? '2px solid #10b981' : '1px solid #e2e8f0', borderRadius: '8px', textAlign: 'center', backgroundColor: isCurrent ? '#ecfdf5' : '#ffffff' }}>
+                          <div style={{ fontSize: '0.7em', color: '#64748b', marginBottom: '2px' }}>{wun.year}</div>
+                          <div style={{ fontSize: '0.8em', fontWeight: 'bold', color: '#ef4444', marginBottom: '6px' }}>{wun.age}세</div>
+                          <div onClick={() => openModal(wun.ganji[0])} style={{ fontSize: '1.1em', fontWeight: 'bold', color: getElementColor(wun.ganji[0]), cursor: 'pointer' }}>{wun.ganji[0]}</div>
+                          <div onClick={() => openModal(wun.ganji[1])} style={{ fontSize: '1.1em', fontWeight: 'bold', color: wun.is_gongmang ? '#ef4444' : getElementColor(wun.ganji[1]), cursor: 'pointer', marginBottom: '4px' }}>{wun.ganji[1]}</div>
+                          <div style={{ display: 'flex', gap: '2px', justifyContent: 'center', marginBottom: '4px' }}>
+                            {wun.jijanggan?.map((gan, i) => <span key={i} onClick={() => openModal(gan)} style={{ fontSize: '0.65em', color: '#94a3b8', cursor: 'pointer' }}>{gan}</span>)}
+                          </div>
+                          <div onClick={() => openModal(wun.shipi)} style={{ fontSize: '0.65em', color: '#64748b', cursor: 'pointer' }}>{wun.shipi}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <hr style={{ margin: '5px 0', border: 'none', borderTop: '1px solid #f1f5f9' }}/>
+
+                <div>
+                  <h3 style={{ margin: '0 0 10px 0', fontSize: '1em', color: '#334155', display: 'flex', justifyContent: 'space-between' }}>
+                    <span>🛤️ 10년 단위 큰 환경 (대운)</span>
+                    <span style={{ fontSize: '0.75em', color: '#6366f1', fontWeight: 'normal', cursor: 'pointer' }} onClick={() => openModal("교운기")}>💡 교운기란?</span>
+                  </h3>
+                  <div style={{ display: 'flex', overflowX: 'auto', gap: '8px', paddingBottom: '10px', scrollbarWidth: 'thin' }}>
+                    {result.daewun.map((wun, idx) => {
+                      const isCurrent = result.seun.find(s => s.year === currentYear)?.age >= wun.age && result.seun.find(s => s.year === currentYear)?.age < wun.age + 10;
+                      return (
+                        <div key={idx} style={{ minWidth: '60px', padding: '10px 4px', border: isCurrent ? '2px solid #3b82f6' : '1px solid #e2e8f0', borderRadius: '8px', textAlign: 'center', backgroundColor: isCurrent ? '#eff6ff' : '#ffffff', opacity: wun.age > 90 ? 0.6 : 1 }}>
+                          <div style={{ fontSize: '0.75em', fontWeight: 'bold', color: isCurrent ? '#1d4ed8' : '#ef4444', marginBottom: '2px' }}>{wun.age}세</div>
+                          <div onClick={() => openModal(wun.ganji[0])} style={{ fontSize: '1.1em', fontWeight: 'bold', color: getElementColor(wun.ganji[0]), cursor: 'pointer' }}>{wun.ganji[0]}</div>
+                          <div onClick={() => openModal(wun.ganji[1])} style={{ fontSize: '1.1em', fontWeight: 'bold', color: wun.is_gongmang ? '#ef4444' : getElementColor(wun.ganji[1]), cursor: 'pointer', marginBottom: '4px' }}>{wun.ganji[1]}</div>
+                          <div style={{ display: 'flex', gap: '2px', justifyContent: 'center', marginBottom: '4px' }}>
+                            {wun.jijanggan?.map((gan, i) => <span key={i} onClick={() => openModal(gan)} style={{ fontSize: '0.65em', color: '#94a3b8', cursor: 'pointer' }}>{gan}</span>)}
+                          </div>
+                          <div onClick={() => openModal(wun.shipi)} style={{ fontSize: '0.65em', color: '#64748b', cursor: 'pointer', marginBottom: '6px' }}>{wun.shipi}</div>
+                          <div style={{ fontSize: '0.6em', color: '#4338ca', backgroundColor: '#e0e7ff', padding: '2px', borderRadius: '4px' }} title="대운 진입(교운기) 날짜">
+                            {wun.start_date.substring(2)}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
-          {/* 🌟 결과 2: 궁합 보기 (그리드 레이아웃) */}
+          {/* 🌟 결과 2: 궁합 보기 (기존 로직 보존) */}
           {!loading && gunghapResult && activeTab === 'gunghap' && (
             <div className="result-grid fade-in">
-              <div className="result-card full-width text-center score-card">
-                <h3 className="card-title justify-center title-serif text-pink">두 사람의 찰떡 궁합도는?</h3>
-                <div className="score-display">
-                  {gunghapResult.score}<span>점</span>
+              <div className="result-card full-width" style={{ backgroundColor: '#ffffff', border: '2px solid #fbcfe8', textAlign: 'center', padding: '30px 20px', boxShadow: '0 4px 15px rgba(219,39,119,0.1)' }}>
+                <h3 style={{ margin: '0 0 10px 0', color: '#831843', fontSize: '1.2em' }}>두 사람의 찰떡 궁합도는?</h3>
+                <div style={{ fontSize: '4em', fontWeight: '900', color: '#db2777', textShadow: '2px 2px 0px #fce7f3' }}>
+                  {gunghapResult.score}<span style={{ fontSize: '0.5em', color: '#f472b6' }}>점</span>
                 </div>
-                <div className="score-summary">"{gunghapResult.summary}"</div>
-              </div>
-              
-              <div className="result-card full-width">
-                 <h4 className="card-title">☯️ 기운의 조화 (오행 보완)</h4>
-                 <p className="card-desc">{gunghapResult.element_complement}</p>
-              </div>
-              
-              <div className="infeed-ad full-width">
-                <AdBanner format="horizontal" id="ad-infeed-gunghap" />
+                <div style={{ marginTop: '15px', backgroundColor: '#fdf2f8', padding: '15px', borderRadius: '8px', color: '#9d174d', fontWeight: 'bold', lineHeight: '1.5' }}>
+                  "{gunghapResult.summary}"
+                </div>
               </div>
 
-              <div className="result-card">
-                 <h4 className="card-title">🧠 마음과 생각 (천간)</h4>
-                 <p className="card-desc">{gunghapResult.heavenly_desc}</p>
-              </div>
-              <div className="result-card">
-                 <h4 className="card-title">🏡 현실적 환경 (지지)</h4>
-                 <p className="card-desc">{gunghapResult.earthly_desc}</p>
+              <div className="infeed-ad full-width"><AdBanner format="horizontal" id="ad-infeed-gunghap" /></div>
+
+              <div className="result-card full-width" style={{ padding: 0, overflow: 'hidden' }}>
+                <div style={{ padding: '20px', borderBottom: '1px solid #f1f5f9' }}>
+                  <h4 style={{ margin: '0 0 10px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{fontSize:'1.2em'}}>☯️</span> 기운의 조화 (오행 보완)</h4>
+                  <p style={{ margin: 0, fontSize: '0.95em', color: '#475569', lineHeight: '1.6' }}>{gunghapResult.element_complement}</p>
+                </div>
+                <div style={{ padding: '20px', borderBottom: '1px solid #f1f5f9', backgroundColor: '#f8fafc' }}>
+                  <h4 style={{ margin: '0 0 10px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{fontSize:'1.2em'}}>🧠</span> 마음과 생각의 끌림 (천간)</h4>
+                  <p style={{ margin: 0, fontSize: '0.95em', color: '#475569', lineHeight: '1.6' }}>{gunghapResult.heavenly_desc}</p>
+                </div>
+                <div style={{ padding: '20px' }}>
+                  <h4 style={{ margin: '0 0 10px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{fontSize:'1.2em'}}>🏡</span> 현실적 환경과 속궁합 (지지)</h4>
+                  <p style={{ margin: 0, fontSize: '0.95em', color: '#475569', lineHeight: '1.6' }}>{gunghapResult.earthly_desc}</p>
+                </div>
               </div>
             </div>
           )}
@@ -485,47 +612,47 @@ export default function SajuCalculator() {
 
       </main>
 
-      {/* ===================== [공통 모달창 영역 (기존 로직 보존)] ===================== */}
+      {/* ================= 공통 모달 (기존 로직 보존) ================= */}
       {showRectifyModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>🔮 생시 역추적 시스템</h3>
-            <p>태어난 연/월/일을 기반으로 가장 확률이 높은 시간을 찾아냅니다.</p>
-            <div className="modal-form-group">
-              <label>Q1. 평소 성향이나 방향은?</label>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(3px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1100, padding: '20px', boxSizing: 'border-box' }}>
+          <div style={{ backgroundColor: '#fff', padding: '25px', borderRadius: '16px', maxWidth: '400px', width: '100%', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
+            <h3 style={{ margin: '0 0 10px 0', color: '#4c1d95', fontSize: '1.3em' }}>🔮 생시 역추적 시스템</h3>
+            <p style={{ margin: '0 0 20px 0', fontSize: '0.9em', color: '#64748b', lineHeight: '1.5' }}>태어난 연/월/일을 기반으로, 고객님의 평소 성향과 바이오리듬을 분석하여 가장 확률이 높은 시간을 찾아냅니다.</p>
+            <div style={{ marginBottom: '20px' }}>
+              <strong style={{ display: 'block', marginBottom: '10px', color: '#1e293b', fontSize: '0.95em' }}>Q1. 평소 성향이나 추구하는 삶의 방향은?</strong>
               <select className="premium-input" value={rectifyData.q1} onChange={(e) => setRectifyData({...rectifyData, q1: e.target.value})}>
-                <option value="A">독립심이 강하고 주체적이다</option>
-                <option value="B">창의적이고 베푸는 것을 좋아한다</option>
+                <option value="A">독립심이 강하고 내 방식대로 하는 게 편하다</option>
+                <option value="B">무언가를 만들고 표현하며 베푸는 것을 좋아한다</option>
                 <option value="C">현실적이고 결과와 재물을 중시한다</option>
-                <option value="D">원칙과 명예를 중시한다</option>
-                <option value="E">직관력이 뛰어나며 사색을 즐긴다</option>
+                <option value="D">원칙과 규칙을 중시하며 명예를 중요하게 생각한다</option>
+                <option value="E">생각이 깊고 직관력이 뛰어나며 공부/사색을 즐긴다</option>
               </select>
             </div>
-            <div className="modal-form-group mt-15">
-              <label>Q2. 에너지가 편안한 시간은?</label>
+            <div style={{ marginBottom: '25px' }}>
+              <strong style={{ display: 'block', marginBottom: '10px', color: '#1e293b', fontSize: '0.95em' }}>Q2. 하루 중 에너지가 가장 넘치거나 편안한 시간은?</strong>
               <select className="premium-input" value={rectifyData.q2} onChange={(e) => setRectifyData({...rectifyData, q2: e.target.value})}>
-                <option value="A">새벽 ~ 아침</option>
-                <option value="B">낮 ~ 늦은 오후</option>
-                <option value="C">해 질 녘 ~ 초저녁</option>
-                <option value="D">늦은 밤 ~ 심야</option>
+                <option value="A">새벽 ~ 아침 (03시 ~ 09시)</option>
+                <option value="B">낮 ~ 늦은 오후 (09시 ~ 15시)</option>
+                <option value="C">해 질 녘 ~ 초저녁 (15시 ~ 21시)</option>
+                <option value="D">늦은 밤 ~ 심야 (21시 ~ 03시)</option>
               </select>
             </div>
-            <div className="modal-actions">
-              <button onClick={() => setShowRectifyModal(false)} className="action-btn-outline">취소</button>
-              <button onClick={handleRectifySubmit} className="action-btn-primary">생시 추정하기</button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={() => setShowRectifyModal(false)} style={{ flex: 1, padding: '12px', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>취소</button>
+              <button onClick={handleRectifySubmit} disabled={loading} style={{ flex: 2, padding: '12px', backgroundColor: '#6d28d9', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>{loading ? '역산 중...' : '생시 추정하기'}</button>
             </div>
           </div>
         </div>
       )}
 
       {modalInfo && (
-        <div className="modal-overlay" onClick={() => setModalInfo(null)}>
-          <div className="modal-content text-left" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{modalInfo.title}</h3>
-              <button onClick={() => setModalInfo(null)} className="close-btn">&times;</button>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(2px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px', boxSizing: 'border-box' }} onClick={() => setModalInfo(null)}>
+          <div style={{ backgroundColor: '#fff', padding: '25px', borderRadius: '16px', maxWidth: '320px', width: '100%', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #f1f5f9', paddingBottom: '10px', marginBottom: '15px' }}>
+              <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.3em', fontWeight: '800' }}>{modalInfo.title}</h3>
+              <button onClick={() => setModalInfo(null)} style={{ background: 'none', border: 'none', fontSize: '1.5em', cursor: 'pointer', color: '#94a3b8' }}>&times;</button>
             </div>
-            <p className="modal-desc">{modalInfo.desc}</p>
+            <p style={{ margin: 0, lineHeight: '1.6', color: '#475569', fontSize: '0.95em', wordBreak: 'keep-all' }}>{modalInfo.desc}</p>
           </div>
         </div>
       )}
