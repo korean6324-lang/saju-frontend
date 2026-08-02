@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-// 💡 통합 사전 데이터 (절대 수정/삭제 금지)
+// 💡 통합 사전 데이터
 const TERMS_DICT = {
   "비견": "독립심, 주체성, 자존심을 상징하며 형제, 친구, 동료와의 동등한 관계를 의미합니다.", "겁재": "경쟁심, 투쟁력, 승부욕을 상징하며 재물을 둘러싼 경쟁이나 대인관계의 뺏고 빼앗김을 의미합니다.", "식신": "창의력, 의식주의 풍요, 전문성, 탐구심을 상징하며 온화하고 베푸는 성향을 의미합니다.", "상관": "뛰어난 표현력, 사교성, 기득권 타파를 상징하며, 틀에 얽매이지 않는 자유로운 발상과 언변을 의미합니다.", "편재": "유동적인 큰 재물, 사업 수완, 공간 지각력, 인맥 관리와 넓은 활동 영역을 의미합니다.", "정재": "고정적이고 안정적인 수입, 성실함, 꼼꼼함, 책임감과 알뜰한 저축심을 의미합니다.", "편관": "카리스마, 권력, 강한 인내심과 돌파력을 상징하며, 위험을 감수하는 리더십과 명예욕을 의미합니다.", "정관": "합리성, 보수적 원칙, 준법정신, 책임감을 상징하며 안정적인 직장과 바른 길을 의미합니다.", "편인": "직관력, 눈치, 특수한 기술이나 예술/종교/철학적 재능, 비대중적인 학문을 의미합니다.", "정인": "학문, 도덕성, 수용력, 인내심을 상징하며 어머니의 사랑과 문서(자격증, 부동산) 운을 의미합니다.", "일간": "사주팔자에서 '나 자신'을 의미하는 기준점입니다.",
   "목": "성장과 추진력, 창조적인 에너지를 상징하며, 어질고(仁) 위로 곧게 뻗어나가는 기운입니다.", "화": "열정과 명랑함, 확산하는 에너지를 상징하며, 예의(禮)를 중시하고 타오르는 불의 기운입니다.", "토": "중재와 포용력, 안정감을 상징하며, 신용(信)을 바탕으로 만물을 품는 대지의 기운입니다.", "금": "결단력과 원칙, 맺고 끊음을 상징하며, 의리(義)를 중시하고 단단하게 결실을 맺는 기운입니다.", "수": "지혜와 유연성, 수용력을 상징하며, 상황에 맞게 대처하고 만물을 적셔주는(智) 물의 기운입니다.",
@@ -11,7 +11,7 @@ const TERMS_DICT = {
   "백호대살": "강렬하고 폭발적인 에너지, 강한 프로 의식을 의미합니다.", "괴강살": "우두머리 기질, 카리스마, 강한 돌파력을 상징합니다.", "천을귀인": "명리학 최고의 길신(수호천사)입니다. 흉살을 길하게 변화시키며 위기에서 구합니다.", "홍염살": "타인에게 은근하고 친근한 매력을 발산하여 호감을 주는 기운입니다.",
   "공망": "천간과 지지의 짝이 맞지 않아 비어있음을 뜻합니다. 작용력이 반감됩니다.", "장생": "탄생, 후원, 순수함, 길한 시작 에너지입니다.", "목욕": "호기심, 멋내기, 불안정하고 반복적인 변화입니다.", "관대": "제복, 고집, 독립, 뻗어나가는 힘입니다.", "건록": "자수성가, 안정, 독립적 실행력입니다.", "제왕": "절정, 카리스마, 독단성, 가장 강한 에너지입니다.", "쇠": "노련함, 보수성, 물러남의 기운입니다.", "병": "예민함, 동정심, 감수성입니다.", "사": "정지, 사색, 한 가지에 몰두하는 에너지입니다.", "묘": "저축, 은둔, 안정적인 추구입니다.", "절": "단절, 무(無)의 상태, 극단적 변화입니다.", "태": "잉태, 조심스럽지만 무한한 가능성입니다.", "양": "양육, 보호, 길러지는 기운입니다.",
   "신강(身强)": "나를 돕는 기운이 커서 주관이 뚜렷하고 추진력이 강한 상태입니다.", "신약(身弱)": "나의 기운이 약해 환경에 순응력이 좋으나 휘둘리기 쉬운 상태입니다.", "용희신": "내 사주의 불균형을 해소하고 나에게 이로움을 주는 긍정적인 운입니다.", "기구신": "내 사주의 불균형을 심화시키고 나에게 불리하게 작용하는 주의할 운입니다.", "지장간": "지지에 숨겨진 천간으로, 사람의 내면적 잠재력, 속마음을 나타냅니다.", "일진": "오늘 하루의 운세를 나타내는 기운으로 원국과 상호작용합니다.", "미상": "태어난 시간을 알 수 없어 파악할 수 없습니다.", "?": "태어난 시간 미상",
-  "지지삼합": "세 지지가 모여 거대한 오행 세력을 형성합니다. 사회적/직업적 연대와 폭발적 성장을 뜻합니다.", "지지방합": "같은 계절에 해당하는 지지들이 모인 형제/가족 같은 끈끈한 혈연적/지역적 결속력입니다.", "지지반합": "삼합 중 두 글자만 모여 해당 오행을 뚜렷하게 지향하는 연대를 뜻합니다.", "천간합화(合化)": "두 천간이 합을 이룰 때, 태어난 계절의 조건이 맞아 완전히 새로운 오행으로 변화하는 강력한 결합입니다.", "천간합(기반)": "두 천간이 합을 하였으나 계절을 얻지 못해 성질이 변하지 않고 묶여있는 상태로, 다정함 또는 일의 지연을 뜻합니다.", "천간충": "천간의 두 기운이 부딪히는 것으로, 정신적인 스트레스나 가치관의 대립, 투쟁을 의미합니다.", "지지육합": "두 지지가 비밀스럽고 다정하게 묶이는 현상으로, 남모르는 유대감이나 안정감을 의미합니다.", "지지충": "지지 두 글자가 강하게 충돌하는 현상으로, 이사, 이직, 분리, 사고 등 현실적인 환경의 급격한 변화를 암시합니다.", "지지원진": "가까이 있으면 밉고 떨어져 있으면 보고 싶은 애증, 예민함, 감정 소모를 유발하는 관계성입니다.", "지지형": "깎고 다듬어 맞추는 과정으로, 수술, 조정, 관재수, 혹은 법/의료/기술적 직업 재능을 의미합니다.", "지지자형": "같은 글자가 두 번 정쳐 발생하는 스스로에 대한 강박, 내면적 스트레스, 고집을 의미합니다.", "교운기": "10년마다 바뀌는 대운(큰 환경)이 교차하는 시점입니다. 이 시기 전후로 가치관이나 환경의 큰 변화를 겪게 됩니다.", "통관용신(通關用神)": "사주 내 두 세력이 팽팽하게 싸울 때, 그 사이를 부드럽게 소통시키고 이어주는 가장 중요한 중재 기운입니다.", "병약용신(病藥用神)": "한 오행이 지나치게 많아 사주에 병(病)이 들었을 때, 그 병을 강력하게 억누르고 치료하는 약(藥)이 되는 기운입니다."
+  "지지삼합": "세 지지가 모여 거대한 오행 세력을 형성합니다. 사회적/직업적 연대와 폭발적 성장을 뜻합니다.", "지지방합": "같은 계절에 해당하는 지지들이 모인 형제/가족 같은 끈끈한 혈연적/지역적 결속력입니다.", "지지반합": "삼합 중 두 글자만 모여 해당 오행을 뚜렷하게 지향하는 연대를 뜻합니다.", "천간합화(合化)": "두 천간이 합을 이룰 때, 태어난 계절의 조건이 맞아 완전히 새로운 오행으로 변화하는 강력한 결합입니다.", "천간합(기반)": "두 천간이 합을 하였으나 계절을 얻지 못해 성질이 변하지 않고 묶여있는 상태로, 다정함 또는 일의 지연을 뜻합니다.", "천간충": "천간의 두 기운이 부딪히는 것으로, 정신적인 스트레스나 가치관의 대립, 투쟁을 의미합니다.", "지지육합": "두 지지가 비밀스럽고 다정하게 묶이는 현상으로, 남모르는 유대감이나 안정감을 의미합니다.", "지지충": "지지 두 글자가 강하게 충돌하는 현상으로, 이사, 이직, 분리, 사고 등 현실적인 환경의 급격한 변화를 암시합니다.", "지지원진": "가까이 있으면 밉고 떨어져 있으면 보고 싶은 애증, 예민함, 감정 소모를 유발하는 관계성입니다.", "지지형": "깎고 다듬어 맞추는 과정으로, 수술, 조정, 관재수, 혹은 법/의료/기술적 직업 재능을 의미합니다.", "지지자형": "같은 글자가 두 번 겹쳐 발생하는 스스로에 대한 강박, 내면적 스트레스, 고집을 의미합니다.", "교운기": "10년마다 바뀌는 대운(큰 환경)이 교차하는 시점입니다. 이 시기 전후로 가치관이나 환경의 큰 변화를 겪게 됩니다.", "통관용신(通關用神)": "사주 내 두 세력이 팽팽하게 싸울 때, 그 사이를 부드럽게 소통시키고 이어주는 가장 중요한 중재 기운입니다.", "병약용신(病藥用神)": "한 오행이 지나치게 많아 사주에 병(病)이 들었을 때, 그 병을 강력하게 억누르고 치료하는 약(藥)이 되는 기운입니다."
 };
 
 // 🌍 글로벌 출생지 데이터
@@ -28,77 +28,47 @@ const GLOBAL_LOCATIONS = [
   { id: 'FR_PAR', label: '🇫🇷 프랑스 (파리)', lon: 2.35, tz: 1 },
 ];
 
-// 🌐 5개 국어 다국어(언어팩) 딕셔너리
+// 🌐 5개 국어 다국어 딕셔너리
 const UI = {
   ko: {
-    appTitle: "명리", appSubtitle: "글로벌 초정밀 사주 & 궁합 엔진",
-    tabSaju: "👤 개인 사주 분석", tabGunghap: "💑 프리미엄 궁합",
-    name: "이름 (닉네임)", gender: "성별", male: "남성", female: "여성",
-    cal: "역법 (양/음력)", solar: "양력", lunar: "음력 (평달)", lunarLeap: "음력 (윤달)",
-    loc: "국가/도시 (경도 자동반영)",
-    bDate: "생년월일", bTime: "태어난 시간",
-    timeUnk: "시간을 정확히 모릅니다", btnRect: "🔮 생시 추론하기",
-    btnSaju: "명리-PRO 원국 분석하기", btnGunghap: "명리-PRO 궁합 확인",
-    loading: "명리-PRO 엔진 가동 중...", myInfo: "👤 나의 정보", ptInfo: "💖 상대방 정보",
+    appTitle: "명리", appSubtitle: "글로벌 초정밀 사주 & 궁합 엔진", tabSaju: "👤 개인 사주 분석", tabGunghap: "💑 프리미엄 궁합",
+    name: "이름 (닉네임)", gender: "성별", male: "남성", female: "여성", cal: "역법 (양/음력)", solar: "양력", lunar: "음력 (평달)", lunarLeap: "음력 (윤달)",
+    loc: "국가/도시 (경도 자동반영)", bDate: "생년월일", bTime: "태어난 시간", timeUnk: "시간을 정확히 모릅니다", btnRect: "🔮 생시 추론하기",
+    btnSaju: "명리-PRO 원국 분석하기", btnGunghap: "명리-PRO 궁합 확인", loading: "명리-PRO 엔진 가동 중...", myInfo: "👤 나의 정보", ptInfo: "💖 상대방 정보",
     menuWhy: "🔍 Why 명리-PRO?", menuSub: "매일 운세 무료 구독 💌", menuContact: "플랫폼 제공 및 문의",
-    rIljin: "📅 오늘의 운세 (일진)", rPillar: "님의 사주 원국표", rElement: "📊 오행 밸런스 및 타고난 그릇",
-    rStory: "📖 심층 스토리텔링", rDynamic: "⚡ 원국 내 상호작용 및 주의할 운세", rFlow: "🛤️ 운명의 흐름 (대/세/월운)"
+    rIljin: "📅 오늘의 운세 (일진)", rPillar: "님의 사주 원국표", rElement: "📊 오행 밸런스 및 타고난 그릇", rStory: "📖 심층 스토리텔링", rDynamic: "⚡ 원국 내 상호작용 및 주의할 운세", rFlow: "🛤️ 운명의 흐름 (대/세/월운)"
   },
   en: {
-    appTitle: "Myeongri", appSubtitle: "Global Precision Saju Engine",
-    tabSaju: "👤 Personal Saju", tabGunghap: "💑 Premium Match",
-    name: "Name (Nickname)", gender: "Gender", male: "Male", female: "Female",
-    cal: "Calendar Type", solar: "Solar", lunar: "Lunar", lunarLeap: "Lunar (Leap)",
-    loc: "Country/City (Longitude)",
-    bDate: "Date of Birth", bTime: "Time of Birth",
-    timeUnk: "I don't know the exact time", btnRect: "🔮 Estimate Time",
-    btnSaju: "Analyze My Saju", btnGunghap: "Check Compatibility",
-    loading: "Running Engine...", myInfo: "👤 My Info", ptInfo: "💖 Partner's Info",
+    appTitle: "Myeongri", appSubtitle: "Global Precision Saju Engine", tabSaju: "👤 Personal Saju", tabGunghap: "💑 Premium Match",
+    name: "Name (Nickname)", gender: "Gender", male: "Male", female: "Female", cal: "Calendar Type", solar: "Solar", lunar: "Lunar", lunarLeap: "Lunar (Leap)",
+    loc: "Country/City (Longitude)", bDate: "Date of Birth", bTime: "Time of Birth", timeUnk: "I don't know the exact time", btnRect: "🔮 Estimate Time",
+    btnSaju: "Analyze My Saju", btnGunghap: "Check Compatibility", loading: "Running Engine...", myInfo: "👤 My Info", ptInfo: "💖 Partner's Info",
     menuWhy: "🔍 Why Myeongri-PRO?", menuSub: "Daily Horoscope Sub 💌", menuContact: "Contact & Platform",
-    rIljin: "📅 Today's Fortune", rPillar: "'s Saju Pillars", rElement: "📊 Five Elements & Capacity",
-    rStory: "📖 In-depth Storytelling", rDynamic: "⚡ Interactions & Dynamics", rFlow: "🛤️ Flow of Destiny"
+    rIljin: "📅 Today's Fortune", rPillar: "'s Saju Pillars", rElement: "📊 Five Elements & Capacity", rStory: "📖 In-depth Storytelling", rDynamic: "⚡ Interactions & Dynamics", rFlow: "🛤️ Flow of Destiny"
   },
   ja: {
-    appTitle: "命理", appSubtitle: "グローバル精密四柱推命エンジン",
-    tabSaju: "👤 個人四柱推命", tabGunghap: "💑 プレミアム相性",
-    name: "名前（ニックネーム）", gender: "性別", male: "男性", female: "女性",
-    cal: "暦法（陽暦/陰暦）", solar: "陽暦", lunar: "陰暦", lunarLeap: "陰暦（閏月）",
-    loc: "国/都市（経度適用）",
-    bDate: "生年月日", bTime: "生まれた時間",
-    timeUnk: "正確な時間がわかりません", btnRect: "🔮 生まれ時間を推測",
-    btnSaju: "命理-PRO 原局分析", btnGunghap: "相性を確認する",
-    loading: "エンジン稼働中...", myInfo: "👤 私の情報", ptInfo: "💖 相手の情報",
+    appTitle: "命理", appSubtitle: "グローバル精密四柱推命エンジン", tabSaju: "👤 個人四柱推命", tabGunghap: "💑 プレミアム相性",
+    name: "名前（ニックネーム）", gender: "性別", male: "男性", female: "女性", cal: "暦法（陽暦/陰暦）", solar: "陽暦", lunar: "陰暦", lunarLeap: "陰暦（閏月）",
+    loc: "国/都市（経度適用）", bDate: "生年月日", bTime: "生まれた時間", timeUnk: "正確な時間がわかりません", btnRect: "🔮 生まれ時間を推測",
+    btnSaju: "命理-PRO 原局分析", btnGunghap: "相性を確認する", loading: "エンジン稼働中...", myInfo: "👤 私の情報", ptInfo: "💖 相手の情報",
     menuWhy: "🔍 なぜ命理-PROなのか？", menuSub: "毎日の運勢無料購読 💌", menuContact: "お問い合わせ",
-    rIljin: "📅 今日の運勢", rPillar: "様の四柱原局", rElement: "📊 五行バランスと器",
-    rStory: "📖 深層ストーリー", rDynamic: "⚡ 相互作用と注意すべき運勢", rFlow: "🛤️ 運命の流れ（大/年/月運）"
+    rIljin: "📅 今日の運勢", rPillar: "様の四柱原局", rElement: "📊 五行バランスと器", rStory: "📖 深層ストーリー", rDynamic: "⚡ 相互作用と注意すべき運勢", rFlow: "🛤️ 運命の流れ（大/年/月運）"
   },
   zh: {
-    appTitle: "命理", appSubtitle: "全球高精度八字与合婚引擎",
-    tabSaju: "👤 个人八字分析", tabGunghap: "💑 高级合婚",
-    name: "姓名 (昵称)", gender: "性别", male: "男", female: "女",
-    cal: "历法 (公历/农历)", solar: "公历", lunar: "农历", lunarLeap: "农历 (闰月)",
-    loc: "国家/城市 (经度应用)",
-    bDate: "出生日期", bTime: "出生时间",
-    timeUnk: "不知道准确时间", btnRect: "🔮 推算出生时间",
-    btnSaju: "分析我的八字", btnGunghap: "查看合婚结果",
-    loading: "引擎运行中...", myInfo: "👤 我的信息", ptInfo: "💖 对方信息",
+    appTitle: "命理", appSubtitle: "全球高精度八字与合婚引擎", tabSaju: "👤 个人八字分析", tabGunghap: "💑 高级合婚",
+    name: "姓名 (昵称)", gender: "性别", male: "男", female: "女", cal: "历法 (公历/农历)", solar: "公历", lunar: "农历", lunarLeap: "农历 (闰月)",
+    loc: "国家/城市 (经度应用)", bDate: "出生日期", bTime: "出生时间", timeUnk: "不知道准确时间", btnRect: "🔮 推算出生时间",
+    btnSaju: "分析我的八字", btnGunghap: "查看合婚结果", loading: "引擎运行中...", myInfo: "👤 我的信息", ptInfo: "💖 对方信息",
     menuWhy: "🔍 为什么选择命理-PRO？", menuSub: "每日运势免费订阅 💌", menuContact: "联系我们",
-    rIljin: "📅 今日运势", rPillar: "的八字命盘", rElement: "📊 五行平衡与格局",
-    rStory: "📖 深度解析", rDynamic: "⚡ 命盘相互作用", rFlow: "🛤️ 命运走势"
+    rIljin: "📅 今日运势", rPillar: "的八字命盘", rElement: "📊 五行平衡与格局", rStory: "📖 深度解析", rDynamic: "⚡ 命盘相互作用", rFlow: "🛤️ 命运走势"
   },
   es: {
-    appTitle: "Myeongri", appSubtitle: "Motor Global de Saju y Compatibilidad",
-    tabSaju: "👤 Saju Personal", tabGunghap: "💑 Compatibilidad Premium",
-    name: "Nombre (Apodo)", gender: "Género", male: "Hombre", female: "Mujer",
-    cal: "Calendario", solar: "Solar", lunar: "Lunar", lunarLeap: "Lunar (Bisiesto)",
-    loc: "País/Ciudad (Longitud)",
-    bDate: "Fecha de Nacimiento", bTime: "Hora de Nacimiento",
-    timeUnk: "No sé la hora exacta", btnRect: "🔮 Estimar Hora",
-    btnSaju: "Analizar mi Saju", btnGunghap: "Ver Compatibilidad",
-    loading: "Procesando...", myInfo: "👤 Mi Info", ptInfo: "💖 Info de Pareja",
+    appTitle: "Myeongri", appSubtitle: "Motor Global de Saju y Compatibilidad", tabSaju: "👤 Saju Personal", tabGunghap: "💑 Compatibilidad Premium",
+    name: "Nombre (Apodo)", gender: "Género", male: "Hombre", female: "Mujer", cal: "Calendario", solar: "Solar", lunar: "Lunar", lunarLeap: "Lunar (Bisiesto)",
+    loc: "País/Ciudad (Longitud)", bDate: "Fecha de Nacimiento", bTime: "Hora de Nacimiento", timeUnk: "No sé la hora exacta", btnRect: "🔮 Estimar Hora",
+    btnSaju: "Analizar mi Saju", btnGunghap: "Ver Compatibilidad", loading: "Procesando...", myInfo: "👤 Mi Info", ptInfo: "💖 Info de Pareja",
     menuWhy: "🔍 ¿Por qué Myeongri-PRO?", menuSub: "Horóscopo Diario 💌", menuContact: "Contacto",
-    rIljin: "📅 Fortuna de Hoy", rPillar: " - Pilares del Destino", rElement: "📊 Elementos y Capacidad",
-    rStory: "📖 Historia Profunda", rDynamic: "⚡ Interacciones", rFlow: "🛤️ Flujo del Destino"
+    rIljin: "📅 Fortuna de Hoy", rPillar: " - Pilares del Destino", rElement: "📊 Elementos y Capacidad", rStory: "📖 Historia Profunda", rDynamic: "⚡ Interacciones", rFlow: "🛤️ Flujo del Destino"
   }
 };
 
@@ -133,6 +103,7 @@ const globalStyles = `
   .horizontal-scroll { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 10px; scrollbar-width: thin; }
   .horizontal-scroll::-webkit-scrollbar { height: 6px; }
   .horizontal-scroll::-webkit-scrollbar-thumb { background-color: #CBD5E1; border-radius: 10px; }
+  
   .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(17, 24, 39, 0.6); backdrop-filter: blur(2px); z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
   .menu-overlay.open { opacity: 1; pointer-events: auto; }
   .side-menu { position: fixed; top: 0; right: -320px; width: 300px; height: 100%; background-color: #FFFFFF; z-index: 2100; box-shadow: -5px 0 30px rgba(0,0,0,0.15); transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; padding: 0; box-sizing: border-box; overflow-y: auto; }
@@ -156,8 +127,8 @@ const globalStyles = `
 
 export default function SajuCalculator() {
   const [activeTab, setActiveTab] = useState('saju');
-  const [lang, setLang] = useState('ko'); // 🌐 언어 상태 관리
-  const t = UI[lang]; // 🌐 다국어 변수 매핑
+  const [lang, setLang] = useState('ko'); 
+  const t = UI[lang]; 
 
   const [isMenuOpen, setIsMenuOpen] = useState(false); 
   const [isWhyProOpen, setIsWhyProOpen] = useState(false); 
@@ -290,32 +261,42 @@ export default function SajuCalculator() {
 
       <div style={{ maxWidth: '640px', margin: '0 auto', padding: '20px', paddingBottom: '60px' }}>
         
-        {/* 🌟 메인 헤더 & 언어팩 드롭다운 🌟 */}
+        {/* 🌟 메인 헤더 & 햄버거 메뉴 🌟 */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: '10px', marginBottom: '25px' }}>
           <div style={{ flex: 1 }}></div>
           <div style={{ textAlign: 'center', flex: 2 }}>
             <h2 style={{ margin: 0, fontSize: '2em', color: '#1C2536', fontWeight: '900', letterSpacing: '-0.5px' }}>{t.appTitle}<span style={{ color: '#B59960' }}>-PRO</span></h2>
             <p style={{ margin: '8px 0 0', color: '#6B7280', fontSize: '0.85em', fontWeight: '600' }}>{t.appSubtitle}</p>
           </div>
-          <div style={{ flex: 1, textAlign: 'right', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '8px' }}>
-            {/* 🌐 언어 선택 드롭다운 */}
-            <select 
-              value={lang} 
-              onChange={(e) => setLang(e.target.value)} 
-              style={{ padding: '6px 4px', borderRadius: '8px', border: '1px solid #E2DED5', fontSize: '0.85em', backgroundColor: '#FFF', color: '#1C2536', outline: 'none', cursor: 'pointer' }}
-            >
-              <option value="ko">🇰🇷 KOR</option><option value="en">🇺🇸 ENG</option>
-              <option value="ja">🇯🇵 JPN</option><option value="zh">🇨🇳 CHN</option><option value="es">🇪🇸 ESP</option>
-            </select>
+          <div style={{ flex: 1, textAlign: 'right', display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
             <button onClick={() => setIsMenuOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 5px' }}>
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1C2536" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
           </div>
         </div>
         
-        <div style={{ display: 'flex', backgroundColor: '#EFECE6', borderRadius: '12px', padding: '6px', marginBottom: '20px' }}>
+        {/* 탭 버튼 (사주 / 궁합) */}
+        <div style={{ display: 'flex', backgroundColor: '#EFECE6', borderRadius: '12px', padding: '6px', marginBottom: '15px' }}>
           <button onClick={() => {setActiveTab('saju'); setError('');}} style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', fontSize: '1em', backgroundColor: activeTab === 'saju' ? '#FFFFFF' : 'transparent', color: activeTab === 'saju' ? '#1C2536' : '#9CA3AF', boxShadow: activeTab === 'saju' ? '0 2px 8px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.3s' }}>{t.tabSaju}</button>
           <button onClick={() => {setActiveTab('gunghap'); setError('');}} style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', fontSize: '1em', backgroundColor: activeTab === 'gunghap' ? '#FFFFFF' : 'transparent', color: activeTab === 'gunghap' ? '#B59960' : '#9CA3AF', boxShadow: activeTab === 'gunghap' ? '0 2px 8px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.3s' }}>{t.tabGunghap}</button>
+        </div>
+
+        {/* 🌐 다국어 언어팩 선택 (메뉴바/탭 아래 우측 배치) */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#FFF', padding: '8px 14px', borderRadius: '20px', border: '1px solid #E2DED5', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
+            <span style={{ marginRight: '6px', fontSize: '1.1em' }}>🌐</span>
+            <select 
+              value={lang} 
+              onChange={(e) => setLang(e.target.value)} 
+              style={{ border: 'none', background: 'transparent', fontSize: '0.85em', color: '#1C2536', fontWeight: '700', outline: 'none', cursor: 'pointer' }}
+            >
+              <option value="ko">한국어 (KOR)</option>
+              <option value="en">English (ENG)</option>
+              <option value="ja">日本語 (JPN)</option>
+              <option value="zh">中文 (CHN)</option>
+              <option value="es">Español (ESP)</option>
+            </select>
+          </div>
         </div>
 
         {error && <div className="fade-in" style={{ padding: '16px', backgroundColor: '#FEF2F2', borderLeft: '4px solid #EF4444', color: '#991B1B', borderRadius: '8px', marginBottom: '20px', fontWeight: '600' }}>{error}</div>}
@@ -364,7 +345,7 @@ export default function SajuCalculator() {
               <button type="submit" className="btn-primary" disabled={loading}>{loading ? <><div className="spinner"></div> {t.loading}</> : t.btnSaju}</button>
             </form>
 
-            {/* 결과 렌더링 (800줄 로직 유지) */}
+            {/* 결과 렌더링 */}
             {result && (
               <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 
