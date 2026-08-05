@@ -239,8 +239,13 @@ const globalStyles = `
   .btn-upgrade:active { transform: scale(0.95); }
   .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 5px; }
   .calendar-day-header { text-align: center; font-size: 0.8em; font-weight: bold; color: #6B7280; padding-bottom: 8px; border-bottom: 1px solid #EFECE6; }
-  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  
+  /* 스크롤바 숨기기 및 터치 스크롤 최적화 */
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; overflow-y: auto; overscroll-behavior: contain; }
   .hide-scrollbar::-webkit-scrollbar { display: none; }
+  
+  /* 해설 및 달력 팝업 오버레이 */
+  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(17, 24, 39, 0.65); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 5000; padding: 20px; box-sizing: border-box; }
 `;
 
 export default function SajuCalculator() {
@@ -351,10 +356,8 @@ export default function SajuCalculator() {
 
   const handleSocialLogin = async (providerName) => {
     try {
-      // 기본 로그인 옵션
       const authOptions = { provider: providerName };
       
-      // 카카오 로그인일 경우에만 이메일을 제외하고 이름과 사진만 요청 (에러 우회)
       if (providerName === 'kakao') {
         authOptions.options = {
           scopes: 'profile_nickname profile_image'
@@ -514,13 +517,29 @@ export default function SajuCalculator() {
             <strong style={{ color: '#0369A1' }}>{t.loginMsg}</strong>
           </div>
 
-          <button className="social-btn btn-kakao" onClick={() => handleSocialLogin('kakao')}>💬 {t.loginKakao}</button>
-          <button className="social-btn btn-naver" onClick={() => handleSocialLogin('naver')}>N {t.loginNaver}</button>
-          <button className="social-btn btn-google" onClick={() => handleSocialLogin('google')}>G {t.loginGoogle}</button>
-          <button className="social-btn btn-apple" onClick={() => handleSocialLogin('apple')}> {t.loginApple}</button>
-          <button className="social-btn btn-github" onClick={() => handleSocialLogin('github')}>
-            🐙 깃허브로 로그인 (GitHub)
-          </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <button className="social-btn btn-kakao" disabled style={{ opacity: 0.5, cursor: 'not-allowed', marginBottom: '0' }}>💬 {t.loginKakao} (점검중)</button>
+            <button className="social-btn btn-naver" disabled style={{ opacity: 0.5, cursor: 'not-allowed', marginBottom: '0' }}>N {t.loginNaver} (점검중)</button>
+            <button className="social-btn btn-google" disabled style={{ opacity: 0.5, cursor: 'not-allowed', marginBottom: '0' }}>G {t.loginGoogle} (점검중)</button>
+            <button className="social-btn btn-apple" disabled style={{ opacity: 0.5, cursor: 'not-allowed', marginBottom: '0' }}> {t.loginApple} (점검중)</button>
+            
+            <button className="social-btn btn-github" onClick={() => handleSocialLogin('github')} style={{ marginBottom: '0' }}>
+              🐙 깃허브로 로그인 (GitHub)
+            </button>
+
+            <button 
+              className="social-btn" 
+              style={{ backgroundColor: '#B59960', color: '#FFFFFF', marginTop: '10px', border: 'none', boxShadow: '0 4px 15px rgba(181, 153, 96, 0.4)', marginBottom: '0' }}
+              onClick={() => {
+                setIsLoggedIn(true);
+                setUser({ id: 'test_admin_999', email: 'admin@myeongri.pro' });
+                setUserTier('premium'); 
+                alert('🛠️ 테스트 계정(프리미엄)으로 접속되었습니다!');
+              }}
+            >
+              ⚡ 원클릭 테스트 로그인 (프리미엄 패스)
+            </button>
+          </div>
 
           <div style={{ marginTop: '30px', display: 'flex', justifyContent: 'center' }}>
             <div style={{ position: 'relative', display: 'inline-block' }}>
@@ -742,7 +761,7 @@ export default function SajuCalculator() {
                   </div>
                 </div>
 
-                {/* 3. 오행 분포도 및 🌟복구된 신강신약(용신)🌟 */}
+                {/* 3. 오행 분포도 및 신강신약(용신) */}
                 <div className="premium-card">
                   <h3 style={{ margin: '0 0 15px 0', fontSize: '1.2em', color: '#1C2536' }}>{t.rElement}</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '25px' }}>
@@ -763,7 +782,7 @@ export default function SajuCalculator() {
                     <p style={{ margin: 0, fontSize: '0.95em', color: '#334155', lineHeight: '1.5' }}>{result.gyeokguk?.description}</p>
                   </div>
 
-                  {/* 🌟 완벽하게 복구된 신강/신약 및 용희신 분석 영역 🌟 */}
+                  {/* 신강/신약 및 용희신 분석 영역 */}
                   {result.yongshin && (
                     <div style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '20px', marginTop: '15px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
@@ -802,7 +821,7 @@ export default function SajuCalculator() {
                   )}
                 </div>
 
-                {/* 🚨 여기서부터 프리미엄 Paywall 영역 (심층 분석) 🚨 */}
+                {/* 프리미엄 Paywall 영역 (심층 분석) */}
                 <div className="locked-section">
                   <div className={userTier === 'expired' ? 'locked-blur' : ''}>
                     
@@ -911,9 +930,7 @@ export default function SajuCalculator() {
                   )}
                 </div>
 
-                {/* =======================================================
-                    👑 전문가 전체 사주풀이 (항상 잠겨있음 / 프리미엄 전용) 👑
-                ======================================================== */}
+                {/* 👑 전문가 전체 사주풀이 (항상 잠겨있음 / 프리미엄 전용) 👑 */}
                 <div className="locked-section" style={{ marginTop: '20px' }}>
                   <div className={userTier !== 'premium' ? 'locked-blur' : ''}>
                     <div className="premium-card" style={{ border: '2px solid #D4AF37', background: 'linear-gradient(to bottom, #FFFCF5, #FFFFFF)', marginBottom: 0 }}>
@@ -1066,12 +1083,9 @@ export default function SajuCalculator() {
 
       {/* 📅 간지 달력 (만세력) 모달 */}
       {showCalendarModal && (
-        <div className="fade-in" 
-             style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(17, 24, 39, 0.8)', backdropFilter: 'blur(5px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 3000, padding: '10px' }}
-             onClick={() => setShowCalendarModal(false)}
-        >
+        <div className="fade-in modal-overlay" style={{ zIndex: 3000 }} onClick={() => setShowCalendarModal(false)}>
           <div className="hide-scrollbar" 
-               style={{ backgroundColor: '#FFF', padding: '15px 20px', borderRadius: '20px', maxWidth: '380px', width: '100%', maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}
+               style={{ backgroundColor: '#FFF', padding: '15px 20px', borderRadius: '20px', maxWidth: '360px', width: '100%', maxHeight: '75vh', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}
                onClick={(e) => e.stopPropagation()}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #EFECE6', paddingBottom: '15px', marginBottom: '15px' }}>
@@ -1099,8 +1113,8 @@ export default function SajuCalculator() {
               {renderCalendarDays()}
             </div>
 
-            <div style={{ marginTop: '15px', textAlign: 'center', fontSize: '0.8em', color: '#9CA3AF' }}>
-              ※ 달력의 글자를 클릭하면 뜻을 볼 수 있어요!
+            <div style={{ marginTop: '15px', textAlign: 'center', fontSize: '0.85em', color: '#6B7280', fontWeight: '600', backgroundColor: '#F3F4F6', padding: '10px', borderRadius: '8px' }}>
+              💡 달력의 한자(글자)를 터치하면 뜻풀이가 나옵니다.
             </div>
           </div>
         </div>
@@ -1108,7 +1122,7 @@ export default function SajuCalculator() {
 
       {/* 🔮 생시 역추적 모달 */}
       {showRectifyModal && (
-        <div className="fade-in" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(17, 24, 39, 0.8)', backdropFilter: 'blur(5px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1100, padding: '20px' }}>
+        <div className="fade-in modal-overlay" style={{ zIndex: 1100 }}>
           <div style={{ backgroundColor: '#FFF', padding: '30px', borderRadius: '20px', maxWidth: '400px', width: '100%' }}>
             <h3 style={{ margin: '0 0 15px 0', color: '#B59960', fontSize: '1.3em' }}>{t.btnRect}</h3>
             <p style={{ margin: '0 0 25px 0', fontSize: '0.95em', color: '#6B7280', lineHeight: '1.5' }}>성향과 에너지 사이클을 분석하여 가장 확률이 높은 태어난 시간을 찾아냅니다.</p>
@@ -1132,16 +1146,13 @@ export default function SajuCalculator() {
         </div>
       )}
 
-
-
       {/* ℹ️ 용어 설명 모달 */}
       {modalInfo && (
-        <div className="fade-in" 
-             style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(17, 24, 39, 0.6)', backdropFilter: 'blur(3px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 4000, padding: '20px' }} 
-             onClick={() => setModalInfo(null)}>
-          <div style={{ backgroundColor: '#FFF', padding: '30px', borderRadius: '20px', maxWidth: '340px', width: '100%', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }} onClick={(e) => e.stopPropagation()}>
+        <div className="fade-in modal-overlay" style={{ zIndex: 4000 }} onClick={() => setModalInfo(null)}>
+          <div style={{ backgroundColor: '#FFF', padding: '25px', borderRadius: '20px', maxWidth: '320px', width: '100%', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }} 
+               onClick={(e) => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #F0ECE1', paddingBottom: '12px', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0, color: '#1C2536', fontSize: '1.4em', fontWeight: '800' }}>{modalInfo.title}</h3>
+              <h3 style={{ margin: 0, color: '#1C2536', fontSize: '1.3em', fontWeight: '800' }}>{modalInfo.title}</h3>
               <button onClick={() => setModalInfo(null)} style={{ background: 'none', border: 'none', fontSize: '1.5em', cursor: 'pointer', color: '#9CA3AF' }}>&times;</button>
             </div>
             <p style={{ margin: 0, lineHeight: '1.7', color: '#4B5563', fontSize: '1em', wordBreak: 'keep-all' }}>{modalInfo.desc}</p>
