@@ -351,7 +351,17 @@ export default function SajuCalculator() {
 
   const handleSocialLogin = async (providerName) => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({ provider: providerName });
+      // 기본 로그인 옵션
+      const authOptions = { provider: providerName };
+      
+      // 카카오 로그인일 경우에만 이메일을 제외하고 이름과 사진만 요청 (에러 우회)
+      if (providerName === 'kakao') {
+        authOptions.options = {
+          scopes: 'profile_nickname profile_image'
+        };
+      }
+
+      const { error } = await supabase.auth.signInWithOAuth(authOptions);
       if (error) throw error;
     } catch (error) { alert(`로그인 중 오류가 발생했습니다: ${error.message}`); }
   };
@@ -1122,7 +1132,7 @@ export default function SajuCalculator() {
         </div>
       )}
 
-      
+
 
       {/* ℹ️ 용어 설명 모달 */}
       {modalInfo && (
