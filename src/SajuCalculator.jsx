@@ -1122,6 +1122,8 @@ export default function SajuCalculator() {
         </div>
       )}
 
+      
+
       {/* ℹ️ 용어 설명 모달 */}
       {modalInfo && (
         <div className="fade-in" 
