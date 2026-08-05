@@ -165,13 +165,13 @@ const analyzeConstitution = (elementsRatio) => {
   const waterMetal = (elementsRatio['수'] || 0) + (elementsRatio['금'] || 0);
   const fireWood = (elementsRatio['화'] || 0) + (elementsRatio['목'] || 0);
 
-  if (strongest === '목') return { name: "목(木) 주도형 - 태음인(太陰人) 기질", desc: `간과 담의 기능이 발달하여 흡수하고 수용하는 에너지가 강력한 태음인 기질입니다. 원국 내 목(木) 기운의 발달로 인내심과 끈기가 강하며, 한 번 결심한 일은 우직하게 밀고 나가는 뚝심이 돋보입니다. 다만 에너지가 안으로 정체되기 쉬우므로, 등산이나 땀을 내는 유산소 운동으로 기운을 밖으로 발산시켜야 길(吉)합니다.`, trait: "태음인" };
-  if (strongest === '화') return { name: "화(火) 주도형 - 열소양인(熱少陽人) 기질", desc: `심장과 소장의 기능이 발달하여 밖으로 뻗어나가는 양(陽)의 에너지가 폭발적인 열정가 체질입니다. 불의를 참지 못하고 감정 표현이 솔직하며 순간적인 직관력이 매우 뛰어납니다. 열이 상체로 쏠리기 쉬우니 명상과 서늘한 식습관으로 하체를 따뜻하게 하는 수승화강(水昇火降)이 필수적입니다.`, trait: "소양인" };
-  if (strongest === '금') return { name: "금(金) 주도형 - 태양인(太陽人) 기질", desc: `폐와 대장의 기운이 강하여 맺고 끊음이 확실한 태양인 기질입니다. 결단력과 통솔력이 뛰어나며 완벽주의 성향과 이상을 향한 추진력이 남다릅니다. 기운이 위로 솟구치고 긴장하기 쉬우므로 하체 근력 운동을 통해 에너지를 아래로 가라앉히는 것이 개운(開運)에 절대적으로 필요합니다.`, trait: "태양인" };
-  if (strongest === '수') return { name: "수(水) 주도형 - 한소음인(寒少陰人) 기질", desc: `신장과 방광의 기능이 발달하여 안으로 수렴하고 저장하는 음(陰)의 에너지가 극대화된 체질입니다. 섬세하고 분석적이며 내면의 통찰력과 지혜가 매우 깊습니다. 몸이 냉해지기 쉽고 위장 기능이 약할 수 있으므로, 항상 몸을 보온하고 소화가 잘 되는 따뜻한 성질의 식단이 필수적입니다.`, trait: "소음인" };
+  if (strongest === '목') return { name: "목(木) 주도형 - 태음인(太陰人)", desc: `간담 기운이 튼튼하고 흡수/수용 에너지가 강한 태음인 기질입니다. 원국 내 목 기운 발달로 끈기가 강하나, 기운 정체에 유의하여 발산하는 활동이 필수적입니다.`, trait: "태음인" };
+  if (strongest === '화') return { name: "화(火) 주도형 - 열소양인(熱少陽人)", desc: `발산하는 에너지가 폭발적인 열정가 체질입니다. 불의를 참지 못하며 감정 표현이 솔직합니다. 상체의 열을 내려주는 서늘한 식습관이 중요합니다.`, trait: "소양인" };
+  if (strongest === '금') return { name: "금(金) 주도형 - 태양인(太陽人)", desc: `폐대장의 기운인 금이 발달하여 맺고 끊음이 확실합니다. 결단력과 직관력이 매우 뛰어나며 완벽주의자 성향이 강합니다. 하체 운동이 특히 좋습니다.`, trait: "태양인" };
+  if (strongest === '수') return { name: "수(水) 주도형 - 한소음인(寒少陰人)", desc: `몸이 냉하기 쉽고 안으로 수렴하는 에너지가 극대화된 체질입니다. 섬세하고 분석적이며 내면의 통찰력이 매우 깊습니다. 따뜻한 성질의 음식이 필수입니다.`, trait: "소음인" };
   
-  if (fireWood > waterMetal) return { name: "토(土) 주도형 - 열을 품은 소양 기질", desc: `비장과 위장의 기능이 중심을 잡고 있으나 내면에 화(火)의 열기를 품은 체질입니다. 사교적이고 타인과의 관계를 부드럽게 조율하는 훌륭한 중재자 역할을 합니다. 스트레스를 받으면 위장 장애로 나타날 수 있으니 규칙적이고 담백한 식습관이 가장 중요합니다.`, trait: "소양인" };
-  return { name: "토(土) 주도형 - 냉을 품은 소음 기질", desc: `비장과 위장의 기운이 주도하지만 수(水)의 한기를 띄어 속이 차가워지기 쉬운 신중한 체질입니다. 섬세하게 주변을 잘 챙기는 든든한 성향이나, 생각이 너무 많아 실천이 늦어질 수 있습니다. 찬 음식과 찬 바람을 피하고 몸의 보온에 각별히 신경 써야 에너지가 살아납니다.`, trait: "소음인" };
+  if (fireWood > waterMetal) return { name: "토(土) 주도형 - 열을 품은 소양 기질", desc: `토 기운이 중심을 잡고 있으나 내면에 열을 품고 있습니다. 사교적이며 타인을 중재하는 훌륭한 상담가 체질입니다.`, trait: "소양인" };
+  return { name: "토(土) 주도형 - 냉을 품은 소음 기질", desc: `토 기운이 주도하지만 한기를 띄어 속이 차가워지기 쉬운 신중한 체질입니다. 섬세하게 주변을 챙기는 믿음직한 성향입니다.`, trait: "소음인" };
 };
 
 const getConstitutionCompatText = (meTrait, ptTrait) => {
@@ -183,9 +183,9 @@ const getConstitutionCompatText = (meTrait, ptTrait) => {
       if ((meTrait === "태음인" && ptTrait === "태양인") || (meTrait === "태양인" && ptTrait === "태음인")) {
           return "수용(태음)과 발산(태양)의 기운이 만나 완벽한 상호 보완을 이룹니다. 기운이 막히기 쉬운 태음인과 뻗어나가려는 태양인이 함께할 때 신체적 시너지가 극대화되는 멋진 조합입니다.";
       }
-      return `서로 다른 체질(${meTrait}와 ${ptTrait})이 만나 다채로운 에너지를 교류합니다. 음양의 조화가 무난하며 서로의 다름이 흥미로운 매력으로 작용하는 관계입니다. 상호 배려를 통해 안정감을 높일 수 있습니다.`;
+      return `서로 다른 체질(${meTrait}와 ${ptTrait})이 만나 다채로운 에너지를 교류합니다. 음양의 조화가 무난하며 서로의 다름이 흥미로운 매력으로 작용하는 관계입니다.`;
   }
-  return `두 분 모두 '${meTrait}'으로 체질이 같습니다. 바이오리듬과 식성이 비슷하여 생활의 주파수를 맞추기 편안하지만, 특정 오행의 기운이 과도하게 쏠려 기운이 편중될 수 있으므로 건강 관리에 함께 유의해야 합니다.`;
+  return `두 분 모두 '${meTrait}'으로 체질이 같습니다. 바이오리듬과 식성이 비슷하여 생활이 편안하지만, 특정 오행의 기운이 과도하게 쏠릴 수 있으므로 건강 관리에 함께 유의해야 합니다.`;
 };
 
 const globalStyles = `
@@ -237,9 +237,9 @@ const globalStyles = `
   .locked-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(248, 247, 244, 0.6); z-index: 10; text-align: center; padding: 20px; box-sizing: border-box; }
   .btn-upgrade { background: linear-gradient(135deg, #D4AF37 0%, #AA771C 100%); color: #FFF; padding: 14px 28px; border-radius: 30px; font-weight: 800; font-size: 1.1em; border: none; cursor: pointer; box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4); margin-top: 15px; transition: transform 0.2s; }
   .btn-upgrade:active { transform: scale(0.95); }
-  .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-top: 5px; }
+  .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 5px; }
   .calendar-day-header { text-align: center; font-size: 0.8em; font-weight: bold; color: #6B7280; padding-bottom: 8px; border-bottom: 1px solid #EFECE6; }
-  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
   .hide-scrollbar::-webkit-scrollbar { display: none; }
 `;
 
@@ -395,23 +395,16 @@ export default function SajuCalculator() {
       const compatText = getConstitutionCompatText(meConst.trait, ptConst.trait);
 
       let prof_advice = "두 분의 관계를 더욱 단단하게 만드는 전문가 개운법 솔루션입니다. ";
-      if (ghResponse.data.score >= 80) prof_advice += "천우신조의 궁합입니다. 내가 부족한 기운을 상대가 넉넉히 채워주며, 상호 보완의 시너지가 극대화됩니다. 함께 재테크나 미래의 목표를 공유하고 공동의 프로젝트를 설계하면 폭발적인 발전이 있습니다. 서로에 대한 신뢰가 깊으니 과감하게 추진해도 좋습니다.";
-      else if (ghResponse.data.score >= 60) prof_advice += "서로의 다름이 긍정적 자극으로 작용하는 관계입니다. 음양오행의 조율이 원만하나, 때로는 가치관의 차이가 발생할 수 있습니다. 각자의 고유한 성향을 통제하려 하지 말고 '그럴 수 있다'는 포용의 자세가 필요합니다. 대화의 시간을 자주 가지고 가벼운 취미를 공유하면 유대감이 훨씬 단단해집니다.";
-      else prof_advice += "서로 다른 주파수를 맞추어가는 세심한 배려가 필요한 궁합입니다. 다름이 스트레스가 아닌 '배울 점'이라 생각하는 시각의 전환이 개운(開運)의 핵심입니다. 각자의 사생활과 영역을 철저히 존중하고, 갈등 시 즉각적인 논쟁을 피하며 주기적으로 각자만의 힐링 타임을 가지는 것을 적극 권장합니다.";
-
-      const fallbackElement = `${meConst.name} 기운과 ${ptConst.name} 기운이 교차하며 상호 온도(조후)와 강약(억부)의 균형을 맞추는 흐름입니다. 오행의 상생상극 작용을 통해 서로의 부족한 점을 채워줍니다.`;
-      const fallbackHeavenly = `천간의 기운이 서로 작용하여 정신적인 유대감과 가치관의 교류를 형성합니다. 이상적인 목표를 향해 시너지를 낼 수 있는 긍정적인 정신적 결속입니다.`;
-      const fallbackEarthly = `지지의 현실적인 환경이 맞물려 물리적인 융합과 현실적 기반을 단단하게 다집니다. 서로의 삶에 실질적인 도움을 주는 끈끈한 인연입니다.`;
+      if (ghResponse.data.score >= 80) prof_advice += "천우신조의 궁합이므로 함께 목표를 구상하거나 미래를 설계하면 긍정적인 발전이 매우 큽니다.";
+      else if (ghResponse.data.score >= 60) prof_advice += "서로의 다름을 존중하고 대화의 시간을 자주 가지며 가벼운 취미를 공유하면 유대감이 훨씬 깊어집니다.";
+      else prof_advice += "다름이 스트레스가 아닌 '배울 점'이라 생각해야 합니다. 각자의 사생활을 존중하고 주기적으로 각자만의 힐링 타임을 가지는 것을 추천합니다.";
 
       setGunghapResult({
         ...ghResponse.data,
         me_info: { constitution_name: meConst.name, constitution_desc: meConst.desc },
         partner_info: { constitution_name: ptConst.name, constitution_desc: ptConst.desc },
         constitution_compat: compatText,
-        professional_advice: prof_advice,
-        element_complement: ghResponse.data.element_complement || fallbackElement,
-        heavenly_desc: ghResponse.data.heavenly_desc || fallbackHeavenly,
-        earthly_desc: ghResponse.data.earthly_desc || fallbackEarthly,
+        professional_advice: prof_advice
       });
 
     } catch (err) { setError(err.response?.data?.detail || '서버 연결 에러가 발생했습니다.'); } finally { setLoading(false); }
@@ -477,14 +470,14 @@ export default function SajuCalculator() {
 
       days.push(
         <div key={i} style={{ 
-          padding: '4px 2px', textAlign: 'center', border: '1px solid #EFECE6', borderRadius: '8px', 
+          padding: '6px 2px', textAlign: 'center', border: '1px solid #EFECE6', borderRadius: '8px', 
           backgroundColor: isToday ? '#FFFBEB' : '#FFF', color: isToday ? '#B59960' : '#1C2536', 
           boxShadow: isToday ? '0 0 0 2px #D4AF37' : 'none',
           display: 'flex', flexDirection: 'column', gap: '3px'
         }}>
-          <div style={{ fontSize: '0.75em', fontWeight: isToday ? 'bold' : 'normal' }}>{i}</div>
-          <div style={{ fontSize: '0.55em', color: '#9CA3AF' }}>음{lunarStr}</div>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '2px', fontSize: '0.85em', fontWeight: '800' }}>
+          <div style={{ fontSize: '0.8em', fontWeight: isToday ? 'bold' : 'normal' }}>{i}</div>
+          <div style={{ fontSize: '0.6em', color: '#9CA3AF' }}>음{lunarStr}</div>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '2px', fontSize: '0.95em', fontWeight: '800' }}>
             <span onClick={(e) => { e.stopPropagation(); openModal(iljinStem); }} style={{ color: getElementColor(iljinStem), cursor: 'pointer' }}>{iljinStem}</span>
             <span onClick={(e) => { e.stopPropagation(); openModal(iljinBranch); }} style={{ color: getElementColor(iljinBranch), cursor: 'pointer' }}>{iljinBranch}</span>
           </div>
@@ -1068,10 +1061,10 @@ export default function SajuCalculator() {
              onClick={() => setShowCalendarModal(false)}
         >
           <div className="hide-scrollbar" 
-               style={{ backgroundColor: '#FFF', padding: '15px 15px', borderRadius: '16px', maxWidth: '360px', width: '100%', maxHeight: '80vh', overflowY: 'auto', boxShadow: '0 20px 40px rgba(0,0,0,0.2)', WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain' }}
+               style={{ backgroundColor: '#FFF', padding: '15px 20px', borderRadius: '20px', maxWidth: '380px', width: '100%', maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}
                onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #EFECE6', paddingBottom: '12px', marginBottom: '15px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #EFECE6', paddingBottom: '15px', marginBottom: '15px' }}>
               <h3 style={{ margin: 0, color: '#1C2536', fontSize: '1.2em', fontWeight: '800' }}>{t.calTitle}</h3>
               <button onClick={() => setShowCalendarModal(false)} style={{ background: 'none', border: 'none', fontSize: '1.5em', cursor: 'pointer', color: '#9CA3AF' }}>&times;</button>
             </div>
@@ -1132,7 +1125,7 @@ export default function SajuCalculator() {
       {/* ℹ️ 용어 설명 모달 */}
       {modalInfo && (
         <div className="fade-in" 
-             style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(17, 24, 39, 0.6)', backdropFilter: 'blur(3px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '20px' }} 
+             style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(17, 24, 39, 0.6)', backdropFilter: 'blur(3px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 4000, padding: '20px' }} 
              onClick={() => setModalInfo(null)}>
           <div style={{ backgroundColor: '#FFF', padding: '30px', borderRadius: '20px', maxWidth: '340px', width: '100%', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #F0ECE1', paddingBottom: '12px', marginBottom: '16px' }}>
