@@ -20,6 +20,18 @@ const TERMS_DICT = {
   "편인": "직관력, 눈치, 특수한 기술이나 예술/종교/철학적 재능, 비대중적인 학문을 의미합니다.",
   "정인": "학문, 도덕성, 수용력, 인내심을 상징하며 어머니의 사랑과 문서(자격증, 부동산) 운을 의미합니다.",
   "일간": "사주팔자에서 '나 자신'을 의미하는 기준점입니다.",
+  "장생": "새로운 시작과 탄생을 의미하는 길성. 후원과 순조로운 출발을 의미합니다.",
+  "목욕": "호기심과 도화, 반복되는 시행착오와 불안정을 의미합니다.",
+  "관대": "성장과 발전, 제복을 입는 직업군이나 강한 고집을 의미합니다.",
+  "건록": "자수성가와 안정, 강한 주체성과 실질적인 독립을 의미합니다.",
+  "제왕": "최고조에 달한 에너지, 압도적인 리더십과 독단적인 성향을 의미합니다.",
+  "쇠": "정점을 지나 노련해진 상태. 무리하지 않는 지혜를 의미합니다.",
+  "병": "기운이 쇠약해지나 동정심과 정신적/예술적 재능이 발달합니다.",
+  "사": "육체적 정지, 고요함, 철학적 사유와 고도의 집중력을 의미합니다.",
+  "묘": "저장과 수집, 알뜰함, 내면의 고립이나 화개(종교/예술)를 의미합니다.",
+  "절": "완전한 단절 후 새로운 전환점. 변화무쌍하고 다소 불안정함을 의미합니다.",
+  "태": "잉태, 새로운 아이디어와 계획, 매사에 조심스러운 성향을 의미합니다.",
+  "양": "양육과 평온, 상속이나 누군가를 기르고 가르치는 것에 유리합니다.",
   "목": "성장과 추진력, 창조적인 에너지를 상징하며, 어질고(仁) 위로 곧게 뻗어나가는 기운입니다.",
   "화": "열정과 명랑함, 확산하는 에너지를 상징하며, 예의(禮)를 중시하고 타오르는 불의 기운입니다.",
   "토": "중재와 포용력, 안정감을 상징하며, 신용(信)을 바탕으로 만물을 품는 대지의 기운입니다.",
@@ -55,19 +67,6 @@ const TERMS_DICT = {
   "공망": "천간과 지지의 짝이 맞지 않아 비어있음을 뜻합니다. 작용력이 반감됩니다.",
   "교운기": "10년마다 바뀌는 대운(큰 환경)이 교차하는 시점입니다. 이 시기 전후로 가치관이나 환경의 큰 변화를 겪게 됩니다."
 };
-
-const GLOBAL_LOCATIONS = [
-  { id: 'KR_SEO', label: '🇰🇷 대한민국 (서울/표준)', lon: 126.97, tz: 9 },
-  { id: 'KR_BUS', label: '🇰🇷 대한민국 (부산/경상)', lon: 129.07, tz: 9 },
-  { id: 'US_NYC', label: '🇺🇸 미국 (뉴욕/동부)', lon: -74.00, tz: -5 },
-  { id: 'US_LAX', label: '🇺🇸 미국 (LA/서부)', lon: -118.24, tz: -8 },
-  { id: 'JP_TOK', label: '🇯🇵 일본 (도쿄)', lon: 139.69, tz: 9 },
-  { id: 'CN_BEI', label: '🇨🇳 중국 (베이징)', lon: 116.40, tz: 8 },
-  { id: 'GB_LON', label: '🇬🇧 영국 (런던)', lon: -0.12, tz: 0 },
-  { id: 'AU_SYD', label: '🇦🇺 호주 (시드니)', lon: 151.20, tz: 10 },
-  { id: 'CA_TOR', label: '🇨🇦 캐나다 (토론토)', lon: -79.38, tz: -5 },
-  { id: 'FR_PAR', label: '🇫🇷 프랑스 (파리)', lon: 2.35, tz: 1 },
-];
 
 const UI = {
   ko: {
@@ -114,9 +113,6 @@ const globalStyles = `
   .btn-primary:disabled { background: #9CA3AF; box-shadow: none; cursor: not-allowed; }
   .spinner { border: 3px solid rgba(243, 232, 208, 0.3); border-top-color: #F3E8D0; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .horizontal-scroll { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 10px; scrollbar-width: thin; }
-  .horizontal-scroll::-webkit-scrollbar { height: 6px; }
-  .horizontal-scroll::-webkit-scrollbar-thumb { background-color: #CBD5E1; border-radius: 10px; }
   .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(17, 24, 39, 0.6); backdrop-filter: blur(2px); z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
   .menu-overlay.open { opacity: 1; pointer-events: auto; }
   .side-menu { position: fixed; top: 0; right: -320px; width: 300px; height: 100%; background-color: #FFFFFF; z-index: 2100; box-shadow: -5px 0 30px rgba(0,0,0,0.15); transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; padding: 0; box-sizing: border-box; overflow-y: auto; }
@@ -127,21 +123,13 @@ const globalStyles = `
   .menu-content { padding: 20px; flex-grow: 1; }
   .menu-box { margin-bottom: 20px; border-bottom: 1px solid #F3F4F6; padding-bottom: 15px; }
   .accordion-title { font-size: 0.95em; color: #1C2536; margin: 0; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-  .accordion-icon { transition: transform 0.3s ease; color: #9CA3AF; }
-  .accordion-icon.open { transform: rotate(180deg); }
   .feature-list { list-style: none; padding: 0; margin: 15px 0 0 0; }
   .feature-list li { position: relative; padding-left: 20px; margin-bottom: 12px; font-size: 0.9em; color: #4B5563; line-height: 1.5; }
   .feature-list li::before { content: '•'; position: absolute; left: 0; top: 0; color: #B59960; font-size: 1.2em; font-weight: bold; }
-  .subscribe-banner { background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%); border: 1px solid #BAE6FD; border-radius: 12px; padding: 16px; margin-bottom: 20px; }
-  .subscribe-tag { display: inline-block; background-color: #0284C7; color: white; font-size: 0.7em; padding: 3px 8px; border-radius: 20px; font-weight: bold; margin-bottom: 8px; }
   .menu-footer { background-color: #F8FAFC; padding: 20px; border-top: 1px solid #EFECE6; font-size: 0.85em; color: #6B7280; }
   .contact-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
   .social-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 15px; border-radius: 12px; font-size: 1.05em; font-weight: 700; cursor: pointer; margin-bottom: 12px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: transform 0.2s; }
   .social-btn:active { transform: scale(0.98); }
-  .btn-kakao { background-color: #FEE500; color: #000000; }
-  .btn-naver { background-color: #03C75A; color: #FFFFFF; }
-  .btn-google { background-color: #FFFFFF; color: #000000; border: 1px solid #E2DED5; }
-  .btn-apple { background-color: #000000; color: #FFFFFF; }  
   .btn-github { background-color: #24292e; color: #FFFFFF; }
   .locked-section { position: relative; border-radius: 16px; overflow: hidden; }
   .locked-blur { filter: blur(6px); opacity: 0.5; pointer-events: none; user-select: none; }
@@ -166,12 +154,11 @@ export default function SajuCalculator() {
   const [formData, setFormData] = useState({ 
     name: '', birthPlace: 'KR_SEO', year: 1990, month: 5, day: 15, hour: 14, minute: 30, gender: 'M', is_lunar: false, is_leap_month: false 
   });
-  const [isTimeUnknown, setIsTimeUnknown] = useState(false);
   const [result, setResult] = useState(null);
   
   const [gunghapData, setGunghapData] = useState({
-    me: { name: '', birthPlace: 'KR_SEO', year: 1990, month: 5, day: 15, hour: 14, minute: 30, gender: 'M', is_lunar: false, is_leap_month: false, is_time_unknown: false },
-    partner: { name: '', birthPlace: 'KR_SEO', year: 1995, month: 8, day: 20, hour: 10, minute: 0, gender: 'F', is_lunar: false, is_leap_month: false, is_time_unknown: false }
+    me: { name: '', birthPlace: 'KR_SEO', year: 1990, month: 5, day: 15, hour: 14, minute: 30, gender: 'M', is_lunar: false, is_leap_month: false },
+    partner: { name: '', birthPlace: 'KR_SEO', year: 1995, month: 8, day: 20, hour: 10, minute: 0, gender: 'F', is_lunar: false, is_leap_month: false }
   });
   const [gunghapResult, setGunghapResult] = useState(null);
 
@@ -179,7 +166,6 @@ export default function SajuCalculator() {
   const [error, setError] = useState('');
   const [modalInfo, setModalInfo] = useState(null);
 
-  // 🚀 앱 실행 시 로그인 상태 확인 및 DB 내역 자동 불러오기
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       const currentUser = session?.user || null;
@@ -198,7 +184,6 @@ export default function SajuCalculator() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // 🚀 Supabase에서 내 사주 기록 가져오기 함수
   const fetchMyBaziProfile = async (userId) => {
     try {
       const { data, error } = await supabase
@@ -250,7 +235,6 @@ export default function SajuCalculator() {
     } catch (error) { alert(`로그아웃 오류: ${error.message}`); }
   };
 
-  // 🚀 1. 도커 엔진(FastAPI) 연동 API 호출 모듈 (Saju)
   const handleSajuSubmit = async (e) => {
     e.preventDefault(); 
     setLoading(true); 
@@ -264,8 +248,8 @@ export default function SajuCalculator() {
       const payload = { 
         birth_dt: birthDt, 
         gender: formData.gender,
-        is_lunar: formData.is_lunar,           // 음력 여부 전송
-        is_leap_month: formData.is_leap_month  // 윤달 여부 전송
+        is_lunar: formData.is_lunar,
+        is_leap_month: formData.is_leap_month
       };
 
       const targetUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -276,21 +260,9 @@ export default function SajuCalculator() {
         setResult(engineResult); 
 
         if (user) {
-          const { error: dbError } = await supabase
-            .from('user_bazi_profiles')
-            .insert([
-              { 
-                user_id: user.id, 
-                name: formData.name || 'User',
-                gender: formData.gender,
-                birth_date: birthDt,
-                bazi_result: engineResult 
-              }
-            ]);
-            
-          if (dbError) {
-            console.error("DB 저장 중 에러 발생:", dbError);
-          }
+          await supabase.from('user_bazi_profiles').insert([{ 
+            user_id: user.id, name: formData.name || 'User', gender: formData.gender, birth_date: birthDt, bazi_result: engineResult 
+          }]);
         }
       } else {
         throw new Error("엔진 연산 결과가 올바르지 않습니다.");
@@ -302,18 +274,11 @@ export default function SajuCalculator() {
     }
   };
 
-  // 🚀 2. 도커 엔진(FastAPI) 연동 API 호출 모듈 (Gunghap)
   const handleGunghapSubmit = async (e) => {
     e.preventDefault(); setLoading(true); setError(''); setGunghapResult(null);
     try {
       const targetUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-      
-      const ghPayload = {
-        my_birth_year: gunghapData.me.year,
-        my_gender: gunghapData.me.gender,
-        target_gua: 1 
-      };
-
+      const ghPayload = { my_birth_year: gunghapData.me.year, my_gender: gunghapData.me.gender, target_gua: 1 };
       const response = await axios.post(`${targetUrl}/api/v1/fengshui/match`, ghPayload);
       setGunghapResult(response.data);
     } catch (err) { setError(err.response?.data?.detail || '궁합 서버 연결 에러가 발생했습니다.'); } finally { setLoading(false); }
@@ -333,8 +298,7 @@ export default function SajuCalculator() {
           <h1 style={{ fontSize: '3em', color: '#1C2536', margin: '0 0 10px 0', fontWeight: '900', letterSpacing: '-1px' }}>{t.appTitle}<span style={{ color: '#B59960' }}>-PRO</span></h1>
           <p style={{ color: '#6B7280', fontSize: '1em', marginBottom: '40px', fontWeight: '600' }}>{t.appSubtitle}</p>
           <div style={{ backgroundColor: '#F0F9FF', padding: '15px', borderRadius: '12px', border: '1px solid #BAE6FD', marginBottom: '30px' }}>
-            <span style={{ fontSize: '1.2em' }}>🎁</span><br/>
-            <strong style={{ color: '#0369A1' }}>{t.loginMsg}</strong>
+            <span style={{ fontSize: '1.2em' }}>🎁</span><br/><strong style={{ color: '#0369A1' }}>{t.loginMsg}</strong>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <button className="social-btn btn-github" onClick={() => handleSocialLogin('github')} style={{ marginBottom: '0' }}>🐙 깃허브로 로그인 (GitHub)</button>
@@ -345,11 +309,17 @@ export default function SajuCalculator() {
     );
   }
 
+  // 화면에 그릴 4개의 기둥 데이터 배열 (시주 -> 년주 순서)
+  const pillarsData = [
+    { label: '시주(實)', age: '말년', key: 'hour', data: result?.bazi_pillars?.hour_pillar, analysis: result?.mechanics?.pillar_analysis?.hour },
+    { label: '일주(花)', age: '중년', key: 'day', data: result?.bazi_pillars?.day_pillar, analysis: result?.mechanics?.pillar_analysis?.day },
+    { label: '월주(苗)', age: '청년', key: 'month', data: result?.bazi_pillars?.month_pillar, analysis: result?.mechanics?.pillar_analysis?.month },
+    { label: '년주(根)', age: '초년', key: 'year', data: result?.bazi_pillars?.year_pillar, analysis: result?.mechanics?.pillar_analysis?.year }
+  ];
+
   return (
     <>
       <style>{globalStyles}</style>
-
-      {/* 사이드바 메뉴 */}
       <div className={`menu-overlay ${isMenuOpen ? 'open' : ''}`} onClick={() => setIsMenuOpen(false)}></div>
       <div className={`side-menu ${isMenuOpen ? 'open' : ''}`}>
         <div className="menu-header">
@@ -378,15 +348,12 @@ export default function SajuCalculator() {
       </div>
 
       <div style={{ maxWidth: '640px', margin: '0 auto', padding: '20px', paddingBottom: '60px' }}>
-        
-        {/* 권한 토글 (테스트용) */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
           <button onClick={() => { setUserTier(userTier === 'trial' ? 'expired' : userTier === 'expired' ? 'premium' : 'trial'); }} style={{ padding: '6px 16px', borderRadius: '20px', fontSize: '0.8em', fontWeight: 'bold', cursor: 'pointer', border: '1px solid #CCC' }}>
             {userTier === 'premium' ? t.tierPremium : userTier === 'expired' ? t.tierExpired : t.tierTrial} (클릭 변경)
           </button>
         </div>
 
-        {/* 상단 헤더 */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: '10px', marginBottom: '25px' }}>
           <div style={{ flex: 1 }}></div>
           <div style={{ textAlign: 'center', flex: 2 }}>
@@ -398,7 +365,6 @@ export default function SajuCalculator() {
           </div>
         </div>
         
-        {/* 탭 버튼 */}
         <div style={{ display: 'flex', backgroundColor: '#EFECE6', borderRadius: '12px', padding: '6px', marginBottom: '20px' }}>
           <button onClick={() => {setActiveTab('saju'); setError('');}} style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', fontSize: '1em', backgroundColor: activeTab === 'saju' ? '#FFFFFF' : 'transparent', color: activeTab === 'saju' ? '#1C2536' : '#9CA3AF', boxShadow: activeTab === 'saju' ? '0 2px 8px rgba(0,0,0,0.05)' : 'none' }}>{t.tabSaju}</button>
           <button onClick={() => {setActiveTab('gunghap'); setError('');}} style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', fontSize: '1em', backgroundColor: activeTab === 'gunghap' ? '#FFFFFF' : 'transparent', color: activeTab === 'gunghap' ? '#B59960' : '#9CA3AF', boxShadow: activeTab === 'gunghap' ? '0 2px 8px rgba(0,0,0,0.05)' : 'none' }}>{t.tabGunghap}</button>
@@ -406,7 +372,6 @@ export default function SajuCalculator() {
 
         {error && <div className="fade-in" style={{ padding: '16px', backgroundColor: '#FEF2F2', borderLeft: '4px solid #EF4444', color: '#991B1B', borderRadius: '8px', marginBottom: '20px', fontWeight: '600' }}>{error}</div>}
 
-        {/* 🔮 [1] 개인 사주 분석 탭 */}
         {activeTab === 'saju' && (
           <div className="fade-in">
             <form onSubmit={handleSajuSubmit} className="premium-card">
@@ -419,8 +384,6 @@ export default function SajuCalculator() {
                   </div>
                 </div>
               </div>
-
-              {/* ✨ 양력/음력 선택 UI 추가됨 */}
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '15px' }}>
                 <div style={{ flex: '1 1 100%' }}>
                   <label className="label-text">{t.cal}</label>
@@ -431,48 +394,95 @@ export default function SajuCalculator() {
                   </div>
                 </div>
               </div>
-
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '20px' }}>
                 <div style={{ flex: '1 1 140px' }}><label className="label-text">{t.bDate}</label><input type="date" className="input-field" required value={formatDate(formData.year, formData.month, formData.day)} onChange={(e) => { if(!e.target.value) return; const [y, m, d] = e.target.value.split('-'); setFormData({...formData, year: parseInt(y), month: parseInt(m), day: parseInt(d)}); }} /></div>
                 <div style={{ flex: '1 1 120px' }}><label className="label-text">{t.bTime}</label><input type="time" className="input-field" value={formatTime(formData.hour, formData.minute)} onChange={(e) => { if(!e.target.value) return; const [h, min] = e.target.value.split(':'); setFormData({...formData, hour: parseInt(h), minute: parseInt(min)}); }} /></div>
               </div>
-
               <div style={{ display: 'flex', gap: '10px' }}>
                 <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%' }}>{loading ? <><div className="spinner"></div> {t.loading}</> : t.btnSaju}</button>
               </div>
             </form>
 
-            {/* 📊 결과 렌더링 (도커 엔진 연동판) */}
             {result && (
               <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 
-                {/* 1. 사주 원국표 (Phase 1 엔진) */}
+                {/* 1. 사주 원국표 (십성 + 12운성 추가됨!) */}
                 <div className="premium-card">
                   <h3 style={{ margin: '0 0 20px 0', fontSize: '1.2em', color: '#1C2536', borderBottom: '2px solid #F0ECE1', paddingBottom: '10px' }}>
                     <span style={{ color: '#B59960' }}>{formData.name || 'User'}</span>님의 초정밀 명식표
                   </h3>
                   <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between' }}>
-                    {[
-                      { key: '시주', data: result.bazi_pillars?.hour_pillar },
-                      { key: '일주', data: result.bazi_pillars?.day_pillar },
-                      { key: '월주', data: result.bazi_pillars?.month_pillar },
-                      { key: '년주', data: result.bazi_pillars?.year_pillar }
-                    ].map((pillar) => (
-                      <div key={pillar.key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#FDFCFB', padding: '20px 5px', borderRadius: '12px', border: '1px solid #EFECE6', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)' }}>
-                        <div style={{ fontSize: '0.8em', color: '#9CA3AF', fontWeight: '700', marginBottom: '12px' }}>{pillar.key}</div>
-                        <div onClick={() => openModal(pillar.data?.[0])} style={{ fontSize: '2em', fontWeight: '900', color: getElementColor(pillar.data?.[0]), cursor: 'pointer', marginBottom: '10px' }}>
+                    {pillarsData.map((pillar) => (
+                      <div key={pillar.key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#FDFCFB', padding: '15px 5px', borderRadius: '12px', border: '1px solid #EFECE6', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)' }}>
+                        <div style={{ fontSize: '0.75em', color: '#9CA3AF', fontWeight: '800', marginBottom: '8px' }}>{pillar.label}</div>
+                        
+                        {/* 천간 십성 */}
+                        <div onClick={() => openModal(pillar.analysis?.stem_deity)} style={{ fontSize: '0.8em', color: pillar.analysis?.stem_deity === '일간' ? '#B59960' : '#6B7280', marginBottom: '5px', cursor: 'pointer', fontWeight: '600' }}>
+                          {pillar.analysis?.stem_deity || '-'}
+                        </div>
+                        
+                        {/* 천간 글자 */}
+                        <div onClick={() => openModal(pillar.data?.[0])} style={{ fontSize: '1.8em', fontWeight: '900', color: getElementColor(pillar.data?.[0]), cursor: 'pointer', marginBottom: '5px' }}>
                           {pillar.data ? pillar.data[0] : '?'}
                         </div>
-                        <div style={{ width: '30px', height: '1px', backgroundColor: '#E5E0D8', margin: '5px 0 10px 0' }} />
-                        <div onClick={() => openModal(pillar.data?.[1])} style={{ fontSize: '2em', fontWeight: '900', color: getElementColor(pillar.data?.[1]), cursor: 'pointer' }}>
+                        
+                        <div style={{ width: '30px', height: '1px', backgroundColor: '#E5E0D8', margin: '5px 0' }} />
+                        
+                        {/* 지지 글자 */}
+                        <div onClick={() => openModal(pillar.data?.[1])} style={{ fontSize: '1.8em', fontWeight: '900', color: getElementColor(pillar.data?.[1]), cursor: 'pointer', marginTop: '5px', marginBottom: '5px' }}>
                           {pillar.data ? pillar.data[1] : '?'}
+                        </div>
+
+                        {/* 지지 십성 */}
+                        <div onClick={() => openModal(pillar.analysis?.branch_deity)} style={{ fontSize: '0.8em', color: '#6B7280', marginBottom: '8px', cursor: 'pointer', fontWeight: '600' }}>
+                          {pillar.analysis?.branch_deity || '-'}
+                        </div>
+
+                        {/* 12운성 배지 */}
+                        <div onClick={() => openModal(pillar.analysis?.star_12?.term)} style={{ fontSize: '0.75em', backgroundColor: '#F3E8D0', color: '#8C6D31', padding: '4px 8px', borderRadius: '12px', fontWeight: '700', cursor: 'pointer' }}>
+                          {pillar.analysis?.star_12?.term || '-'}
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* 2. 역학 딥다이브 (Phase 2 & 3 엔진) */}
+                {/* 2. 근묘화실 생애주기 분석 (★ 신규 기획 추가) */}
+                <div className="premium-card">
+                  <h3 style={{ margin: '0 0 15px 0', fontSize: '1.2em', color: '#1C2536' }}>🌱 근묘화실(根苗花實) 생애주기</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{ padding: '15px', backgroundColor: '#F9FAFB', borderRadius: '10px', borderLeft: '4px solid #10B981' }}>
+                      <strong style={{ color: '#047857', display: 'block', marginBottom: '5px' }}>초년기 (0~20세) - 년주(根)</strong>
+                      <div style={{ fontSize: '0.9em', color: '#4B5563', lineHeight: '1.5' }}>
+                        부모/조상 궁인 년주에 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.year?.stem_deity}</span>과(와) <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.year?.branch_deity}</span>의 기운이 흐릅니다. 12운성 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.year?.star_12?.term}</span>의 에너지를 띠며 초년의 가치관과 학업 환경이 형성되었습니다.
+                        <div style={{ fontSize: '0.9em', color: '#6B7280', marginTop: '4px' }}>* {result.mechanics?.pillar_analysis?.year?.star_12?.meaning}</div>
+                      </div>
+                    </div>
+                    <div style={{ padding: '15px', backgroundColor: '#F9FAFB', borderRadius: '10px', borderLeft: '4px solid #3B82F6' }}>
+                      <strong style={{ color: '#1D4ED8', display: 'block', marginBottom: '5px' }}>청년기 (20~40세) - 월주(苗)</strong>
+                      <div style={{ fontSize: '0.9em', color: '#4B5563', lineHeight: '1.5' }}>
+                        사회적 무기이자 직업 궁인 월주에 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.month?.branch_deity}</span>의 에너지가 강하게 자리잡고 있습니다. 이 시기에는 12운성 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.month?.star_12?.term}</span>의 흐름 속에서 사회 진출과 경쟁을 경험합니다.
+                        <div style={{ fontSize: '0.9em', color: '#6B7280', marginTop: '4px' }}>* {result.mechanics?.pillar_analysis?.month?.star_12?.meaning}</div>
+                      </div>
+                    </div>
+                    <div style={{ padding: '15px', backgroundColor: '#F9FAFB', borderRadius: '10px', borderLeft: '4px solid #F59E0B' }}>
+                      <strong style={{ color: '#B45309', display: 'block', marginBottom: '5px' }}>중년기 (40~60세) - 일주(花)</strong>
+                      <div style={{ fontSize: '0.9em', color: '#4B5563', lineHeight: '1.5' }}>
+                        나 자신과 배우자를 뜻하는 일지에 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.day?.branch_deity}</span>이(가) 놓여 있습니다. 12운성 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.day?.star_12?.term}</span>의 양상으로 가정을 꾸리고 독립적인 자아를 실현해 나갑니다.
+                        <div style={{ fontSize: '0.9em', color: '#6B7280', marginTop: '4px' }}>* {result.mechanics?.pillar_analysis?.day?.star_12?.meaning}</div>
+                      </div>
+                    </div>
+                    <div style={{ padding: '15px', backgroundColor: '#F9FAFB', borderRadius: '10px', borderLeft: '4px solid #8B5CF6' }}>
+                      <strong style={{ color: '#6D28D9', display: 'block', marginBottom: '5px' }}>말년기 (60세 이후) - 시주(實)</strong>
+                      <div style={{ fontSize: '0.9em', color: '#4B5563', lineHeight: '1.5' }}>
+                        인생의 최종 결실과 자녀운을 상징하는 시주에 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.hour?.branch_deity}</span>의 기운이 모여, 12운성 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.hour?.star_12?.term}</span>의 형태로 안정을 찾거나 새로운 변화를 맞이합니다.
+                        <div style={{ fontSize: '0.9em', color: '#6B7280', marginTop: '4px' }}>* {result.mechanics?.pillar_analysis?.hour?.star_12?.meaning}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. 기운의 역동성 (통근, 허자, 충) */}
                 <div className="premium-card">
                   <h3 style={{ margin: '0 0 15px 0', fontSize: '1.2em', color: '#1C2536' }}>⚡ 기운의 역동성 (Mechanics)</h3>
                   <div style={{ marginBottom: '15px' }}>
@@ -505,22 +515,6 @@ export default function SajuCalculator() {
                            : '충(沖) 없음 안전함'}
                        </div>
                      </div>
-                  </div>
-                </div>
-
-                {/* 3. 풍수 방위학 (Phase 4 엔진) */}
-                <div className="premium-card" style={{ backgroundColor: '#FDFBFB', border: '1px solid #E2E8F0' }}>
-                  <h3 style={{ margin: '0 0 15px 0', fontSize: '1.2em', color: '#1C2536' }}>🧭 공간 에너지 및 방위 (Feng Shui)</h3>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontSize: '0.9em', color: '#64748B', marginBottom: '5px' }}>나의 본명궁 (행운의 방향)</div>
-                      <div style={{ fontSize: '1.5em', fontWeight: '800', color: '#D97706' }}>
-                        {result.fengshui_profile?.gua_number}백성 {result.fengshui_profile?.gua_name}
-                      </div>
-                    </div>
-                    <div style={{ padding: '10px 20px', backgroundColor: '#FEF3C7', color: '#B45309', borderRadius: '30px', fontWeight: '900', fontSize: '1.1em' }}>
-                      {result.fengshui_profile?.house_group}
-                    </div>
                   </div>
                 </div>
 
@@ -559,8 +553,6 @@ export default function SajuCalculator() {
                       )}
                     </div>
                   </div>
-                  
-                  {/* 잠금 화면 (프리미엄 미결제 시) */}
                   {userTier !== 'premium' && (
                     <div className="locked-overlay" style={{ background: 'rgba(255, 252, 245, 0.8)' }}>
                       <div style={{ fontSize: '3em', marginBottom: '10px' }}>👑</div>
@@ -581,8 +573,6 @@ export default function SajuCalculator() {
             <form onSubmit={handleGunghapSubmit} className="premium-card">
               <div style={{ backgroundColor: '#F9F8F6', padding: '20px', borderRadius: '12px', marginBottom: '20px', border: '1px solid #EFECE6' }}>
                 <h4 style={{ margin: '0 0 15px 0', color: '#1C2536', fontSize: '1.1em' }}>{t.myInfo}</h4>
-                
-                {/* ✨ 나의 양력/음력 선택 UI 추가 */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
                   <div style={{ flex: '1 1 100%' }}>
                     <label className="label-text">{t.cal}</label>
@@ -593,16 +583,12 @@ export default function SajuCalculator() {
                     </div>
                   </div>
                 </div>
-
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
                   <div style={{ flex: '1 1 140px' }}><label className="label-text">{t.bDate}</label><input type="date" className="input-field" value={formatDate(gunghapData.me.year, gunghapData.me.month, gunghapData.me.day)} onChange={(e) => { if(!e.target.value) return; const [y, m, d] = e.target.value.split('-'); setGunghapData(prev => ({...prev, me: {...prev.me, year: parseInt(y), month: parseInt(m), day: parseInt(d)}})); }} /></div>
                 </div>
               </div>
-
               <div style={{ backgroundColor: '#FFF5F7', padding: '20px', borderRadius: '12px', marginBottom: '25px', border: '1px solid #FCE7F3' }}>
                 <h4 style={{ margin: '0 0 15px 0', color: '#BE185D', fontSize: '1.1em' }}>{t.ptInfo}</h4>
-
-                {/* ✨ 상대방 양력/음력 선택 UI 추가 */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
                   <div style={{ flex: '1 1 100%' }}>
                     <label className="label-text">{t.cal}</label>
@@ -613,7 +599,6 @@ export default function SajuCalculator() {
                     </div>
                   </div>
                 </div>
-
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
                   <div style={{ flex: '1 1 140px' }}><label className="label-text">{t.bDate}</label><input type="date" className="input-field" style={{ borderColor: '#FBCFE8' }} value={formatDate(gunghapData.partner.year, gunghapData.partner.month, gunghapData.partner.day)} onChange={(e) => { if(!e.target.value) return; const [y, m, d] = e.target.value.split('-'); setGunghapData(prev => ({...prev, partner: {...prev.partner, year: parseInt(y), month: parseInt(m), day: parseInt(d)}})); }} /></div>
                 </div>
@@ -634,7 +619,6 @@ export default function SajuCalculator() {
         )}
       </div>
 
-      {/* ℹ️ 용어 설명 모달 */}
       {modalInfo && (
         <div className="fade-in modal-overlay" style={{ zIndex: 4000 }} onClick={() => setModalInfo(null)}>
           <div style={{ backgroundColor: '#FFF', padding: '25px', borderRadius: '20px', maxWidth: '320px', width: '100%', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }} onClick={(e) => e.stopPropagation()}>
