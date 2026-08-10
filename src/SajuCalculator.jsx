@@ -72,11 +72,8 @@ const UI = {
     name: "이름 (닉네임)", gender: "성별", male: "남성", female: "여성", cal: "역법 (양/음력)", solar: "양력", lunar: "음력 (평달)", lunarLeap: "음력 (윤달)",
     bDate: "생년월일", bTime: "태어난 시간", btnSaju: "명리-PRO 원국 분석하기", btnGunghap: "명리-PRO 궁합 확인", loading: "명리-PRO 엔진 가동 중...", 
     myInfo: "👤 나의 정보", ptInfo: "💖 상대방 정보", menuWhy: "🔍 Why 명리-PRO?", 
-    tierTrial: "✅ 7일 무료 체험중", tierExpired: "⚠️ 무료 체험 만료", tierPremium: "👑 프리미엄 구독중",
     expertTitle: "👑 전문가 1:1 심층 사주풀이",
-    lockMsgExpired: "무료 체험이 만료되었습니다.\n프리미엄 결제 후 모든 심층 분석을 확인하세요.", 
-    lockMsgExpert: "프리미엄 결제 전용 콘텐츠입니다.\n추상적인 말을 배제한 명확한 해석을 확인하세요.",
-    btnPay: "프리미엄 결제하고 확인하기", loginMsg: "1초만에 가입하고 7일 무료 체험을 시작하세요!"
+    loginMsg: "1초만에 가입하고 초정밀 명리 분석을 시작하세요!"
   }
 };
 
@@ -112,10 +109,6 @@ const globalStyles = `
   .menu-nav-btn { display: flex; align-items: center; width: 100%; padding: 18px 20px; background: none; border: none; border-bottom: 1px solid #F3F4F6; font-size: 1.05em; font-weight: 700; color: #1C2536; cursor: pointer; text-align: left; }
   .social-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 15px; border-radius: 12px; font-size: 1.05em; font-weight: 700; cursor: pointer; margin-bottom: 12px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
   .btn-github { background-color: #24292e; color: #FFFFFF; }
-  .locked-section { position: relative; border-radius: 16px; overflow: hidden; }
-  .locked-blur { filter: blur(6px); opacity: 0.5; pointer-events: none; user-select: none; }
-  .locked-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(248, 247, 244, 0.6); z-index: 10; text-align: center; padding: 20px; box-sizing: border-box; }
-  .btn-upgrade { background: linear-gradient(135deg, #D4AF37 0%, #AA771C 100%); color: #FFF; padding: 14px 28px; border-radius: 30px; font-weight: 800; font-size: 1.1em; border: none; cursor: pointer; margin-top: 15px; }
   .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(17, 24, 39, 0.65); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 5000; padding: 20px; }
 `;
 
@@ -125,7 +118,6 @@ export default function SajuCalculator() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false); 
   const [user, setUser] = useState(null);
-  const [userTier, setUserTier] = useState('trial'); 
 
   const [activeTab, setActiveTab] = useState('saju');
   const [isMenuOpen, setIsMenuOpen] = useState(false); 
@@ -145,7 +137,6 @@ export default function SajuCalculator() {
   const [error, setError] = useState('');
   const [modalInfo, setModalInfo] = useState(null);
 
-  // 🚀 Supabase 로그인 및 데이터 연동
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       const currentUser = session?.user || null;
@@ -184,7 +175,6 @@ export default function SajuCalculator() {
     } catch (error) { alert(`로그인 오류: ${error.message}`); }
   };
 
-  // 🚀 1. 개인 사주 분석 API 호출
   const handleSajuSubmit = async (e) => {
     e.preventDefault(); setLoading(true); setError(''); setResult(null);
     try {
@@ -206,7 +196,6 @@ export default function SajuCalculator() {
     } catch (err) { setError(err.response?.data?.detail || '엔진 서버 통신 에러'); } finally { setLoading(false); }
   };
 
-  // 🚀 2. 프리미엄 궁합 분석 API 호출
   const handleGunghapSubmit = async (e) => {
     e.preventDefault(); setLoading(true); setError(''); setGunghapResult(null);
     try {
@@ -228,7 +217,6 @@ export default function SajuCalculator() {
     else setModalInfo({ title: keyword, desc: "해당 단어의 상세 사전 데이터가 준비 중입니다." });
   };
 
-  // 로그인되지 않은 화면
   if (!isLoggedIn) {
     return (
       <div style={{ maxWidth: '400px', margin: '0 auto', padding: '40px 20px', textAlign: 'center', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -241,14 +229,13 @@ export default function SajuCalculator() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <button className="social-btn btn-github" onClick={() => handleSocialLogin('github')} style={{ marginBottom: '0' }}>🐙 깃허브로 로그인</button>
-            <button className="social-btn" style={{ backgroundColor: '#B59960', color: '#FFFFFF', marginTop: '10px' }} onClick={() => { setIsLoggedIn(true); setUserTier('premium'); alert('테스트 계정 접속'); }}>⚡ 테스트 로그인 (프리미엄)</button>
+            <button className="social-btn" style={{ backgroundColor: '#B59960', color: '#FFFFFF', marginTop: '10px' }} onClick={() => { setIsLoggedIn(true); }}>⚡ 원클릭 테스트 로그인</button>
           </div>
         </div>
       </div>
     );
   }
 
-  // 4기둥 데이터 매핑
   const pillarsData = [
     { label: '시주(實)', key: 'hour', data: result?.bazi_pillars?.hour_pillar, analysis: result?.mechanics?.pillar_analysis?.hour },
     { label: '일주(花)', key: 'day', data: result?.bazi_pillars?.day_pillar, analysis: result?.mechanics?.pillar_analysis?.day },
@@ -260,7 +247,6 @@ export default function SajuCalculator() {
     <>
       <style>{globalStyles}</style>
       
-      {/* 메뉴 오버레이 */}
       <div className={`menu-overlay ${isMenuOpen ? 'open' : ''}`} onClick={() => setIsMenuOpen(false)}></div>
       <div className={`side-menu ${isMenuOpen ? 'open' : ''}`}>
         <div className="menu-header">
@@ -275,13 +261,6 @@ export default function SajuCalculator() {
 
       <div style={{ maxWidth: '640px', margin: '0 auto', padding: '20px', paddingBottom: '60px' }}>
         
-        {/* 상단 테스트용 권한 토글 */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
-          <button onClick={() => { setUserTier(userTier === 'trial' ? 'expired' : userTier === 'expired' ? 'premium' : 'trial'); }} style={{ padding: '6px 16px', borderRadius: '20px', fontSize: '0.8em', fontWeight: 'bold', cursor: 'pointer', border: '1px solid #CCC' }}>
-            {userTier === 'premium' ? t.tierPremium : userTier === 'expired' ? t.tierExpired : t.tierTrial} (클릭 변경)
-          </button>
-        </div>
-
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: '10px', marginBottom: '25px' }}>
           <div style={{ flex: 1 }}></div>
           <div style={{ textAlign: 'center', flex: 2 }}>
@@ -292,7 +271,6 @@ export default function SajuCalculator() {
           </div>
         </div>
         
-        {/* 상단 탭 버튼 */}
         <div style={{ display: 'flex', backgroundColor: '#EFECE6', borderRadius: '12px', padding: '6px', marginBottom: '20px' }}>
           <button onClick={() => {setActiveTab('saju'); setError('');}} style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', fontSize: '1em', backgroundColor: activeTab === 'saju' ? '#FFFFFF' : 'transparent', color: activeTab === 'saju' ? '#1C2536' : '#9CA3AF' }}>{t.tabSaju}</button>
           <button onClick={() => {setActiveTab('gunghap'); setError('');}} style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', fontSize: '1em', backgroundColor: activeTab === 'gunghap' ? '#FFFFFF' : 'transparent', color: activeTab === 'gunghap' ? '#B59960' : '#9CA3AF' }}>{t.tabGunghap}</button>
@@ -303,7 +281,6 @@ export default function SajuCalculator() {
         {/* 🔮 [1] 개인 사주 분석 탭 */}
         {activeTab === 'saju' && (
           <div className="fade-in">
-            {/* 사주 입력 폼 (이름, 성별, 양음력, 날짜, 시간) */}
             <form onSubmit={handleSajuSubmit} className="premium-card">
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '15px' }}>
                 <div style={{ flex: '1 1 140px' }}><label className="label-text">{t.name}</label><input type="text" className="input-field" placeholder="홍길동" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} /></div>
@@ -331,11 +308,10 @@ export default function SajuCalculator() {
               <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%' }}>{loading ? <><div className="spinner"></div> {t.loading}</> : t.btnSaju}</button>
             </form>
 
-            {/* 📊 분석 결과 렌더링 영역 (절대 누락 없음) */}
             {result && (
               <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 
-                {/* 1. 명식표 (8글자 + 십성 + 12운성) */}
+                {/* 1. 명식표 */}
                 <div className="premium-card">
                   <h3 style={{ margin: '0 0 20px 0', fontSize: '1.2em', color: '#1C2536', borderBottom: '2px solid #F0ECE1', paddingBottom: '10px' }}><span style={{ color: '#B59960' }}>{formData.name || 'User'}</span>님의 초정밀 명식표</h3>
                   <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between' }}>
@@ -353,50 +329,50 @@ export default function SajuCalculator() {
                   </div>
                 </div>
 
-                {/* 🚀 2. 나의 무기와 직업운 (격국) */}
-                {result.career_and_fortune?.gyeokguk && (
+                {/* 2. 나의 무기와 직업운 (격국) */}
+                {result.mechanics?.career_and_fortune?.gyeokguk && (
                   <div className="premium-card" style={{ border: '2px solid #10B981', background: 'linear-gradient(to bottom, #ECFDF5, #FFFFFF)' }}>
                     <h3 style={{ margin: '0 0 15px 0', fontSize: '1.2em', color: '#047857' }}>💼 나의 무기와 직업운</h3>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
                       <span style={{ fontSize: '1.4em', fontWeight: '900', color: '#065F46', backgroundColor: '#D1FAE5', padding: '5px 12px', borderRadius: '8px' }}>
-                        {result.career_and_fortune.gyeokguk.name}
+                        {result.mechanics.career_and_fortune.gyeokguk.name}
                       </span>
                     </div>
                     <p style={{ margin: 0, fontSize: '0.95em', color: '#4B5563', lineHeight: '1.6' }}>
-                      {result.career_and_fortune.gyeokguk.description}
+                      {result.mechanics.career_and_fortune.gyeokguk.description}
                     </p>
                   </div>
                 )}
 
-                {/* 🚀 3. 맞춤형 행운 가이드 (조후 용신) */}
-                {result.career_and_fortune?.yongshin && (
+                {/* 3. 맞춤형 행운 가이드 (조후 용신) */}
+                {result.mechanics?.career_and_fortune?.yongshin && (
                   <div className="premium-card" style={{ border: '2px solid #3B82F6', background: 'linear-gradient(to bottom, #EFF6FF, #FFFFFF)' }}>
                     <h3 style={{ margin: '0 0 15px 0', fontSize: '1.2em', color: '#1D4ED8' }}>🍀 맞춤형 행운 가이드 (개운법)</h3>
                     <div style={{ marginBottom: '15px' }}>
                       <span style={{ fontSize: '0.9em', color: '#6B7280' }}>나에게 가장 필요한 기운(용신):</span>
-                      <strong style={{ fontSize: '1.2em', color: getElementColor(result.career_and_fortune.yongshin.element), marginLeft: '8px' }}>
-                        {result.career_and_fortune.yongshin.element} ({result.career_and_fortune.yongshin.remedy?.hanja})
+                      <strong style={{ fontSize: '1.2em', color: getElementColor(result.mechanics.career_and_fortune.yongshin.element), marginLeft: '8px' }}>
+                        {result.mechanics.career_and_fortune.yongshin.element} ({result.mechanics.career_and_fortune.yongshin.remedy?.hanja})
                       </strong>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       <div style={{ backgroundColor: '#DBEAFE', padding: '12px', borderRadius: '8px' }}>
-                        <strong style={{ color: '#1E40AF', fontSize: '0.9em' }}>🎨 행운의 색상:</strong> {result.career_and_fortune.yongshin.remedy?.color}
+                        <strong style={{ color: '#1E40AF', fontSize: '0.9em' }}>🎨 행운의 색상:</strong> {result.mechanics.career_and_fortune.yongshin.remedy?.color}
                       </div>
                       <div style={{ backgroundColor: '#DBEAFE', padding: '12px', borderRadius: '8px' }}>
-                        <strong style={{ color: '#1E40AF', fontSize: '0.9em' }}>🍲 행운의 음식:</strong> {result.career_and_fortune.yongshin.remedy?.food}
+                        <strong style={{ color: '#1E40AF', fontSize: '0.9em' }}>🍲 행운의 음식:</strong> {result.mechanics.career_and_fortune.yongshin.remedy?.food}
                       </div>
                       <div style={{ backgroundColor: '#DBEAFE', padding: '12px', borderRadius: '8px' }}>
-                        <strong style={{ color: '#1E40AF', fontSize: '0.9em' }}>🧭 행운의 방향:</strong> {result.career_and_fortune.yongshin.remedy?.direction}
+                        <strong style={{ color: '#1E40AF', fontSize: '0.9em' }}>🧭 행운의 방향:</strong> {result.mechanics.career_and_fortune.yongshin.remedy?.direction}
                       </div>
                       <div style={{ backgroundColor: '#EFF6FF', padding: '12px', borderLeft: '4px solid #3B82F6', marginTop: '5px' }}>
                         <strong style={{ color: '#2563EB', fontSize: '0.9em', display: 'block', marginBottom: '4px' }}>✨ 실생활 액땜 가이드</strong>
-                        <span style={{ fontSize: '0.9em', color: '#4B5563', lineHeight: '1.5' }}>{result.career_and_fortune.yongshin.remedy?.advice}</span>
+                        <span style={{ fontSize: '0.9em', color: '#4B5563', lineHeight: '1.5' }}>{result.mechanics.career_and_fortune.yongshin.remedy?.advice}</span>
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* 4. 근묘화실(根苗花實) 생애주기 분석 */}
+                {/* 4. 근묘화실 생애주기 분석 */}
                 <div className="premium-card">
                   <h3 style={{ margin: '0 0 15px 0', fontSize: '1.2em', color: '#1C2536' }}>🌱 근묘화실(根苗花實) 생애주기</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -417,7 +393,7 @@ export default function SajuCalculator() {
                     <div style={{ padding: '15px', backgroundColor: '#F9FAFB', borderRadius: '10px', borderLeft: '4px solid #F59E0B' }}>
                       <strong style={{ color: '#B45309', display: 'block', marginBottom: '5px' }}>중년기 (40~60세) - 일주(花)</strong>
                       <div style={{ fontSize: '0.9em', color: '#4B5563', lineHeight: '1.5' }}>
-                        나 자신과 배우자를 뜻하는 일지에 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.day?.branch_deity}</span>이(가) 놓여 있습니다. 12운성 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.day?.star_12?.term}</span>의 양상으로 가정을 꾸리고 독립적인 자아를 실현해 나갑니다.
+                        나 자신과 배우자를 뜻하는 일지에 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.day?.branch_deity}</span>이(가) 놓여 있습니다. 12운성 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.day?.star_12?.term}</span>의 양상으로 가정을 꾸리고 독립적인 자아 실현을 해 나갑니다.
                         <div style={{ fontSize: '0.9em', color: '#6B7280', marginTop: '4px' }}>* {result.mechanics?.pillar_analysis?.day?.star_12?.meaning}</div>
                       </div>
                     </div>
@@ -467,37 +443,41 @@ export default function SajuCalculator() {
                   </div>
                 </div>
 
-                {/* 6. 전문가 처방 DB (업상대체) */}
-                <div className="locked-section">
-                  <div className={userTier !== 'premium' ? 'locked-blur' : ''}>
-                    <div className="premium-card" style={{ border: '2px solid #D4AF37', background: 'linear-gradient(to bottom, #FFFCF5, #FFFFFF)' }}>
-                      <h3 style={{ margin: '0 0 15px 0', fontSize: '1.3em', color: '#AA771C' }}>{t.expertTitle} (업상대체)</h3>
-                      {result.expert_prescription?.length > 0 ? (
-                        result.expert_prescription.map((rx, idx) => (
-                          <div key={idx} style={{ marginBottom: '20px', borderBottom: idx !== result.expert_prescription.length -1 ? '1px dashed #E5E0D8' : 'none', paddingBottom: '15px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}><span style={{ fontSize: '1.2em', fontWeight: '900', color: '#1C2536' }}>{rx.term}</span><span style={{ fontSize: '0.85em', color: '#6B7280' }}>({rx.hanja})</span></div>
-                            <div style={{ backgroundColor: '#FEF2F2', padding: '12px', borderRadius: '8px', marginBottom: '8px', borderLeft: '4px solid #EF4444' }}><strong style={{ color: '#DC2626', fontSize: '0.9em', display: 'block' }}>⚠️ 직언 진단</strong><span style={{ fontSize: '0.9em', color: '#4B5563' }}>{rx.disease_diagnosis}</span></div>
-                            <div style={{ backgroundColor: '#ECFDF5', padding: '12px', borderRadius: '8px', marginBottom: '8px', borderLeft: '4px solid #10B981' }}><strong style={{ color: '#059669', fontSize: '0.9em', display: 'block' }}>💊 개운법 처방</strong><span style={{ fontSize: '0.9em', color: '#4B5563' }}>{rx.prescription_eopsang}</span></div>
-                          </div>
-                        ))
-                      ) : ( <p style={{ color: '#6B7280', fontSize: '0.95em' }}>현재 사주 원국에 강하게 발현된 흉살이 없어 평온한 기운을 유지하고 있습니다.</p> )}
-                    </div>
-                  </div>
-                  {userTier !== 'premium' && (
-                    <div className="locked-overlay" style={{ background: 'rgba(255, 252, 245, 0.8)' }}>
-                      <div style={{ fontSize: '3em', marginBottom: '10px' }}>👑</div>
-                      <h3 style={{ margin: '0 0 10px 0', color: '#AA771C', fontSize: '1.3em' }}>{t.expertTitle}</h3>
-                      <p style={{ margin: 0, color: '#4B5563', fontSize: '0.95em' }}>{t.lockMsgExpert}</p>
-                      <button className="btn-upgrade" onClick={() => setUserTier('premium')}>{t.btnPay}</button>
-                    </div>
+                {/* 6. 전문가 1:1 심층 사주풀이 (업상대체) - 잠금 해제됨! */}
+                <div className="premium-card" style={{ border: '2px solid #D4AF37', background: 'linear-gradient(to bottom, #FFFCF5, #FFFFFF)' }}>
+                  <h3 style={{ margin: '0 0 15px 0', fontSize: '1.3em', color: '#AA771C' }}>{t.expertTitle} (업상대체)</h3>
+                  {result.expert_prescription?.length > 0 ? (
+                    result.expert_prescription.map((rx, idx) => (
+                      <div key={idx} style={{ marginBottom: '20px', borderBottom: idx !== result.expert_prescription.length -1 ? '1px dashed #E5E0D8' : 'none', paddingBottom: '15px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                          <span style={{ fontSize: '1.2em', fontWeight: '900', color: '#1C2536' }}>{rx.term}</span>
+                          <span style={{ fontSize: '0.85em', color: '#6B7280' }}>({rx.hanja})</span>
+                        </div>
+                        <div style={{ backgroundColor: '#FEF2F2', padding: '12px', borderRadius: '8px', marginBottom: '8px', borderLeft: '4px solid #EF4444' }}>
+                          <strong style={{ color: '#DC2626', fontSize: '0.9em', display: 'block' }}>⚠️ 직언 진단</strong>
+                          <span style={{ fontSize: '0.9em', color: '#4B5563' }}>{rx.disease_diagnosis}</span>
+                        </div>
+                        <div style={{ backgroundColor: '#ECFDF5', padding: '12px', borderRadius: '8px', marginBottom: '8px', borderLeft: '4px solid #10B981' }}>
+                          <strong style={{ color: '#059669', fontSize: '0.9em', display: 'block' }}>💊 개운법 처방</strong>
+                          <span style={{ fontSize: '0.9em', color: '#4B5563' }}>{rx.prescription_eopsang}</span>
+                        </div>
+                        <div style={{ backgroundColor: '#F0F9FF', padding: '12px', borderRadius: '8px', borderLeft: '4px solid #0EA5E9' }}>
+                          <strong style={{ color: '#0284C7', fontSize: '0.9em', display: 'block' }}>✨ 축언</strong>
+                          <span style={{ fontSize: '0.9em', color: '#4B5563' }}>{rx.final_blessing}</span>
+                        </div>
+                      </div>
+                    ))
+                  ) : ( 
+                    <p style={{ color: '#6B7280', fontSize: '0.95em' }}>현재 사주 원국에 강하게 발현된 흉살이 없어 평온한 기운을 유지하고 있습니다.</p> 
                   )}
                 </div>
+
               </div>
             )}
           </div>
         )}
 
-        {/* 💑 [2] 프리미엄 궁합 탭 (누락 없이 완벽 복구됨) */}
+        {/* 💑 [2] 프리미엄 궁합 탭 */}
         {activeTab === 'gunghap' && (
           <div className="fade-in">
             <form onSubmit={handleGunghapSubmit} className="premium-card">
