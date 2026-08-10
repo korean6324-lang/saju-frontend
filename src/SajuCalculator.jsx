@@ -179,44 +179,41 @@ export default function SajuCalculator() {
   const [error, setError] = useState('');
   const [modalInfo, setModalInfo] = useState(null);
 
-  // 🚀 [추가됨] 앱 실행 시 로그인 상태 확인 및 DB 내역 자동 불러오기 로직
+  // 🚀 앱 실행 시 로그인 상태 확인 및 DB 내역 자동 불러오기
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       const currentUser = session?.user || null;
       setIsLoggedIn(!!session);
       setUser(currentUser);
-      if (currentUser) fetchMyBaziProfile(currentUser.id); // 로그인 시 데이터 즉시 호출
+      if (currentUser) fetchMyBaziProfile(currentUser.id);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       const currentUser = session?.user || null;
       setIsLoggedIn(!!session);
       setUser(currentUser);
-      if (currentUser) fetchMyBaziProfile(currentUser.id); // 상태 변경 시 데이터 즉시 호출
+      if (currentUser) fetchMyBaziProfile(currentUser.id);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  // 🚀 [추가됨] Supabase에서 내 사주 기록 가져오기 함수
+  // 🚀 Supabase에서 내 사주 기록 가져오기 함수
   const fetchMyBaziProfile = async (userId) => {
     try {
       const { data, error } = await supabase
         .from('user_bazi_profiles')
         .select('*')
         .eq('user_id', userId)
-        .order('created_at', { ascending: false }) // 가장 최근 분석 기록 1개만 가져옴
+        .order('created_at', { ascending: false })
         .limit(1);
 
       if (error) throw error;
 
       if (data && data.length > 0) {
         const profile = data[0];
-        
-        // 1. DB에 저장된 초정밀 엔진 결과를 즉시 화면에 렌더링
         setResult(profile.bazi_result); 
         
-        // 2. 입력 폼(Form)에도 내가 저장했던 생년월일시를 그대로 채워줌
         const bDate = new Date(profile.birth_date);
         setFormData(prev => ({
           ...prev,
@@ -266,7 +263,9 @@ export default function SajuCalculator() {
       
       const payload = { 
         birth_dt: birthDt, 
-        gender: formData.gender 
+        gender: formData.gender,
+        is_lunar: formData.is_lunar,           // 음력 여부 전송
+        is_leap_month: formData.is_leap_month  // 윤달 여부 전송
       };
 
       const targetUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -421,6 +420,18 @@ export default function SajuCalculator() {
                 </div>
               </div>
 
+              {/* ✨ 양력/음력 선택 UI 추가됨 */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '15px' }}>
+                <div style={{ flex: '1 1 100%' }}>
+                  <label className="label-text">{t.cal}</label>
+                  <div style={{ display: 'flex', gap: '5px', height: '49px' }}>
+                    <button type="button" onClick={() => setFormData({...formData, is_lunar: false, is_leap_month: false})} style={{ flex: 1, borderRadius: '8px', border: !formData.is_lunar ? '2px solid #1C2536' : '1px solid #E2DED5', background: !formData.is_lunar ? '#F3F4F6' : '#FAFAFA', fontWeight: !formData.is_lunar ? '700' : '500', color: !formData.is_lunar ? '#1C2536' : '#9CA3AF', cursor: 'pointer' }}>{t.solar}</button>
+                    <button type="button" onClick={() => setFormData({...formData, is_lunar: true, is_leap_month: false})} style={{ flex: 1, borderRadius: '8px', border: (formData.is_lunar && !formData.is_leap_month) ? '2px solid #1C2536' : '1px solid #E2DED5', background: (formData.is_lunar && !formData.is_leap_month) ? '#F3F4F6' : '#FAFAFA', fontWeight: (formData.is_lunar && !formData.is_leap_month) ? '700' : '500', color: (formData.is_lunar && !formData.is_leap_month) ? '#1C2536' : '#9CA3AF', cursor: 'pointer' }}>{t.lunar}</button>
+                    <button type="button" onClick={() => setFormData({...formData, is_lunar: true, is_leap_month: true})} style={{ flex: 1, borderRadius: '8px', border: formData.is_leap_month ? '2px solid #1C2536' : '1px solid #E2DED5', background: formData.is_leap_month ? '#F3F4F6' : '#FAFAFA', fontWeight: formData.is_leap_month ? '700' : '500', color: formData.is_leap_month ? '#1C2536' : '#9CA3AF', cursor: 'pointer' }}>{t.lunarLeap}</button>
+                  </div>
+                </div>
+              </div>
+
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '20px' }}>
                 <div style={{ flex: '1 1 140px' }}><label className="label-text">{t.bDate}</label><input type="date" className="input-field" required value={formatDate(formData.year, formData.month, formData.day)} onChange={(e) => { if(!e.target.value) return; const [y, m, d] = e.target.value.split('-'); setFormData({...formData, year: parseInt(y), month: parseInt(m), day: parseInt(d)}); }} /></div>
                 <div style={{ flex: '1 1 120px' }}><label className="label-text">{t.bTime}</label><input type="time" className="input-field" value={formatTime(formData.hour, formData.minute)} onChange={(e) => { if(!e.target.value) return; const [h, min] = e.target.value.split(':'); setFormData({...formData, hour: parseInt(h), minute: parseInt(min)}); }} /></div>
@@ -570,12 +581,39 @@ export default function SajuCalculator() {
             <form onSubmit={handleGunghapSubmit} className="premium-card">
               <div style={{ backgroundColor: '#F9F8F6', padding: '20px', borderRadius: '12px', marginBottom: '20px', border: '1px solid #EFECE6' }}>
                 <h4 style={{ margin: '0 0 15px 0', color: '#1C2536', fontSize: '1.1em' }}>{t.myInfo}</h4>
+                
+                {/* ✨ 나의 양력/음력 선택 UI 추가 */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
+                  <div style={{ flex: '1 1 100%' }}>
+                    <label className="label-text">{t.cal}</label>
+                    <div style={{ display: 'flex', gap: '5px', height: '40px' }}>
+                      <button type="button" onClick={() => setGunghapData(prev => ({...prev, me: {...prev.me, is_lunar: false, is_leap_month: false}}))} style={{ flex: 1, borderRadius: '6px', border: !gunghapData.me.is_lunar ? '2px solid #1C2536' : '1px solid #E2DED5', background: !gunghapData.me.is_lunar ? '#F3F4F6' : '#FAFAFA', fontWeight: !gunghapData.me.is_lunar ? '700' : '500', color: !gunghapData.me.is_lunar ? '#1C2536' : '#9CA3AF', cursor: 'pointer', fontSize: '0.9em' }}>{t.solar}</button>
+                      <button type="button" onClick={() => setGunghapData(prev => ({...prev, me: {...prev.me, is_lunar: true, is_leap_month: false}}))} style={{ flex: 1, borderRadius: '6px', border: (gunghapData.me.is_lunar && !gunghapData.me.is_leap_month) ? '2px solid #1C2536' : '1px solid #E2DED5', background: (gunghapData.me.is_lunar && !gunghapData.me.is_leap_month) ? '#F3F4F6' : '#FAFAFA', fontWeight: (gunghapData.me.is_lunar && !gunghapData.me.is_leap_month) ? '700' : '500', color: (gunghapData.me.is_lunar && !gunghapData.me.is_leap_month) ? '#1C2536' : '#9CA3AF', cursor: 'pointer', fontSize: '0.9em' }}>{t.lunar}</button>
+                      <button type="button" onClick={() => setGunghapData(prev => ({...prev, me: {...prev.me, is_lunar: true, is_leap_month: true}}))} style={{ flex: 1, borderRadius: '6px', border: gunghapData.me.is_leap_month ? '2px solid #1C2536' : '1px solid #E2DED5', background: gunghapData.me.is_leap_month ? '#F3F4F6' : '#FAFAFA', fontWeight: gunghapData.me.is_leap_month ? '700' : '500', color: gunghapData.me.is_leap_month ? '#1C2536' : '#9CA3AF', cursor: 'pointer', fontSize: '0.9em' }}>{t.lunarLeap}</button>
+                    </div>
+                  </div>
+                </div>
+
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
                   <div style={{ flex: '1 1 140px' }}><label className="label-text">{t.bDate}</label><input type="date" className="input-field" value={formatDate(gunghapData.me.year, gunghapData.me.month, gunghapData.me.day)} onChange={(e) => { if(!e.target.value) return; const [y, m, d] = e.target.value.split('-'); setGunghapData(prev => ({...prev, me: {...prev.me, year: parseInt(y), month: parseInt(m), day: parseInt(d)}})); }} /></div>
                 </div>
               </div>
+
               <div style={{ backgroundColor: '#FFF5F7', padding: '20px', borderRadius: '12px', marginBottom: '25px', border: '1px solid #FCE7F3' }}>
                 <h4 style={{ margin: '0 0 15px 0', color: '#BE185D', fontSize: '1.1em' }}>{t.ptInfo}</h4>
+
+                {/* ✨ 상대방 양력/음력 선택 UI 추가 */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
+                  <div style={{ flex: '1 1 100%' }}>
+                    <label className="label-text">{t.cal}</label>
+                    <div style={{ display: 'flex', gap: '5px', height: '40px' }}>
+                      <button type="button" onClick={() => setGunghapData(prev => ({...prev, partner: {...prev.partner, is_lunar: false, is_leap_month: false}}))} style={{ flex: 1, borderRadius: '6px', border: !gunghapData.partner.is_lunar ? '2px solid #BE185D' : '1px solid #FBCFE8', background: !gunghapData.partner.is_lunar ? '#FDF2F8' : '#FAFAFA', fontWeight: !gunghapData.partner.is_lunar ? '700' : '500', color: !gunghapData.partner.is_lunar ? '#BE185D' : '#9CA3AF', cursor: 'pointer', fontSize: '0.9em' }}>{t.solar}</button>
+                      <button type="button" onClick={() => setGunghapData(prev => ({...prev, partner: {...prev.partner, is_lunar: true, is_leap_month: false}}))} style={{ flex: 1, borderRadius: '6px', border: (gunghapData.partner.is_lunar && !gunghapData.partner.is_leap_month) ? '2px solid #BE185D' : '1px solid #FBCFE8', background: (gunghapData.partner.is_lunar && !gunghapData.partner.is_leap_month) ? '#FDF2F8' : '#FAFAFA', fontWeight: (gunghapData.partner.is_lunar && !gunghapData.partner.is_leap_month) ? '700' : '500', color: (gunghapData.partner.is_lunar && !gunghapData.partner.is_leap_month) ? '#BE185D' : '#9CA3AF', cursor: 'pointer', fontSize: '0.9em' }}>{t.lunar}</button>
+                      <button type="button" onClick={() => setGunghapData(prev => ({...prev, partner: {...prev.partner, is_lunar: true, is_leap_month: true}}))} style={{ flex: 1, borderRadius: '6px', border: gunghapData.partner.is_leap_month ? '2px solid #BE185D' : '1px solid #FBCFE8', background: gunghapData.partner.is_leap_month ? '#FDF2F8' : '#FAFAFA', fontWeight: gunghapData.partner.is_leap_month ? '700' : '500', color: gunghapData.partner.is_leap_month ? '#BE185D' : '#9CA3AF', cursor: 'pointer', fontSize: '0.9em' }}>{t.lunarLeap}</button>
+                    </div>
+                  </div>
+                </div>
+
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
                   <div style={{ flex: '1 1 140px' }}><label className="label-text">{t.bDate}</label><input type="date" className="input-field" style={{ borderColor: '#FBCFE8' }} value={formatDate(gunghapData.partner.year, gunghapData.partner.month, gunghapData.partner.day)} onChange={(e) => { if(!e.target.value) return; const [y, m, d] = e.target.value.split('-'); setGunghapData(prev => ({...prev, partner: {...prev.partner, year: parseInt(y), month: parseInt(m), day: parseInt(d)}})); }} /></div>
                 </div>
