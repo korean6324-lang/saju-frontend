@@ -7,7 +7,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// 💡 통합 사전 데이터 (생략 없이 모두 포함)
+// 💡 통합 사전 데이터
 const TERMS_DICT = {
   "비견": "독립심, 주체성, 자존심을 상징하며 형제, 친구, 동료와의 동등한 관계를 의미합니다.",
   "겁재": "경쟁심, 투쟁력, 승부욕을 상징하며 재물을 둘러싼 경쟁이나 대인관계의 뺏고 빼앗김을 의미합니다.",
@@ -63,9 +63,7 @@ const TERMS_DICT = {
   "원진살": "이유 없는 미움과 원망이 교차하는 기운. 대인관계에서 예민함이 증폭됩니다.",
   "천라지망": "하늘과 땅에 그물이 쳐진 형국으로, 섣불리 움직이면 그물에 얽매이기 쉽습니다.",
   "통근": "천간의 글자가 지지에 뿌리를 내려 기운이 매우 실하고 강한 상태를 의미합니다.",
-  "허투": "천간의 글자가 지지에 뿌리를 내리지 못해 기운이 허공에 뜬 불안정한 상태입니다.",
-  "공망": "천간과 지지의 짝이 맞지 않아 비어있음을 뜻합니다. 작용력이 반감됩니다.",
-  "교운기": "10년마다 바뀌는 대운(큰 환경)이 교차하는 시점입니다. 이 시기 전후로 가치관이나 환경의 큰 변화를 겪게 됩니다."
+  "허투": "천간의 글자가 지지에 뿌리를 내리지 못해 기운이 허공에 뜬 불안정한 상태입니다."
 };
 
 const UI = {
@@ -206,19 +204,16 @@ export default function SajuCalculator() {
     } catch (err) { setError(err.response?.data?.detail || '엔진 서버 통신 에러'); } finally { setLoading(false); }
   };
 
-  // 🚀 [수정됨] 궁합 분석 요청 (나와 상대방 데이터 모두 전송)
   const handleGunghapSubmit = async (e) => {
     e.preventDefault(); setLoading(true); setError(''); setGunghapResult(null);
     try {
       const targetUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-      
       const ghPayload = { 
         my_birth_year: gunghapData.me.year, 
         my_gender: gunghapData.me.gender, 
         partner_birth_year: gunghapData.partner.year,
         partner_gender: gunghapData.partner.gender
       };
-
       const response = await axios.post(`${targetUrl}/api/v1/fengshui/match`, ghPayload);
       setGunghapResult(response.data);
     } catch (err) { setError(err.response?.data?.detail || '궁합 서버 통신 에러'); } finally { setLoading(false); }
@@ -295,7 +290,6 @@ export default function SajuCalculator() {
 
         {error && <div className="fade-in" style={{ padding: '16px', backgroundColor: '#FEF2F2', borderLeft: '4px solid #EF4444', color: '#991B1B', borderRadius: '8px', marginBottom: '20px', fontWeight: '600' }}>{error}</div>}
 
-        {/* 🔮 [1] 개인 사주 분석 탭 */}
         {activeTab === 'saju' && (
           <div className="fade-in">
             <form onSubmit={handleSajuSubmit} className="premium-card">
@@ -343,6 +337,49 @@ export default function SajuCalculator() {
                     ))}
                   </div>
                 </div>
+
+                {/* 🚀 1. 나의 무기와 직업운 (격국) */}
+                {result.mechanics?.career_and_fortune?.gyeokguk && (
+                  <div className="premium-card" style={{ border: '2px solid #10B981', background: 'linear-gradient(to bottom, #ECFDF5, #FFFFFF)' }}>
+                    <h3 style={{ margin: '0 0 15px 0', fontSize: '1.2em', color: '#047857' }}>💼 나의 무기와 직업운</h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                      <span style={{ fontSize: '1.4em', fontWeight: '900', color: '#065F46', backgroundColor: '#D1FAE5', padding: '5px 12px', borderRadius: '8px' }}>
+                        {result.mechanics.career_and_fortune.gyeokguk.name}
+                      </span>
+                    </div>
+                    <p style={{ margin: 0, fontSize: '0.95em', color: '#4B5563', lineHeight: '1.6' }}>
+                      {result.mechanics.career_and_fortune.gyeokguk.description}
+                    </p>
+                  </div>
+                )}
+
+                {/* 🚀 2. 맞춤형 행운 가이드 (조후 용신) */}
+                {result.mechanics?.career_and_fortune?.yongshin && (
+                  <div className="premium-card" style={{ border: '2px solid #3B82F6', background: 'linear-gradient(to bottom, #EFF6FF, #FFFFFF)' }}>
+                    <h3 style={{ margin: '0 0 15px 0', fontSize: '1.2em', color: '#1D4ED8' }}>🍀 맞춤형 행운 가이드 (개운법)</h3>
+                    <div style={{ marginBottom: '15px' }}>
+                      <span style={{ fontSize: '0.9em', color: '#6B7280' }}>나에게 가장 필요한 기운(용신):</span>
+                      <strong style={{ fontSize: '1.2em', color: getElementColor(result.mechanics.career_and_fortune.yongshin.element), marginLeft: '8px' }}>
+                        {result.mechanics.career_and_fortune.yongshin.element} ({result.mechanics.career_and_fortune.yongshin.remedy.hanja})
+                      </strong>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div style={{ backgroundColor: '#DBEAFE', padding: '12px', borderRadius: '8px' }}>
+                        <strong style={{ color: '#1E40AF', fontSize: '0.9em' }}>🎨 행운의 색상:</strong> {result.mechanics.career_and_fortune.yongshin.remedy.color}
+                      </div>
+                      <div style={{ backgroundColor: '#DBEAFE', padding: '12px', borderRadius: '8px' }}>
+                        <strong style={{ color: '#1E40AF', fontSize: '0.9em' }}>🍲 행운의 음식:</strong> {result.mechanics.career_and_fortune.yongshin.remedy.food}
+                      </div>
+                      <div style={{ backgroundColor: '#DBEAFE', padding: '12px', borderRadius: '8px' }}>
+                        <strong style={{ color: '#1E40AF', fontSize: '0.9em' }}>🧭 행운의 방향:</strong> {result.mechanics.career_and_fortune.yongshin.remedy.direction}
+                      </div>
+                      <div style={{ backgroundColor: '#EFF6FF', padding: '12px', borderLeft: '4px solid #3B82F6', marginTop: '5px' }}>
+                        <strong style={{ color: '#2563EB', fontSize: '0.9em', display: 'block', marginBottom: '4px' }}>✨ 실생활 액땜 가이드</strong>
+                        <span style={{ fontSize: '0.9em', color: '#4B5563', lineHeight: '1.5' }}>{result.mechanics.career_and_fortune.yongshin.remedy.advice}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="premium-card">
                   <h3 style={{ margin: '0 0 15px 0', fontSize: '1.2em', color: '#1C2536' }}>🌱 근묘화실(根苗花實) 생애주기</h3>
@@ -419,7 +456,6 @@ export default function SajuCalculator() {
               <button type="submit" className="btn-primary" style={{ width: '100%', background: 'linear-gradient(135deg, #BE185D 0%, #9D174D 100%)', color: '#FFF' }} disabled={loading}>{loading ? <><div className="spinner" style={{ borderColor: 'rgba(255,255,255,0.3)', borderTopColor: '#FFF' }}></div> {t.loading}</> : t.btnGunghap}</button>
             </form>
 
-            {/* 🚀 [수정됨] 궁합 분석 결과 UI 렌더링 */}
             {gunghapResult && (
               <div className="fade-in premium-card" style={{ textAlign: 'center', borderColor: '#FCE7F3', boxShadow: '0 10px 30px rgba(190,24,93,0.05)' }}>
                 <h3 style={{ margin: '0 0 15px 0', color: '#831843', fontSize: '1.3em' }}>풍수 방위 궁합 분석 결과</h3>
