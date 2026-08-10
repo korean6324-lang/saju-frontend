@@ -179,19 +179,60 @@ export default function SajuCalculator() {
   const [error, setError] = useState('');
   const [modalInfo, setModalInfo] = useState(null);
 
+  // 🚀 [추가됨] 앱 실행 시 로그인 상태 확인 및 DB 내역 자동 불러오기 로직
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
+      const currentUser = session?.user || null;
       setIsLoggedIn(!!session);
-      setUser(session?.user || null);
+      setUser(currentUser);
+      if (currentUser) fetchMyBaziProfile(currentUser.id); // 로그인 시 데이터 즉시 호출
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const currentUser = session?.user || null;
       setIsLoggedIn(!!session);
-      setUser(session?.user || null);
+      setUser(currentUser);
+      if (currentUser) fetchMyBaziProfile(currentUser.id); // 상태 변경 시 데이터 즉시 호출
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // 🚀 [추가됨] Supabase에서 내 사주 기록 가져오기 함수
+  const fetchMyBaziProfile = async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_bazi_profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false }) // 가장 최근 분석 기록 1개만 가져옴
+        .limit(1);
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const profile = data[0];
+        
+        // 1. DB에 저장된 초정밀 엔진 결과를 즉시 화면에 렌더링
+        setResult(profile.bazi_result); 
+        
+        // 2. 입력 폼(Form)에도 내가 저장했던 생년월일시를 그대로 채워줌
+        const bDate = new Date(profile.birth_date);
+        setFormData(prev => ({
+          ...prev,
+          name: profile.name,
+          gender: profile.gender,
+          year: bDate.getFullYear(),
+          month: bDate.getMonth() + 1,
+          day: bDate.getDate(),
+          hour: bDate.getHours(),
+          minute: bDate.getMinutes()
+        }));
+      }
+    } catch (err) {
+      console.error("저장된 사주 정보를 불러오는 중 오류 발생:", err);
+    }
+  };
 
   const handleSocialLogin = async (providerName) => {
     try {
@@ -221,7 +262,6 @@ export default function SajuCalculator() {
 
     try {
       const pad = (n) => String(n).padStart(2, '0');
-      // ISO 포맷의 생년월일시 문자열 조합
       const birthDt = `${formData.year}-${pad(formData.month)}-${pad(formData.day)}T${pad(formData.hour)}:${pad(formData.minute)}:00`;
       
       const payload = { 
@@ -234,9 +274,8 @@ export default function SajuCalculator() {
       
       if (response.data.status === 'success') {
         const engineResult = response.data.data;
-        setResult(engineResult); // 1. 화면에 결과 렌더링
+        setResult(engineResult); 
 
-        // 2. Supabase DB에 유저 데이터 안전하게 저장
         if (user) {
           const { error: dbError } = await supabase
             .from('user_bazi_profiles')
@@ -246,13 +285,12 @@ export default function SajuCalculator() {
                 name: formData.name || 'User',
                 gender: formData.gender,
                 birth_date: birthDt,
-                bazi_result: engineResult // 엔진의 분석 결과를 통째로 보관
+                bazi_result: engineResult 
               }
             ]);
             
           if (dbError) {
             console.error("DB 저장 중 에러 발생:", dbError);
-            // 저장에 실패해도 사용자 화면에는 분석 결과를 보여주도록 에러 처리 최소화
           }
         }
       } else {
@@ -271,11 +309,10 @@ export default function SajuCalculator() {
     try {
       const targetUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
       
-      // 본명궁 크로스매칭을 위한 기초 연산
       const ghPayload = {
         my_birth_year: gunghapData.me.year,
         my_gender: gunghapData.me.gender,
-        target_gua: 1 // TODO: 프론트엔드 통합 완료 후 Phase 4 궁합 데이터 주입 로직으로 고도화
+        target_gua: 1 
       };
 
       const response = await axios.post(`${targetUrl}/api/v1/fengshui/match`, ghPayload);
