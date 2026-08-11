@@ -1,567 +1,802 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { createClient } from '@supabase/supabase-js';
+import React, { useState, useEffect, useRef } from 'react';
 
-// 💡 Supabase 클라이언트 초기화
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-// 💡 통합 사전 데이터
-const TERMS_DICT = {
-  "비견": "독립심, 주체성, 자존심을 상징하며 형제, 친구, 동료와의 동등한 관계를 의미합니다.",
-  "겁재": "경쟁심, 투쟁력, 승부욕을 상징하며 재물을 둘러싼 경쟁이나 대인관계의 뺏고 빼앗김을 의미합니다.",
-  "식신": "창의력, 의식주의 풍요, 전문성, 탐구심을 상징하며 온화하고 베푸는 성향을 의미합니다.",
-  "상관": "뛰어난 표현력, 사교성, 기득권 타파를 상징하며, 틀에 얽매이지 않는 자유로운 발상과 언변을 의미합니다.",
-  "편재": "유동적인 큰 재물, 사업 수완, 공간 지각력, 인맥 관리와 넓은 활동 영역을 의미합니다.",
-  "정재": "고정적이고 안정적인 수입, 성실함, 꼼꼼함, 책임감과 알뜰한 저축심을 의미합니다.",
-  "편관": "카리스마, 권력, 강한 인내심과 돌파력을 상징하며, 위험을 감수하는 리더십과 명예욕을 의미합니다.",
-  "정관": "합리성, 보수적 원칙, 준법정신, 책임감을 상징하며 안정적인 직장과 바른 길을 의미합니다.",
-  "편인": "직관력, 눈치, 특수한 기술이나 예술/종교/철학적 재능, 비대중적인 학문을 의미합니다.",
-  "정인": "학문, 도덕성, 수용력, 인내심을 상징하며 어머니의 사랑과 문서(자격증, 부동산) 운을 의미합니다.",
-  "일간": "사주팔자에서 '나 자신'을 의미하는 기준점입니다.",
-  "장생": "새로운 시작과 탄생을 의미하는 길성. 후원과 순조로운 출발을 의미합니다.",
-  "목욕": "호기심과 도화, 반복되는 시행착오와 불안정을 의미합니다.",
-  "관대": "성장과 발전, 제복을 입는 직업군이나 강한 고집을 의미합니다.",
-  "건록": "자수성가와 안정, 강한 주체성과 실질적인 독립을 의미합니다.",
-  "제왕": "최고조에 달한 에너지, 압도적인 리더십과 독단적인 성향을 의미합니다.",
-  "쇠": "정점을 지나 노련해진 상태. 무리하지 않는 지혜를 의미합니다.",
-  "병": "기운이 쇠약해지나 동정심과 정신적/예술적 재능이 발달합니다.",
-  "사": "육체적 정지, 고요함, 철학적 사유와 고도의 집중력을 의미합니다.",
-  "묘": "저장과 수집, 알뜰함, 내면의 고립이나 화개(종교/예술)를 의미합니다.",
-  "절": "완전한 단절 후 새로운 전환점. 변화무쌍하고 다소 불안정함을 의미합니다.",
-  "태": "잉태, 새로운 아이디어와 계획, 매사에 조심스러운 성향을 의미합니다.",
-  "양": "양육과 평온, 상속이나 누군가를 기르고 가르치는 것에 유리합니다.",
-  "목": "성장과 추진력, 창조적인 에너지를 상징하며, 어질고(仁) 위로 곧게 뻗어나가는 기운입니다.",
-  "화": "열정과 명랑함, 확산하는 에너지를 상징하며, 예의(禮)를 중시하고 타오르는 불의 기운입니다.",
-  "토": "중재와 포용력, 안정감을 상징하며, 신용(信)을 바탕으로 만물을 품는 대지의 기운입니다.",
-  "금": "결단력과 원칙, 맺고 끊음을 상징하며, 의리(義)를 중시하고 단단하게 결실을 맺는 기운입니다.",
-  "수": "지혜와 유연성, 수용력을 상징하며, 상황에 맞게 대처하고 만물을 적셔주는(智) 물의 기운입니다.",
-  "갑": "큰 나무(陽木). 강한 생명력과 추진력, 리더십과 우두머리 기질을 상징합니다.",
-  "을": "화초나 덩굴(陰木). 유연함과 환경 적응력, 끈질긴 생명력과 사교성을 상징합니다.",
-  "병": "태양(陽火). 밝고 화려하며, 열정적이고 명랑하게 만물을 비추는 기운을 상징합니다.",
-  "정": "촛불, 달빛(陰火). 은은한 온기와 희생정신, 섬세하고 따뜻한 감수성을 상징합니다.",
-  "무": "큰 산(陽土). 듬직하고 포용력이 넓으며, 만물을 중재하고 믿음을 주는 기운입니다.",
-  "기": "평야, 논밭(陰土). 어머니 같은 수용력, 실속을 챙기며 다정다감한 기운입니다.",
-  "경": "바위, 무쇠(陽金). 원칙과 결단력, 강한 의리와 카리스마를 상징합니다.",
-  "신": "보석, 정밀한 칼(陰金). 예민한 감수성과 정교함, 완벽주의와 날카로움을 상징합니다.",
-  "임": "바다, 강물(陽水). 지혜롭고 융통성이 뛰어나며, 모든 것을 포용하는 넓은 스케일을 의미합니다.",
-  "계": "이슬비, 옹달샘(陰水). 부드럽고 다정하며, 섬세한 지혜와 기획력을 상징합니다.",
-  "자": "쥐(수). 어둠 속의 비밀스러운 활동, 강한 번식력과 뛰어난 지혜를 의미합니다.",
-  "축": "소(토). 묵묵한 끈기와 성실함, 속을 알 수 없는 뚝심을 의미합니다.",
-  "인": "호랑이(목). 강한 독립심과 개척 정신, 명예욕과 권력을 향한 의지를 의미합니다.",
-  "묘": "토끼(목). 부드럽고 다정함, 섬세한 감수성과 예술적 재능을 의미합니다.",
-  "진": "용(토). 이상향과 야망, 스케일이 크고 변화무쌍한 에너지를 의미합니다.",
-  "사": "뱀(화). 강한 집념과 열정, 화려함과 빠른 두뇌 회전을 의미합니다.",
-  "오": "말(화). 활달하고 진취적이며, 솔직하고 사교적인 확산의 에너지를 의미합니다.",
-  "미": "양(토). 온순해 보이나 강한 고집, 희생정신과 철학/예술적 성향을 의미합니다.",
-  "신": "원숭이(금). 다재다능하고 재주가 많으며, 임기응변과 결단력이 뛰어납니다.",
-  "유": "닭(금). 섬세하고 예민하며, 맺고 끊음이 정확한 완벽주의 성향을 의미합니다.",
-  "술": "개(토). 충직함과 강한 책임감, 직관력이 뛰어나고 방어적인 성향을 의미합니다.",
-  "해": "돼지(수). 온화함과 넓은 포용력, 풍요로움과 지적 호기심을 의미합니다.",
-  "백호대살": "강렬하고 폭발적인 에너지, 강한 프로 의식을 의미합니다.",
-  "원진살": "이유 없는 미움과 원망이 교차하는 기운. 대인관계에서 예민함이 증폭됩니다.",
-  "천라지망": "하늘과 땅에 그물이 쳐진 형국으로, 섣불리 움직이면 그물에 얽매이기 쉽습니다.",
-  "통근": "천간의 글자가 지지에 뿌리를 내려 기운이 매우 실하고 강한 상태를 의미합니다.",
-  "허투": "천간의 글자가 지지에 뿌리를 내리지 못해 기운이 허공에 뜬 불안정한 상태입니다."
-};
-
-const UI = {
-  ko: {
-    appTitle: "명리", appSubtitle: "글로벌 초정밀 사주 & 궁합 엔진", tabSaju: "👤 개인 사주 분석", tabGunghap: "💑 프리미엄 궁합",
-    name: "이름 (닉네임)", gender: "성별", male: "남성", female: "여성", cal: "역법 (양/음력)", solar: "양력", lunar: "음력 (평달)", lunarLeap: "음력 (윤달)",
-    bDate: "생년월일", bTime: "태어난 시간", btnSaju: "명리-PRO 원국 분석하기", btnGunghap: "명리-PRO 궁합 확인", loading: "명리-PRO 엔진 가동 중...", 
-    myInfo: "👤 나의 정보", ptInfo: "💖 상대방 정보", menuWhy: "🔍 Why 명리-PRO?", 
-    expertTitle: "👑 전문가 1:1 심층 사주풀이",
-    loginMsg: "1초만에 가입하고 초정밀 명리 분석을 시작하세요!"
-  }
-};
-
-const getElementColor = (text) => {
-  if (['목','갑','을','인','묘'].includes(text)) return '#10b981';
-  if (['화','병','정','사','오'].includes(text)) return '#ef4444';
-  if (['토','무','기','진','술','축','미'].includes(text)) return '#d97706';
-  if (['금','경','신','유'].includes(text)) return '#64748b';
-  if (['수','임','계','자','해'].includes(text)) return '#3b82f6';
-  if (text === '?') return '#cbd5e1'; 
-  return '#333';
-};
-
-const formatDate = (y, m, d) => `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-const formatTime = (h, m) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-
-const globalStyles = `
-  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-  body { background-color: #F8F7F4; margin: 0; font-family: 'Pretendard', -apple-system, sans-serif; color: #2C303A; overflow-x: hidden; }
-  .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  .premium-card { background: #FFFFFF; border-radius: 16px; padding: 24px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03); border: 1px solid #EFECE6; margin-bottom: 20px; }
-  .input-field { width: 100%; padding: 14px 12px; border: 1px solid #E2DED5; border-radius: 10px; font-size: 16px; color: #1C2536 !important; background-color: #FAFAFA; transition: all 0.2s; box-sizing: border-box; min-width: 0; }
-  .label-text { font-size: 0.85em; color: #6B7280; margin-bottom: 6px; display: block; font-weight: 600; }
-  .btn-primary { background: linear-gradient(135deg, #1C2536 0%, #111827 100%); color: #F3E8D0; padding: 16px; border: none; border-radius: 12px; font-size: 1.1em; font-weight: 700; cursor: pointer; width: 100%; transition: all 0.2s; box-shadow: 0 4px 15px rgba(17, 24, 39, 0.2); }
-  .spinner { border: 3px solid rgba(243, 232, 208, 0.3); border-top-color: #F3E8D0; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(17, 24, 39, 0.6); backdrop-filter: blur(2px); z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
-  .menu-overlay.open { opacity: 1; pointer-events: auto; }
-  .side-menu { position: fixed; top: 0; right: -320px; width: 300px; height: 100%; background-color: #FFFFFF; z-index: 2100; box-shadow: -5px 0 30px rgba(0,0,0,0.15); transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; overflow-y: auto; }
-  .side-menu.open { right: 0; }
-  .menu-header { display: flex; justify-content: space-between; align-items: center; padding: 25px 20px; border-bottom: 1px solid #EFECE6; background-color: #F8F7F4; }
-  .menu-nav-btn { display: flex; align-items: center; width: 100%; padding: 18px 20px; background: none; border: none; border-bottom: 1px solid #F3F4F6; font-size: 1.05em; font-weight: 700; color: #1C2536; cursor: pointer; text-align: left; }
-  .social-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 15px; border-radius: 12px; font-size: 1.05em; font-weight: 700; cursor: pointer; margin-bottom: 12px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-  .btn-github { background-color: #24292e; color: #FFFFFF; }
-  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(17, 24, 39, 0.65); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 5000; padding: 20px; }
-`;
+// 🔴 추후 파이썬 백엔드를 Vercel에 배포하시면 이 주소를 배포된 도메인으로 변경하세요!
+const BACKEND_URL = "https://saju-backend-ffum.onrender.com"; 
 
 export default function SajuCalculator() {
-  const [lang, setLang] = useState('ko'); 
-  const t = UI[lang] || UI['ko']; 
+    const [view, setView] = useState("hero"); // "hero" | "dashboard"
+    const [loading, setLoading] = useState(false);
+    const [resData, setResData] = useState(null);
+    const [copyFormattedText, setCopyFormattedText] = useState("");
+    
+    // 모달 상태
+    const [errorModal, setErrorModal] = useState({ show: false, msg: "" });
+    const [dictModal, setDictModal] = useState({ show: false, keyword: "", results: null });
+    
+    // 툴팁 상태
+    const [tooltip, setTooltip] = useState({ show: false, meta: null, top: 0, left: 0 });
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false); 
-  const [user, setUser] = useState(null);
-
-  const [activeTab, setActiveTab] = useState('saju');
-  const [isMenuOpen, setIsMenuOpen] = useState(false); 
-
-  const [formData, setFormData] = useState({ 
-    name: '', year: 1990, month: 5, day: 15, hour: 14, minute: 30, gender: 'M', is_lunar: false, is_leap_month: false 
-  });
-  const [result, setResult] = useState(null);
-  
-  const [gunghapData, setGunghapData] = useState({
-    me: { year: 1990, month: 5, day: 15, gender: 'M', is_lunar: false, is_leap_month: false },
-    partner: { year: 1995, month: 8, day: 20, gender: 'F', is_lunar: false, is_leap_month: false }
-  });
-  const [gunghapResult, setGunghapResult] = useState(null);
-
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [modalInfo, setModalInfo] = useState(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const currentUser = session?.user || null;
-      setIsLoggedIn(!!session);
-      setUser(currentUser);
-      if (currentUser) fetchMyBaziProfile(currentUser.id);
+    // 폼 입력 상태
+    const [form, setForm] = useState({
+        calendar_type: 'solar', dt_input: '1946-12-07T04:30', gender: 'M',
+        opt_daewun: false, daewun_num: '', 
+        use_traditional: false, lunar_month: 11,
+        use_partner: true, p_calendar_type: 'solar', p_dt_input: '1950-05-12T12:00', p_gender: 'F'
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      const currentUser = session?.user || null;
-      setIsLoggedIn(!!session);
-      setUser(currentUser);
-      if (currentUser) fetchMyBaziProfile(currentUser.id);
-    });
-    return () => subscription.unsubscribe();
-  }, []);
+    const handleInputChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+    };
 
-  const fetchMyBaziProfile = async (userId) => {
-    try {
-      const { data, error } = await supabase.from('user_bazi_profiles').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(1);
-      if (error) throw error;
-      if (data && data.length > 0) {
-        const profile = data[0];
-        setResult(profile.bazi_result); 
-        const bDate = new Date(profile.birth_date);
-        setFormData(prev => ({
-          ...prev, name: profile.name, gender: profile.gender, year: bDate.getFullYear(), month: bDate.getMonth() + 1, day: bDate.getDate(), hour: bDate.getHours(), minute: bDate.getMinutes()
-        }));
-      }
-    } catch (err) { console.error("데이터 로드 오류:", err); }
-  };
-
-  const handleSocialLogin = async (provider) => {
-    try {
-      await supabase.auth.signInWithOAuth({ provider });
-    } catch (error) { alert(`로그인 오류: ${error.message}`); }
-  };
-
-  const handleSajuSubmit = async (e) => {
-    e.preventDefault(); setLoading(true); setError(''); setResult(null);
-    try {
-      const pad = (n) => String(n).padStart(2, '0');
-      const birthDt = `${formData.year}-${pad(formData.month)}-${pad(formData.day)}T${pad(formData.hour)}:${pad(formData.minute)}:00`;
-      
-      const payload = { birth_dt: birthDt, gender: formData.gender, is_lunar: formData.is_lunar, is_leap_month: formData.is_leap_month };
-      const targetUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-      const response = await axios.post(`${targetUrl}/api/v1/engine/full-analysis`, payload);
-      
-      if (response.data.status === 'success') {
-        setResult(response.data.data); 
-        if (user) {
-          await supabase.from('user_bazi_profiles').insert([{ 
-            user_id: user.id, name: formData.name || 'User', gender: formData.gender, birth_date: birthDt, bazi_result: response.data.data 
-          }]);
+    // ----------------------------------------------------
+    // 1. 사전 기능
+    // ----------------------------------------------------
+    const handleDictSearch = async (e) => {
+        const keyword = e.target.value;
+        setDictModal(prev => ({ ...prev, keyword }));
+        if (!keyword) {
+            setDictModal(prev => ({ ...prev, results: null }));
+            return;
         }
-      } else throw new Error("분석 오류");
-    } catch (err) { setError(err.response?.data?.detail || '엔진 서버 통신 에러'); } finally { setLoading(false); }
-  };
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/dictionary?q=${encodeURIComponent(keyword)}`);
+            const results = await response.json();
+            setDictModal(prev => ({ ...prev, results }));
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
-  const handleGunghapSubmit = async (e) => {
-    e.preventDefault(); setLoading(true); setError(''); setGunghapResult(null);
-    try {
-      const targetUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-      const ghPayload = { 
-        my_birth_year: gunghapData.me.year, 
-        my_gender: gunghapData.me.gender, 
-        partner_birth_year: gunghapData.partner.year,
-        partner_gender: gunghapData.partner.gender
-      };
-      const response = await axios.post(`${targetUrl}/api/v1/fengshui/match`, ghPayload);
-      setGunghapResult(response.data);
-    } catch (err) { setError(err.response?.data?.detail || '궁합 서버 통신 에러'); } finally { setLoading(false); }
-  };
+    // ----------------------------------------------------
+    // 2. 툴팁 기능 (마우스 오버 이벤트)
+    // ----------------------------------------------------
+    const showTooltip = (e, meta) => {
+        if (!meta) return;
+        const rect = e.target.getBoundingClientRect();
+        let top = rect.top - 120; // 툴팁 대략적 높이
+        let left = rect.left + (rect.width / 2) - 130; // 260px의 절반
+        if (top < 10) top = rect.bottom + 10;
+        if (left < 10) left = 10;
+        if (left + 260 > window.innerWidth - 10) left = window.innerWidth - 270;
 
-  const openModal = (keyword) => {
-    if (!keyword) return;
-    if (TERMS_DICT[keyword]) setModalInfo({ title: keyword, desc: TERMS_DICT[keyword] });
-    else setModalInfo({ title: keyword, desc: "해당 단어의 상세 사전 데이터가 준비 중입니다." });
-  };
+        setTooltip({ show: true, meta, top, left });
+    };
+    const hideTooltip = () => setTooltip(prev => ({ ...prev, show: false }));
 
-  if (!isLoggedIn) {
+    // 스크롤 시 툴팁 숨김
+    useEffect(() => {
+        const handleScroll = () => hideTooltip();
+        window.addEventListener('scroll', handleScroll, true);
+        return () => window.removeEventListener('scroll', handleScroll, true);
+    }, []);
+
+    // ----------------------------------------------------
+    // 3. 메인 스캔 (엔진 호출)
+    // ----------------------------------------------------
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const payload = {
+                datetime_str: form.dt_input.replace('T', ' '),
+                calendar_type: form.calendar_type,
+                gender: form.gender,
+                longitude: 127.0,
+                apply_true_solar: true, apply_yaja: true,
+                apply_traditional_lunar: form.use_traditional,
+                lunar_month: form.use_traditional ? parseInt(form.lunar_month) : null
+            };
+            if (form.opt_daewun && form.daewun_num !== '') payload.daewun_num = parseInt(form.daewun_num);
+            if (form.use_partner) {
+                payload.partner_datetime_str = form.p_dt_input.replace('T', ' ');
+                payload.partner_calendar_type = form.p_calendar_type;
+                payload.partner_gender = form.p_gender;
+            }
+
+            const response = await fetch(`${BACKEND_URL}/api/bazi`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.detail || JSON.stringify(errData));
+            }
+
+            const res = await response.json();
+            setResData(res);
+            generateCopyText(res); // 복사 텍스트 생성
+            setView("dashboard");
+            window.scrollTo(0, 0);
+
+        } catch (err) {
+            setErrorModal({ show: true, msg: `서버 연산 중 에러:\n\n${err.message}` });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // ----------------------------------------------------
+    // 4. 복사 텍스트 자동 생성 로직
+    // ----------------------------------------------------
+    const generateCopyText = (res) => {
+        const bazi = res.bazi;
+        let txt = `======================================\n   [ BAZI MASTER ENGINE 분석 리포트 ]\n======================================\n\n`;
+        txt += `▶ 진태양시 보정: ${res.corrected_time}\n\n`;
+        
+        txt += `[1. 사주 원국 (四柱 原局)]\n`;
+        txt += `▪ 연주: ${bazi.year.stem}${bazi.year.branch} (${bazi.year.stem_tg}/${bazi.year.branch_tg})\n`;
+        txt += `▪ 월주: ${bazi.month.stem}${bazi.month.branch} (${bazi.month.stem_tg}/${bazi.month.branch_tg})\n`;
+        txt += `▪ 일주: ${bazi.day.stem}${bazi.day.branch} (${bazi.day.stem_tg}/${bazi.day.branch_tg})\n`;
+        txt += `▪ 시주: ${bazi.hour.stem}${bazi.hour.branch} (${bazi.hour.stem_tg}/${bazi.hour.branch_tg})\n\n`;
+
+        if (res.classical?.reading) {
+            txt += `[2. 전문가용 심층 고법 간명지]\n`;
+            res.classical.reading.forEach(sec => {
+                txt += `\n■ ${sec.section}\n`;
+                sec.items.forEach(item => {
+                    if (item.title) txt += ` * ${item.title}\n`;
+                    if (item.hanja) txt += `  [${item.hanja}]\n`;
+                    txt += `   : ${item.text}\n`;
+                });
+            });
+            txt += `\n`;
+        }
+
+        if (res.yongshin) {
+            const ys = res.yongshin;
+            txt += `[3. 격국(格局)과 용신(用神)]\n`;
+            txt += `▪ 나의 그릇: ${ys.geokguk.name.split('(')[0]} - ${ys.geokguk.desc}\n`;
+            txt += `▪ 나의 내공: ${ys.strength.status} (아군:${ys.strength.my_power} / 적군:${ys.strength.other_power})\n`;
+            txt += `▪ 수호신(용신): ${ys.yongshin.yongshin}\n▪ 희신: ${ys.yongshin.huishin}\n▪ 기신: ${ys.yongshin.gishin}\n\n`;
+        }
+
+        if (res.unse?.year) {
+            const cy = new Date().getFullYear();
+            txt += `[4. 운세 예측]\n`;
+            txt += `▪ ${cy}년 올해의 운세: ${res.unse.year.overall_status}\n  : ${res.unse.year.overall_desc}\n`;
+            if (res.unse.month) txt += `▪ ${res.unse.month.month_num}월 이달의 운세: ${res.unse.month.data.overall_status}\n  : ${res.unse.month.data.overall_desc}\n`;
+            if (res.unse.day) txt += `▪ ${res.unse.day.day_num}일 오늘의 운세: ${res.unse.day.data.overall_status}\n  : ${res.unse.day.data.overall_desc}\n\n`;
+        }
+
+        if (res.napeum_reading) {
+            txt += `[5. 납음오행(納音五行)의 숨은 파동]\n`;
+            res.napeum_reading.forEach(n => { txt += `▪ ${n.pillar}: ${n.full} - ${n.desc}\n`; });
+            txt += `\n`;
+        }
+
+        if (res.practical) {
+            const pd = res.practical;
+            txt += `[6. 실용 통변 (직업 & 건강)]\n`;
+            txt += `▪ 추천 직무: ${pd.career.core_trait}\n  : ${pd.career.recommended_jobs}\n`;
+            pd.health.forEach(h => { txt += `▪ 건강(${h.element}): ${h.status} - ${h.organ}\n`; });
+            txt += `\n`;
+        }
+
+        if (res.gunghap) {
+            const gh = res.gunghap;
+            txt += `[7. 궁합 분석]\n`;
+            txt += `▪ 겉궁합(구궁): ${gh.gugung.status} (${gh.gugung.score}점)\n  : ${gh.gugung.desc}\n`;
+            txt += `▪ 속궁합(일지): ${gh.inner.relation} - ${gh.inner.status}\n  : ${gh.inner.desc}\n\n`;
+        }
+
+        if (res.mechanics?.elements_dist) {
+            const elDist = res.mechanics.elements_dist;
+            txt += `[8. 오행 밸런스 지표]\n`;
+            txt += `▪ 오행 분포: 목(${elDist['목']||0}) 화(${elDist['화']||0}) 토(${elDist['토']||0}) 금(${elDist['금']||0}) 수(${elDist['수']||0})\n`;
+            txt += `▪ 통근력 점수: ${res.mechanics.tonggeun.total_power}\n`;
+            if (res.elements_imbalance) {
+                txt += `\n[오행 과다 및 고립 분석]\n`;
+                res.elements_imbalance.forEach(item => {
+                    txt += `▪ [${item.element}] ${item.type} (${item.count}개): ${item.desc}\n`;
+                });
+            }
+        }
+        setCopyFormattedText(txt);
+    };
+
+    const handleCopy = () => {
+        if (!copyFormattedText) return alert("복사할 데이터가 없습니다.");
+        navigator.clipboard.writeText(copyFormattedText)
+            .then(() => alert("분석 결과가 깔끔한 텍스트 리포트로 복사되었습니다.\n카카오톡이나 메모장에 붙여넣기 하세요."))
+            .catch(err => alert("복사 실패: " + err));
+    };
+
+    // ----------------------------------------------------
+    // 5. JSX 렌더링 헬퍼 함수
+    // ----------------------------------------------------
+    const renderTooltipItem = (keyword, isChar = true, text = null) => {
+        if (!resData) return text || keyword;
+        const metaDict = resData.mechanics.metadata || {};
+        const meta = metaDict[keyword];
+        const display = text || keyword;
+        if (!meta) return <span key={Math.random()}>{display}</span>;
+        
+        const cssClass = isChar ? "hanja-tooltip char-tooltip" : "hanja-tooltip";
+        return (
+            <span key={Math.random()} className={cssClass} onMouseEnter={(e) => showTooltip(e, meta)} onMouseLeave={hideTooltip}>
+                {display}
+            </span>
+        );
+    };
+
+    const renderHanjaString = (str) => {
+        if (!str) return "";
+        return str.split('').map(char => renderTooltipItem(char, true));
+    };
+
+    // 가로 스와이프 기능
+    const attachSwipe = (el) => {
+        if (!el) return;
+        let isDown = false; let startX; let scrollLeft;
+        el.onmousedown = (e) => { isDown = true; el.style.cursor = 'grabbing'; startX = e.pageX - el.offsetLeft; scrollLeft = el.scrollLeft; };
+        el.onmouseleave = () => { isDown = false; el.style.cursor = 'grab'; };
+        el.onmouseup = () => { isDown = false; el.style.cursor = 'grab'; };
+        el.onmousemove = (e) => { if (!isDown) return; e.preventDefault(); const walk = (e.pageX - el.offsetLeft - startX) * 2; el.scrollLeft = scrollLeft - walk; };
+    };
+
     return (
-      <div style={{ maxWidth: '400px', margin: '0 auto', padding: '40px 20px', textAlign: 'center', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <style>{globalStyles}</style>
-        <div className="fade-in">
-          <h1 style={{ fontSize: '3em', color: '#1C2536', margin: '0 0 10px 0', fontWeight: '900', letterSpacing: '-1px' }}>{t.appTitle}<span style={{ color: '#B59960' }}>-PRO</span></h1>
-          <p style={{ color: '#6B7280', fontSize: '1em', marginBottom: '40px', fontWeight: '600' }}>{t.appSubtitle}</p>
-          <div style={{ backgroundColor: '#F0F9FF', padding: '15px', borderRadius: '12px', border: '1px solid #BAE6FD', marginBottom: '30px' }}>
-            <strong style={{ color: '#0369A1' }}>{t.loginMsg}</strong>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <button className="social-btn btn-github" onClick={() => handleSocialLogin('github')} style={{ marginBottom: '0' }}>🐙 깃허브로 로그인</button>
-            <button className="social-btn" style={{ backgroundColor: '#B59960', color: '#FFFFFF', marginTop: '10px' }} onClick={() => { setIsLoggedIn(true); }}>⚡ 원클릭 테스트 로그인</button>
-          </div>
+        <div style={{ fontFamily: "'Noto Serif KR', serif", background: "var(--bg-color)", minHeight: "100vh", color: "var(--text-main)" }}>
+            {/* ===================== CSS 스타일 내장 ===================== */}
+            <style>{`
+                :root { --bg-color: #0d0f12; --card-bg: #16181d; --text-main: #f1f2f6; --text-muted: #95a5a6; --gold-light: #f1c40f; --gold-main: #d4af37; --gold-dark: #b5952f; --accent-red: #e74c3c; --accent-blue: #3498db; --accent-green: #2ecc71; }
+                * { box-sizing: border-box; }
+                ::-webkit-scrollbar { width: 6px; height: 6px; }
+                ::-webkit-scrollbar-track { background: var(--bg-color); }
+                ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+                .hero-section { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; background: radial-gradient(circle at center, #1a1e24 0%, var(--bg-color) 100%); text-align: center; position: relative; }
+                .hero-title { font-size: 3rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 10px; color: var(--gold-main); text-shadow: 0 4px 15px rgba(212,175,55,0.2); }
+                .hero-subtitle { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 40px; font-weight: 300; }
+                .input-card { background: var(--card-bg); padding: 30px; border-radius: 12px; width: 100%; max-width: 700px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
+                .input-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, var(--gold-main), transparent); }
+                .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; text-align: left; }
+                label { font-size: 13px; font-weight: 700; color: var(--gold-light); margin-bottom: 5px; display: block; }
+                input, select { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid #333; color: white; border-radius: 6px; font-family: inherit; font-size: 14px; transition: all 0.3s; }
+                input:focus, select:focus { border-color: var(--gold-main); outline: none; }
+                .btn-primary { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--gold-dark), var(--gold-main)); color: #000; border: none; border-radius: 6px; font-size: 16px; font-weight: 900; cursor: pointer; margin-top: 25px; transition: transform 0.2s, box-shadow 0.2s; }
+                .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212,175,55,0.4); }
+                .top-nav { position: absolute; top: 20px; right: 20px; z-index: 100; }
+                .btn-icon { background: rgba(255,255,255,0.1); color: white; border: 1px solid #333; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; transition: 0.3s; }
+                .btn-icon:hover { background: var(--gold-main); color: #000; border-color: var(--gold-main); }
+                .dashboard { padding: 40px 20px; max-width: 1200px; margin: auto; }
+                .dash-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 30px; }
+                .dash-header h2 { margin: 0; color: var(--gold-main); font-weight: 900; }
+                .bazi-table-container { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid #222; margin-bottom: 30px; }
+                .bazi-table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: center; }
+                .bazi-table th { color: var(--text-muted); font-size: 13px; padding-bottom: 15px; border-bottom: 1px solid #333; font-weight: 400; }
+                .bazi-table td { padding: 20px 10px; border-right: 1px solid #222; }
+                .bazi-table td:last-child { border-right: none; }
+                .stem, .branch { font-size: 38px; font-weight: 900; color: #fff; line-height: 1.2; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+                .ten-god { font-size: 13px; color: var(--gold-main); margin-bottom: 5px; font-weight: 700; letter-spacing: 1px; }
+                .hidden-stems { font-size: 12px; color: #777; margin-top: 15px; text-align: left; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; }
+                .panel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+                .panel { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid #222; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; }
+                .panel-full { grid-column: 1 / -1; }
+                .panel h3 { margin-top: 0; color: var(--gold-main); font-size: 1.1rem; margin-bottom: 20px; display: flex; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
+                .swipe-container { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; cursor: grab; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+                .swipe-container::-webkit-scrollbar { display: none; }
+                .timeline-card { flex: 0 0 100px; background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 8px; text-align: center; padding: 15px 10px; transition: 0.3s; user-select: none; }
+                .timeline-card:hover { background: rgba(212,175,55,0.1); border-color: var(--gold-dark); transform: translateY(-3px); }
+                .highlight-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 3px solid var(--gold-main); margin-bottom: 15px; }
+                .badge { display: inline-block; padding: 4px 8px; background: rgba(255,255,255,0.05); border: 1px solid #444; border-radius: 4px; font-size: 12px; margin: 3px; font-weight: 700; color: #ccc; }
+                .badge-good { border-color: var(--accent-green); color: var(--accent-green); background: rgba(46,204,113,0.1); }
+                .badge-bad { border-color: var(--accent-red); color: var(--accent-red); background: rgba(231,76,60,0.1); }
+                .hanja-tooltip { display: inline-block; cursor: pointer; color: var(--gold-main); border-bottom: 1px dashed rgba(212,175,55,0.5); }
+                .hanja-tooltip.char-tooltip { color: #fff; border-bottom: none; }
+                .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 2000; backdrop-filter: blur(5px); }
+                .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); width: 90%; max-width: 600px; max-height: 80vh; border-radius: 12px; padding: 25px; display: flex; flex-direction: column; border: 1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+                .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
+                .modal-header h3 { margin: 0; color: var(--gold-main); }
+                .close-btn { background: none; border: none; font-size: 28px; color: #888; cursor: pointer; }
+                .dict-search-box input { width: 100%; padding: 15px; font-size: 15px; background: #000; border-radius: 8px; color: white; border: 1px solid #333; }
+                .dict-results { overflow-y: auto; padding-right: 10px; margin-top: 15px; }
+                .dict-item { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 4px solid var(--gold-main); margin-bottom: 15px; }
+            `}</style>
+
+            {/* ===================== 전역 툴팁 ===================== */}
+            {tooltip.show && tooltip.meta && (
+                <div style={{
+                    position: 'fixed', zIndex: 9999, width: '260px',
+                    backgroundColor: '#222', color: '#fff', textAlign: 'left', borderRadius: '8px',
+                    padding: '15px', fontSize: '13px', lineHeight: '1.5', border: '1px solid #444',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.8)', pointerEvents: 'none', fontWeight: 300,
+                    top: tooltip.top + 'px', left: tooltip.left + 'px'
+                }}>
+                    <strong style={{ color: 'var(--gold-main)' }}>
+                        {tooltip.meta.term} {tooltip.meta.hanja ? `(${tooltip.meta.hanja})` : ''}
+                    </strong><br /><br />{tooltip.meta.meaning}
+                </div>
+            )}
+
+            {/* ===================== 사전 모달 ===================== */}
+            {dictModal.show && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h3>📖 마스터 백과사전</h3>
+                            <button className="close-btn" onClick={() => setDictModal({ show: false, keyword: "", results: null })}>×</button>
+                        </div>
+                        <div className="dict-search-box">
+                            <input type="text" placeholder="궁금한 용어나 한자를 입력하세요" onChange={handleDictSearch} autoFocus />
+                        </div>
+                        <div className="dict-results">
+                            {!dictModal.results ? (
+                                <div style={{ textAlign: 'center', color: '#555', marginTop: '30px' }}>검색어를 입력하시면 전문 해설이 나타납니다.</div>
+                            ) : dictModal.results.length === 0 ? (
+                                <div style={{ textAlign: 'center', color: '#888', marginTop: '30px' }}>검색 결과가 없습니다.</div>
+                            ) : (
+                                dictModal.results.map((r, idx) => (
+                                    <div className="dict-item" key={idx}>
+                                        <h4 style={{ margin: '0 0 8px 0', color: '#fff', fontSize: '16px' }}>
+                                            {r.term} {r.hanja ? `(${r.hanja})` : ''} <span style={{ fontSize: '11px', background: 'rgba(212,175,55,0.2)', padding: '3px 8px', borderRadius: '4px', color: 'var(--gold-main)', marginLeft: '10px' }}>{r.category}</span>
+                                        </h4>
+                                        <p style={{ margin: 0 }}>{r.meaning}</p>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ===================== 에러 모달 ===================== */}
+            {errorModal.show && (
+                <div className="modal-overlay" style={{ zIndex: 3000 }}>
+                    <div className="modal-content" style={{ borderLeft: '4px solid var(--accent-red)' }}>
+                        <div className="modal-header">
+                            <h3 style={{ color: 'var(--accent-red)' }}>⚠️ 시스템 오류 안내</h3>
+                            <button className="close-btn" onClick={() => setErrorModal({ show: false, msg: "" })}>×</button>
+                        </div>
+                        <div style={{ marginBottom: '15px' }}>
+                            <textarea readOnly value={errorModal.msg} style={{ width: '100%', height: '150px', background: '#000', color: 'var(--accent-red)', padding: '10px', border: '1px solid #333', borderRadius: '6px', fontFamily: 'monospace', resize: 'none' }}></textarea>
+                        </div>
+                        <button className="btn-primary" style={{ marginTop: 0, background: 'var(--accent-red)', color: '#fff', border: 'none' }} onClick={() => navigator.clipboard.writeText(errorModal.msg)}>오류 내용 복사하기</button>
+                    </div>
+                </div>
+            )}
+
+            {/* ===================== VIEW: 메인 입력창 (Hero) ===================== */}
+            {view === "hero" && (
+                <div className="hero-section">
+                    <div className="top-nav">
+                        <button className="btn-icon" onClick={() => setDictModal(prev => ({ ...prev, show: true }))}>📖 사전 열기</button>
+                    </div>
+                    <h1 className="hero-title">BAZI MASTER ENGINE</h1>
+                    <div className="hero-subtitle">대한민국 1% 명리 마스터를 위한 초정밀 예측 시스템</div>
+                    
+                    <form className="input-card" onSubmit={handleSubmit}>
+                        <div className="form-grid">
+                            <div>
+                                <label>본인 생년월일시</label>
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <select name="calendar_type" value={form.calendar_type} onChange={handleInputChange} style={{ width: '35%' }}>
+                                        <option value="solar">양력</option>
+                                        <option value="lunar">음력(평달)</option>
+                                        <option value="lunar_leap">음력(윤달)</option>
+                                    </select>
+                                    <input type="datetime-local" name="dt_input" value={form.dt_input} onChange={handleInputChange} required style={{ width: '65%' }} />
+                                </div>
+                            </div>
+                            <div>
+                                <label>본인 성별</label>
+                                <select name="gender" value={form.gender} onChange={handleInputChange}>
+                                    <option value="M">남성 (Male)</option>
+                                    <option value="F">여성 (Female)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '15px', marginTop: '20px', fontSize: '13px' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
+                                <input type="checkbox" name="opt_daewun" checked={form.opt_daewun} onChange={handleInputChange} style={{ width: 'auto' }} /> 대운수 수동지정
+                            </label>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
+                                <input type="checkbox" name="use_traditional" checked={form.use_traditional} onChange={handleInputChange} style={{ width: 'auto' }} /> 고법 둔월법
+                            </label>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', color: 'var(--accent-red)' }}>
+                                <input type="checkbox" name="use_partner" checked={form.use_partner} onChange={handleInputChange} style={{ width: 'auto' }} /> 💘 파트너 궁합
+                            </label>
+                        </div>
+
+                        {form.opt_daewun && (
+                            <div style={{ marginTop: '15px', background: 'rgba(0,0,0,0.2)', padding: '15px', borderRadius: '6px' }}>
+                                <label>대운수 지정 (미입력시 자동)</label>
+                                <input type="number" name="daewun_num" value={form.daewun_num} onChange={handleInputChange} min="0" max="10" placeholder="0~10 입력" />
+                            </div>
+                        )}
+
+                        {form.use_traditional && (
+                            <div style={{ marginTop: '15px', background: 'rgba(0,0,0,0.2)', padding: '15px', borderRadius: '6px' }}>
+                                <label>고법(古法) 음력 월 강제 지정</label>
+                                <input type="number" name="lunar_month" value={form.lunar_month} onChange={handleInputChange} min="1" max="12" />
+                            </div>
+                        )}
+
+                        {form.use_partner && (
+                            <div style={{ marginTop: '15px', background: 'rgba(231,76,60,0.05)', border: '1px solid rgba(231,76,60,0.2)', padding: '15px', borderRadius: '6px' }}>
+                                <label style={{ color: 'var(--accent-red)' }}>상대방 (궁합용)</label>
+                                <div className="form-grid" style={{ marginBottom: 0 }}>
+                                    <div style={{ display: 'flex', gap: '10px' }}>
+                                        <select name="p_calendar_type" value={form.p_calendar_type} onChange={handleInputChange} style={{ width: '35%' }}>
+                                            <option value="solar">양력</option>
+                                            <option value="lunar">음력(평달)</option>
+                                            <option value="lunar_leap">음력(윤달)</option>
+                                        </select>
+                                        <input type="datetime-local" name="p_dt_input" value={form.p_dt_input} onChange={handleInputChange} style={{ width: '65%' }} />
+                                    </div>
+                                    <select name="p_gender" value={form.p_gender} onChange={handleInputChange}>
+                                        <option value="F">여성 (Female)</option>
+                                        <option value="M">남성 (Male)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        )}
+
+                        <button type="submit" className="btn-primary" disabled={loading} style={{ opacity: loading ? 0.7 : 1 }}>
+                            {loading ? "연산 중 (Processing...)" : "운명 스캔 시작 (SCAN)"}
+                        </button>
+                    </form>
+                </div>
+            )}
+
+            {/* ===================== VIEW: 대시보드 리포트 ===================== */}
+            {view === "dashboard" && resData && (
+                <div className="dashboard">
+                    <div className="dash-header">
+                        <h2>분석 리포트</h2>
+                        <div>
+                            <span style={{ fontSize: '12px', color: '#777', marginRight: '15px' }}>
+                                진태양시 보정: <span style={{ color: '#fff' }}>{resData.corrected_time}</span>
+                            </span>
+                            <button className="btn-icon" onClick={handleCopy} style={{ marginRight: '8px' }}>📋 복사</button>
+                            <button className="btn-icon" onClick={() => { setView("hero"); window.scrollTo(0,0); }} style={{ background: '#333' }}>⟲ 다시하기</button>
+                        </div>
+                    </div>
+
+                    {resData.applied_traditional && (
+                        <div style={{ background: 'rgba(231,76,60,0.1)', borderLeft: '3px solid var(--accent-red)', padding: '15px', borderRadius: '6px', marginBottom: '20px', fontSize: '13px' }}>
+                            ⚠️ <b>고법(古法) 명리 적용:</b> 천문학적 절기를 무시하고 입력하신 음력 달로 월주가 덮어씌워졌습니다. (대운은 천문 기준 유지)
+                        </div>
+                    )}
+
+                    <div className="bazi-table-container">
+                        <table className="bazi-table">
+                            <thead>
+                                <tr><th>연주 (Year)</th><th>월주 (Month)</th><th>일주 (Day)</th><th>시주 (Hour)</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    {['year', 'month', 'day', 'hour'].map(p => {
+                                        const bazi = resData.bazi[p];
+                                        const hidden = resData.mechanics.hidden_stems[p];
+                                        const isGm = resData.mechanics.gongmang.includes(bazi.branch);
+                                        const safeStem = (arr, isBold) => {
+                                            if (!arr || !arr[0] || arr[0].trim() === '' || arr[0] === 'null' || arr[0] === 'None') return '-';
+                                            const el = renderTooltipItem(arr[0], true);
+                                            return isBold ? <b>{el}</b> : el;
+                                        };
+                                        return (
+                                            <td key={p}>
+                                                <div className="ten-god">{renderTooltipItem(bazi.stem_tg, false)}</div>
+                                                <div className="stem">{renderTooltipItem(bazi.stem, true)}</div>
+                                                <div className="branch">{renderTooltipItem(bazi.branch, true)}</div>
+                                                <div className="ten-god" style={{ color: 'var(--text-muted)' }}>{renderTooltipItem(bazi.branch_tg, false)}</div>
+                                                <div style={{ fontSize: '11px', color: '#555', marginTop: '5px' }}>[납음] {bazi.napeum}</div>
+                                                
+                                                {/* 공망 칼각 정렬 */}
+                                                <div style={{ height: '24px', margin: '10px 0 5px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    {isGm && <div className="badge badge-bad" style={{ margin: 0 }}>{renderTooltipItem('공망', false)}</div>}
+                                                </div>
+
+                                                <div className="hidden-stems">
+                                                    <span style={{ color: 'var(--gold-main)' }}>지장간</span><br />
+                                                    {safeStem(hidden.initial, false)} · {safeStem(hidden.middle, false)} · {safeStem(hidden.main, true)}
+                                                </div>
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div className="panel-grid">
+                        {/* 1. 전문가용 심층 고법 간명지 */}
+                        {resData.classical?.reading && (
+                            <div className="panel panel-full">
+                                <h3>📜 전문가용 심층 고법 간명지</h3>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                                    {resData.classical.reading.map((sec, i) => (
+                                        <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--gold-dark)', background: 'rgba(212,175,55,0.03)' }} key={i}>
+                                            <h4 style={{ margin: '0 0 10px 0', color: 'var(--gold-main)', borderBottom: '1px dashed rgba(212,175,55,0.2)', paddingBottom: '5px' }}>{sec.section}</h4>
+                                            {sec.items.map((item, j) => (
+                                                <div style={{ marginBottom: '10px' }} key={j}>
+                                                    {item.title && <div style={{ color: 'var(--accent-blue)', fontWeight: 'bold', fontSize: '14px', marginBottom: '3px' }}>{item.title}</div>}
+                                                    {item.hanja && <div style={{ fontSize: '16px', fontWeight: 'bold', letterSpacing: '1px', marginBottom: '3px', color: '#fff' }}>{renderHanjaString(item.hanja)}</div>}
+                                                    <div style={{ fontSize: '13px', color: '#ccc', lineHeight: '1.5' }}>{item.text}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
+                                {/* 당사주 12성 */}
+                                {resData.classical.stars && (
+                                    <>
+                                        <h4 style={{ marginTop: '20px', color: 'var(--text-muted)', fontSize: '13px' }}>[참고] 당사주 12성 흐름</h4>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                                            {Object.entries(resData.classical.stars).map(([pillar, star]) => (
+                                                <div style={{ flex: 1, minWidth: '120px', background: 'rgba(0,0,0,0.4)', padding: '10px', borderRadius: '6px', border: '1px solid #333' }} key={pillar}>
+                                                    <div style={{ fontSize: '11px', color: '#777' }}>{pillar === 'year' ? '초년(연)' : pillar === 'month' ? '청년(월)' : pillar === 'day' ? '중년(일)' : '말년(시)'}</div>
+                                                    <div style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--gold-dark)' }}>{star.name}</div>
+                                                    <div style={{ fontSize: '11px', color: '#aaa', marginTop: '3px' }}>{star.desc}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        )}
+
+                        {/* 2. 격국과 용신 */}
+                        {resData.yongshin && (
+                            <div className="panel">
+                                <h3>⚖️ 격국(格局)과 용신(用神)</h3>
+                                <div className="highlight-box">
+                                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>나의 그릇</div>
+                                    <div style={{ fontSize: '18px', color: 'var(--gold-main)', fontWeight: 'bold', marginBottom: '5px' }}>{renderTooltipItem(resData.yongshin.geokguk.name.split('(')[0], false, resData.yongshin.geokguk.name)}</div>
+                                    <div style={{ fontSize: '13px' }}>{resData.yongshin.geokguk.desc}</div>
+                                </div>
+                                <div className="highlight-box" style={{ borderLeftColor: 'var(--accent-blue)' }}>
+                                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>나의 내공</div>
+                                    <div className="status-blue" style={{ marginBottom: '5px' }}>{resData.yongshin.strength.status} <span style={{ fontSize: '12px', fontWeight: 'normal', color: '#777' }}>(아군:{resData.yongshin.strength.my_power} 적군:{resData.yongshin.strength.other_power})</span></div>
+                                    <div style={{ fontSize: '13px' }}>주체성과 에너지의 강약을 수치화했습니다.</div>
+                                </div>
+                                <div className="highlight-box" style={{ borderLeftColor: 'var(--accent-green)', marginBottom: 0 }}>
+                                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>수호신 (조후/억부)</div>
+                                    <div style={{ fontSize: '13px', lineHeight: '1.6', marginTop: '5px' }}>
+                                        <span className="badge badge-good">용신</span> {resData.yongshin.yongshin.yongshin}<br />
+                                        <span className="badge" style={{ borderColor: 'var(--accent-blue)', color: 'var(--accent-blue)' }}>희신</span> {resData.yongshin.yongshin.huishin}<br />
+                                        <span className="badge badge-bad">기신</span> {resData.yongshin.yongshin.gishin}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 3. 올해 예측 */}
+                        {resData.unse?.year && (
+                            <div className="panel">
+                                <h3>🎯 올해({new Date().getFullYear()}년) 족집게 예측</h3>
+                                {(() => {
+                                    const y = resData.unse.year;
+                                    const isGood = y.overall_status.includes('발복') || y.overall_status.includes('무난') || y.overall_status.includes('성취');
+                                    const bc = isGood ? 'var(--accent-green)' : 'var(--accent-red)';
+                                    return (
+                                        <>
+                                            <div className="highlight-box" style={{ borderLeftColor: bc }}>
+                                                <div className={isGood ? "status-green" : "status-red"} style={{ marginBottom: '5px' }}>{y.overall_status}</div>
+                                                <div style={{ fontSize: '13px' }}>{y.overall_desc}</div>
+                                            </div>
+                                            {y.events.length > 0 ? y.events.map((ev, i) => {
+                                                const ebc = ev.type === 'good' ? 'var(--accent-green)' : 'var(--accent-red)';
+                                                return (
+                                                    <div className="highlight-box" style={{ borderLeftColor: ebc, padding: '10px' }} key={i}>
+                                                        <div style={{ color: ebc, fontWeight: 'bold', fontSize: '14px', marginBottom: '3px' }}>{ev.title}</div>
+                                                        <div style={{ fontSize: '12px', color: '#ccc' }}>{ev.desc}</div>
+                                                    </div>
+                                                )
+                                            }) : <div style={{ fontSize: '12px', color: '#777' }}>올해는 큰 충/합이 없는 평탄한 시기입니다.</div>}
+                                        </>
+                                    )
+                                })()}
+                            </div>
+                        )}
+
+                        {/* 4. 이달과 오늘의 운세 */}
+                        {resData.unse?.month && resData.unse?.day && (
+                            <div className="panel">
+                                <h3>📅 이달과 오늘의 운세</h3>
+                                {(() => {
+                                    const m = resData.unse.month;
+                                    const d = resData.unse.day;
+                                    const mGood = m.data.overall_status.includes('발복') || m.data.overall_status.includes('무난') || m.data.overall_status.includes('성취');
+                                    const dGood = d.data.overall_status.includes('발복') || d.data.overall_status.includes('무난') || d.data.overall_status.includes('성취');
+                                    return (
+                                        <>
+                                            <div className="highlight-box" style={{ borderLeftColor: mGood ? 'var(--accent-green)' : 'var(--accent-blue)' }}>
+                                                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '5px' }}>■ {m.month_num}월 이달의 운세 ({renderTooltipItem(m.stem, true)}{renderTooltipItem(m.branch, true)}월)</div>
+                                                <div className={mGood ? "status-green" : "status-red"} style={{ marginBottom: '5px', fontSize: '1.1rem' }}>{m.data.overall_status}</div>
+                                                <div style={{ fontSize: '13px' }}>{m.data.overall_desc}</div>
+                                            </div>
+                                            <div className="highlight-box" style={{ borderLeftColor: dGood ? 'var(--accent-green)' : 'var(--gold-main)', marginBottom: 0 }}>
+                                                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '5px' }}>■ {d.day_num}일 오늘의 운세 ({renderTooltipItem(d.stem, true)}{renderTooltipItem(d.branch, true)}일)</div>
+                                                <div className={dGood ? "status-green" : "status-red"} style={{ marginBottom: '5px', fontSize: '1.1rem' }}>{d.data.overall_status}</div>
+                                                <div style={{ fontSize: '13px' }}>{d.data.overall_desc}</div>
+                                            </div>
+                                        </>
+                                    )
+                                })()}
+                            </div>
+                        )}
+
+                        {/* 5. 현대 실용 통변 */}
+                        {resData.practical && (
+                            <div className="panel panel-full">
+                                <h3>💼 현대 실용 통변 (직업 & 헬스케어)</h3>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '15px' }}>
+                                    <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--accent-blue)' }}>
+                                        <div style={{ color: 'var(--accent-blue)', fontWeight: 'bold', fontSize: '15px', marginBottom: '5px' }}>🎯 추천 직무: {resData.practical.career.core_trait}</div>
+                                        <div style={{ fontSize: '13px', marginBottom: '8px' }}>{resData.practical.career.recommended_jobs}</div>
+                                        <div style={{ fontSize: '12px', color: '#aaa', background: 'rgba(0,0,0,0.4)', padding: '8px', borderRadius: '4px' }}>{resData.practical.career.work_environment}</div>
+                                    </div>
+                                    <div>
+                                        {resData.practical.health.map((h, i) => {
+                                            const bc = h.status.includes('양호') ? 'var(--accent-green)' : 'var(--accent-red)';
+                                            return (
+                                                <div className="highlight-box" style={{ marginBottom: '10px', padding: '10px', borderLeftColor: bc }} key={i}>
+                                                    <div style={{ color: bc, fontWeight: 'bold', fontSize: '13px' }}>[{h.element}] {h.status}</div>
+                                                    <div style={{ fontSize: '12px', margin: '3px 0' }}>장기: {h.organ} / 증상: {h.symptom}</div>
+                                                    <div style={{ fontSize: '11px', color: '#888' }}>{h.advice}</div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 6. 납음오행 */}
+                        {resData.napeum_reading && (
+                            <div className="panel panel-full">
+                                <h3>🎵 납음오행(納音五行)의 숨은 파동</h3>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '15px' }}>
+                                    {resData.napeum_reading.map((n, i) => (
+                                        <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--gold-main)', padding: '15px' }} key={i}>
+                                            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '3px' }}>{n.pillar}</div>
+                                            <div style={{ color: 'var(--gold-light)', fontWeight: 'bold', fontSize: '16px', marginBottom: '5px' }}>[납음] {n.full}</div>
+                                            <div style={{ fontSize: '13px', color: '#ccc' }}>{n.desc}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 7. 궁합 분석 */}
+                        {resData.gunghap && (
+                            <div className="panel panel-full">
+                                <h3>💞 삼원갑자 및 심층 궁합 분석</h3>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+                                    <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--accent-blue)' }}>
+                                        <div style={{ fontSize: '12px', color: '#aaa' }}>나의 영혼 기운</div>
+                                        <div style={{ fontSize: '14px' }}>{resData.gunghap.my_samwon.name} / <b style={{ color: 'var(--accent-blue)' }}>{resData.gunghap.my_star.name}</b></div>
+                                    </div>
+                                    <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--accent-red)' }}>
+                                        <div style={{ fontSize: '12px', color: '#aaa' }}>상대방 영혼 기운</div>
+                                        <div style={{ fontSize: '14px' }}>{resData.gunghap.partner_samwon.name} / <b style={{ color: 'var(--accent-red)' }}>{resData.gunghap.partner_star.name}</b></div>
+                                    </div>
+                                </div>
+                                <div className="highlight-box" style={{ borderLeftColor: 'var(--gold-main)' }}>
+                                    <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--gold-main)', marginBottom: '5px' }}>✨ 구궁(九宮) 겉궁합: {resData.gunghap.gugung.status} ({resData.gunghap.gugung.score}점)</div>
+                                    <div style={{ fontSize: '13px', marginBottom: '10px' }}>{resData.gunghap.gugung.desc}</div>
+                                    <div style={{ background: 'rgba(0,0,0,0.5)', padding: '10px', borderRadius: '4px', fontSize: '12px' }}>
+                                        <b style={{ color: 'var(--gold-light)' }}>📜 고서 비결:</b> {resData.gunghap.gugung.classical}<br /><br />
+                                        <b style={{ color: 'var(--accent-green)' }}>⏰ 발현 응기:</b> {resData.gunghap.gugung.timing}
+                                    </div>
+                                </div>
+                                <div className="highlight-box" style={{ borderLeftColor: '#9b59b6', margin: 0 }}>
+                                    <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#9b59b6', marginBottom: '5px' }}>🔥 일지(日支) 속궁합: {resData.gunghap.inner.relation} - {resData.gunghap.inner.status}</div>
+                                    <div style={{ fontSize: '13px' }}>{resData.gunghap.inner.desc}</div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 8. 인생 타임라인 */}
+                        {resData.timeline && (
+                            <div className="panel panel-full">
+                                <h3>⏳ 인생 타임라인 (스와이프 하여 확인)</h3>
+                                <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '5px' }}>■ 대운 (10년 주기 / {resData.timeline.daewun.direction})</div>
+                                <div className="swipe-container" ref={el => attachSwipe(el)}>
+                                    {resData.timeline.daewun.timeline.map((dw, i) => (
+                                        <div className="timeline-card" key={i}>
+                                            <div className="timeline-age">{dw.age}세~</div>
+                                            <div style={{ fontSize: '11px', color: 'var(--gold-main)', marginBottom: '2px' }}>{renderTooltipItem(dw.stem_tg, false)}</div>
+                                            <div className="timeline-ganzhi">{renderTooltipItem(dw.stem, true)}<br />{renderTooltipItem(dw.branch, true)}</div>
+                                            <div style={{ fontSize: '11px', color: 'var(--gold-main)', marginTop: '2px' }}>{renderTooltipItem(dw.branch_tg, false)}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '15px', marginBottom: '5px' }}>■ 최근 10년 세운 (올해 기준)</div>
+                                <div className="swipe-container" ref={el => attachSwipe(el)}>
+                                    {resData.timeline.sewun.map((sw, i) => (
+                                        <div className="timeline-card" key={i}>
+                                            <div className="timeline-age">{sw.year}년</div>
+                                            <div style={{ fontSize: '11px', color: 'var(--gold-main)', marginBottom: '2px' }}>{renderTooltipItem(sw.stem_tg, false)}</div>
+                                            <div className="timeline-ganzhi">{renderTooltipItem(sw.stem, true)}<br />{renderTooltipItem(sw.branch, true)}</div>
+                                            <div style={{ fontSize: '11px', color: 'var(--gold-main)', marginTop: '2px' }}>{renderTooltipItem(sw.branch_tg, false)}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 9. 오행, 통근, 과다고립 3단 그리드 */}
+                        {resData.mechanics?.elements_dist && (
+                            <div className="panel">
+                                <h3>📊 오행 분포</h3>
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    {['목', '화', '토', '금', '수'].map((el) => {
+                                        const colors = { '목': '#2ecc71', '화': '#e74c3c', '토': '#f1c40f', '금': '#bdc3c7', '수': '#3498db' };
+                                        return (
+                                            <div style={{ flex: 1, background: 'rgba(255,255,255,0.05)', textAlign: 'center', padding: '10px', borderRadius: '6px', borderBottom: `3px solid ${colors[el]}` }} key={el}>
+                                                <div style={{ fontSize: '12px', color: '#aaa' }}>{el}</div>
+                                                <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{resData.mechanics.elements_dist[el] || 0}</div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="panel">
+                            <h3>🌱 통근력 (아성)</h3>
+                            {(() => {
+                                let power = resData.mechanics.tonggeun.total_power;
+                                let rootText = "";
+                                if (!resData.mechanics.tonggeun.has_root || power < 10) rootText = "지지에 뿌리가 극히 미약하거나 없어 주관이 흔들리기 쉽습니다.";
+                                else if (power < 30) rootText = "지지에 미약하게나마 뿌리를 내리고 있어 간신히 버티는 형국입니다.";
+                                else if (power < 60) rootText = "뿌리가 제법 튼튼하여 어지간한 풍파에도 휩쓸리지 않습니다.";
+                                else rootText = "뿌리가 매우 깊고 강력하여 태풍이 불어도 절대 흔들리지 않는 굳건함이 있습니다.";
+                                return <div style={{ fontSize: '13px' }}>총 파워: <b>{power}</b><br />{rootText}</div>
+                            })()}
+                        </div>
+
+                        {resData.elements_imbalance && (
+                            <div className="panel">
+                                <h3>⚖️ 오행 과다/고립 분석</h3>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                    {resData.elements_imbalance.map((item, i) => {
+                                        let cc = item.type === "과다" ? "var(--accent-red)" : (item.type === "고립(無)" ? "#aaa" : "var(--accent-green)");
+                                        return (
+                                            <div style={{ background: 'rgba(255,255,255,0.03)', borderLeft: `3px solid ${cc}`, padding: '10px', borderRadius: '6px' }} key={i}>
+                                                <div style={{ fontWeight: 'bold', fontSize: '13px', marginBottom: '3px', color: cc }}>[{item.element}] {item.type} <span style={{ fontSize: '11px', color: '#888', fontWeight: 'normal' }}>({item.count}개)</span></div>
+                                                <div style={{ fontSize: '12px', color: '#ccc' }}>{item.desc}</div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 10. 신살 및 흉액 */}
+                        {resData.dynamics && Object.keys(resData.dynamics.special_stars).length > 0 && (
+                            <div className="panel panel-full">
+                                <h3>🌟 심층 신살</h3>
+                                <div>
+                                    {Object.entries(resData.dynamics.special_stars).map(([sType, list]) => 
+                                        list.length > 0 ? list.map((item, idx) => (
+                                            <span className="badge" key={`${sType}-${idx}`}>{renderTooltipItem(sType, false)}: {renderHanjaString(item)}</span>
+                                        )) : null
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {resData.dynamics && Object.keys(resData.dynamics.disasters).length > 0 && (
+                            <div className="panel panel-full">
+                                <h3>⚠️ 상호작용 및 흉액 진단</h3>
+                                <div>
+                                    {Object.entries(resData.dynamics.disasters).map(([dType, list]) => {
+                                        if(list.length === 0) return null;
+                                        let cleanType = dType.split('(')[0];
+                                        return list.map((item, idx) => (
+                                            <span className="badge badge-bad" key={`${dType}-${idx}`}>{renderTooltipItem(cleanType, false, dType)}: {renderHanjaString(item)}</span>
+                                        ));
+                                    })}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
-      </div>
     );
-  }
-
-  const pillarsData = [
-    { label: '시주(實)', key: 'hour', data: result?.bazi_pillars?.hour_pillar, analysis: result?.mechanics?.pillar_analysis?.hour },
-    { label: '일주(花)', key: 'day', data: result?.bazi_pillars?.day_pillar, analysis: result?.mechanics?.pillar_analysis?.day },
-    { label: '월주(苗)', key: 'month', data: result?.bazi_pillars?.month_pillar, analysis: result?.mechanics?.pillar_analysis?.month },
-    { label: '년주(根)', key: 'year', data: result?.bazi_pillars?.year_pillar, analysis: result?.mechanics?.pillar_analysis?.year }
-  ];
-
-  return (
-    <>
-      <style>{globalStyles}</style>
-      
-      <div className={`menu-overlay ${isMenuOpen ? 'open' : ''}`} onClick={() => setIsMenuOpen(false)}></div>
-      <div className={`side-menu ${isMenuOpen ? 'open' : ''}`}>
-        <div className="menu-header">
-          <h2 style={{ margin: 0, fontSize: '1.5em', color: '#1C2536', fontWeight: '900' }}>{t.appTitle}<span style={{ color: '#B59960' }}>-PRO</span></h2>
-          <button onClick={() => setIsMenuOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontSize: '24px' }}>&times;</button>
-        </div>
-        <div style={{ paddingBottom: '5px' }}>
-          <button className="menu-nav-btn" onClick={() => { setActiveTab('saju'); setIsMenuOpen(false); }}>{t.tabSaju}</button>
-          <button className="menu-nav-btn" onClick={() => { setActiveTab('gunghap'); setIsMenuOpen(false); }}>{t.tabGunghap}</button>
-        </div>
-      </div>
-
-      <div style={{ maxWidth: '640px', margin: '0 auto', padding: '20px', paddingBottom: '60px' }}>
-        
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: '10px', marginBottom: '25px' }}>
-          <div style={{ flex: 1 }}></div>
-          <div style={{ textAlign: 'center', flex: 2 }}>
-            <h2 style={{ margin: 0, fontSize: '2em', color: '#1C2536', fontWeight: '900', letterSpacing: '-0.5px' }}>{t.appTitle}<span style={{ color: '#B59960' }}>-PRO</span></h2>
-          </div>
-          <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-            <button onClick={() => setIsMenuOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0', fontSize: '24px' }}>≡</button>
-          </div>
-        </div>
-        
-        <div style={{ display: 'flex', backgroundColor: '#EFECE6', borderRadius: '12px', padding: '6px', marginBottom: '20px' }}>
-          <button onClick={() => {setActiveTab('saju'); setError('');}} style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', fontSize: '1em', backgroundColor: activeTab === 'saju' ? '#FFFFFF' : 'transparent', color: activeTab === 'saju' ? '#1C2536' : '#9CA3AF' }}>{t.tabSaju}</button>
-          <button onClick={() => {setActiveTab('gunghap'); setError('');}} style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', fontSize: '1em', backgroundColor: activeTab === 'gunghap' ? '#FFFFFF' : 'transparent', color: activeTab === 'gunghap' ? '#B59960' : '#9CA3AF' }}>{t.tabGunghap}</button>
-        </div>
-
-        {error && <div className="fade-in" style={{ padding: '16px', backgroundColor: '#FEF2F2', borderLeft: '4px solid #EF4444', color: '#991B1B', borderRadius: '8px', marginBottom: '20px', fontWeight: '600' }}>{error}</div>}
-
-        {/* 🔮 [1] 개인 사주 분석 탭 */}
-        {activeTab === 'saju' && (
-          <div className="fade-in">
-            <form onSubmit={handleSajuSubmit} className="premium-card">
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '15px' }}>
-                <div style={{ flex: '1 1 140px' }}><label className="label-text">{t.name}</label><input type="text" className="input-field" placeholder="홍길동" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} /></div>
-                <div style={{ flex: '1 1 140px' }}><label className="label-text">{t.gender}</label>
-                  <div style={{ display: 'flex', gap: '5px', height: '49px' }}>
-                    <button type="button" onClick={() => setFormData({...formData, gender: 'M'})} style={{ flex: 1, borderRadius: '8px', border: formData.gender === 'M' ? '2px solid #1C2536' : '1px solid #E2DED5', background: formData.gender === 'M' ? '#F3F4F6' : '#FAFAFA', fontWeight: formData.gender === 'M' ? '700' : '500', color: formData.gender === 'M' ? '#1C2536' : '#9CA3AF', cursor: 'pointer' }}>{t.male}</button>
-                    <button type="button" onClick={() => setFormData({...formData, gender: 'F'})} style={{ flex: 1, borderRadius: '8px', border: formData.gender === 'F' ? '2px solid #1C2536' : '1px solid #E2DED5', background: formData.gender === 'F' ? '#F3F4F6' : '#FAFAFA', fontWeight: formData.gender === 'F' ? '700' : '500', color: formData.gender === 'F' ? '#1C2536' : '#9CA3AF', cursor: 'pointer' }}>{t.female}</button>
-                  </div>
-                </div>
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '15px' }}>
-                <div style={{ flex: '1 1 100%' }}>
-                  <label className="label-text">{t.cal}</label>
-                  <div style={{ display: 'flex', gap: '5px', height: '49px' }}>
-                    <button type="button" onClick={() => setFormData({...formData, is_lunar: false, is_leap_month: false})} style={{ flex: 1, borderRadius: '8px', border: !formData.is_lunar ? '2px solid #1C2536' : '1px solid #E2DED5', background: !formData.is_lunar ? '#F3F4F6' : '#FAFAFA', fontWeight: !formData.is_lunar ? '700' : '500', color: !formData.is_lunar ? '#1C2536' : '#9CA3AF', cursor: 'pointer' }}>{t.solar}</button>
-                    <button type="button" onClick={() => setFormData({...formData, is_lunar: true, is_leap_month: false})} style={{ flex: 1, borderRadius: '8px', border: (formData.is_lunar && !formData.is_leap_month) ? '2px solid #1C2536' : '1px solid #E2DED5', background: (formData.is_lunar && !formData.is_leap_month) ? '#F3F4F6' : '#FAFAFA', fontWeight: (formData.is_lunar && !formData.is_leap_month) ? '700' : '500', color: (formData.is_lunar && !formData.is_leap_month) ? '#1C2536' : '#9CA3AF', cursor: 'pointer' }}>{t.lunar}</button>
-                    <button type="button" onClick={() => setFormData({...formData, is_lunar: true, is_leap_month: true})} style={{ flex: 1, borderRadius: '8px', border: formData.is_leap_month ? '2px solid #1C2536' : '1px solid #E2DED5', background: formData.is_leap_month ? '#F3F4F6' : '#FAFAFA', fontWeight: formData.is_leap_month ? '700' : '500', color: formData.is_leap_month ? '#1C2536' : '#9CA3AF', cursor: 'pointer' }}>{t.lunarLeap}</button>
-                  </div>
-                </div>
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '20px' }}>
-                <div style={{ flex: '1 1 140px' }}><label className="label-text">{t.bDate}</label><input type="date" className="input-field" required value={formatDate(formData.year, formData.month, formData.day)} onChange={(e) => { if(!e.target.value) return; const [y, m, d] = e.target.value.split('-'); setFormData({...formData, year: parseInt(y), month: parseInt(m), day: parseInt(d)}); }} /></div>
-                <div style={{ flex: '1 1 120px' }}><label className="label-text">{t.bTime}</label><input type="time" className="input-field" value={formatTime(formData.hour, formData.minute)} onChange={(e) => { if(!e.target.value) return; const [h, min] = e.target.value.split(':'); setFormData({...formData, hour: parseInt(h), minute: parseInt(min)}); }} /></div>
-              </div>
-              <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%' }}>{loading ? <><div className="spinner"></div> {t.loading}</> : t.btnSaju}</button>
-            </form>
-
-            {result && (
-              <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                
-                {/* 1. 명식표 */}
-                <div className="premium-card">
-                  <h3 style={{ margin: '0 0 20px 0', fontSize: '1.2em', color: '#1C2536', borderBottom: '2px solid #F0ECE1', paddingBottom: '10px' }}><span style={{ color: '#B59960' }}>{formData.name || 'User'}</span>님의 초정밀 명식표</h3>
-                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between' }}>
-                    {pillarsData.map((pillar) => (
-                      <div key={pillar.key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#FDFCFB', padding: '15px 5px', borderRadius: '12px', border: '1px solid #EFECE6' }}>
-                        <div style={{ fontSize: '0.75em', color: '#9CA3AF', fontWeight: '800', marginBottom: '8px' }}>{pillar.label}</div>
-                        <div onClick={() => openModal(pillar.analysis?.stem_deity)} style={{ fontSize: '0.8em', color: pillar.analysis?.stem_deity === '일간' ? '#B59960' : '#6B7280', marginBottom: '5px', cursor: 'pointer', fontWeight: '600' }}>{pillar.analysis?.stem_deity || '-'}</div>
-                        <div onClick={() => openModal(pillar.data?.[0])} style={{ fontSize: '1.8em', fontWeight: '900', color: getElementColor(pillar.data?.[0]), cursor: 'pointer', marginBottom: '5px' }}>{pillar.data ? pillar.data[0] : '?'}</div>
-                        <div style={{ width: '30px', height: '1px', backgroundColor: '#E5E0D8', margin: '5px 0' }} />
-                        <div onClick={() => openModal(pillar.data?.[1])} style={{ fontSize: '1.8em', fontWeight: '900', color: getElementColor(pillar.data?.[1]), cursor: 'pointer', marginTop: '5px', marginBottom: '5px' }}>{pillar.data ? pillar.data[1] : '?'}</div>
-                        <div onClick={() => openModal(pillar.analysis?.branch_deity)} style={{ fontSize: '0.8em', color: '#6B7280', marginBottom: '8px', cursor: 'pointer', fontWeight: '600' }}>{pillar.analysis?.branch_deity || '-'}</div>
-                        <div onClick={() => openModal(pillar.analysis?.star_12?.term)} style={{ fontSize: '0.75em', backgroundColor: '#F3E8D0', color: '#8C6D31', padding: '4px 8px', borderRadius: '12px', fontWeight: '700', cursor: 'pointer' }}>{pillar.analysis?.star_12?.term || '-'}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 2. 나의 무기와 직업운 (격국) */}
-                {result.mechanics?.career_and_fortune?.gyeokguk && (
-                  <div className="premium-card" style={{ border: '2px solid #10B981', background: 'linear-gradient(to bottom, #ECFDF5, #FFFFFF)' }}>
-                    <h3 style={{ margin: '0 0 15px 0', fontSize: '1.2em', color: '#047857' }}>💼 나의 무기와 직업운</h3>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                      <span style={{ fontSize: '1.4em', fontWeight: '900', color: '#065F46', backgroundColor: '#D1FAE5', padding: '5px 12px', borderRadius: '8px' }}>
-                        {result.mechanics.career_and_fortune.gyeokguk.name}
-                      </span>
-                    </div>
-                    <p style={{ margin: 0, fontSize: '0.95em', color: '#4B5563', lineHeight: '1.6' }}>
-                      {result.mechanics.career_and_fortune.gyeokguk.description}
-                    </p>
-                  </div>
-                )}
-
-                {/* 3. 맞춤형 행운 가이드 (조후 용신) */}
-                {result.mechanics?.career_and_fortune?.yongshin && (
-                  <div className="premium-card" style={{ border: '2px solid #3B82F6', background: 'linear-gradient(to bottom, #EFF6FF, #FFFFFF)' }}>
-                    <h3 style={{ margin: '0 0 15px 0', fontSize: '1.2em', color: '#1D4ED8' }}>🍀 맞춤형 행운 가이드 (개운법)</h3>
-                    <div style={{ marginBottom: '15px' }}>
-                      <span style={{ fontSize: '0.9em', color: '#6B7280' }}>나에게 가장 필요한 기운(용신):</span>
-                      <strong style={{ fontSize: '1.2em', color: getElementColor(result.mechanics.career_and_fortune.yongshin.element), marginLeft: '8px' }}>
-                        {result.mechanics.career_and_fortune.yongshin.element} ({result.mechanics.career_and_fortune.yongshin.remedy?.hanja})
-                      </strong>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <div style={{ backgroundColor: '#DBEAFE', padding: '12px', borderRadius: '8px' }}>
-                        <strong style={{ color: '#1E40AF', fontSize: '0.9em' }}>🎨 행운의 색상:</strong> {result.mechanics.career_and_fortune.yongshin.remedy?.color}
-                      </div>
-                      <div style={{ backgroundColor: '#DBEAFE', padding: '12px', borderRadius: '8px' }}>
-                        <strong style={{ color: '#1E40AF', fontSize: '0.9em' }}>🍲 행운의 음식:</strong> {result.mechanics.career_and_fortune.yongshin.remedy?.food}
-                      </div>
-                      <div style={{ backgroundColor: '#DBEAFE', padding: '12px', borderRadius: '8px' }}>
-                        <strong style={{ color: '#1E40AF', fontSize: '0.9em' }}>🧭 행운의 방향:</strong> {result.mechanics.career_and_fortune.yongshin.remedy?.direction}
-                      </div>
-                      <div style={{ backgroundColor: '#EFF6FF', padding: '12px', borderLeft: '4px solid #3B82F6', marginTop: '5px' }}>
-                        <strong style={{ color: '#2563EB', fontSize: '0.9em', display: 'block', marginBottom: '4px' }}>✨ 실생활 액땜 가이드</strong>
-                        <span style={{ fontSize: '0.9em', color: '#4B5563', lineHeight: '1.5' }}>{result.mechanics.career_and_fortune.yongshin.remedy?.advice}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* 4. 근묘화실 생애주기 분석 */}
-                <div className="premium-card">
-                  <h3 style={{ margin: '0 0 15px 0', fontSize: '1.2em', color: '#1C2536' }}>🌱 근묘화실(根苗花實) 생애주기</h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <div style={{ padding: '15px', backgroundColor: '#F9FAFB', borderRadius: '10px', borderLeft: '4px solid #10B981' }}>
-                      <strong style={{ color: '#047857', display: 'block', marginBottom: '5px' }}>초년기 (0~20세) - 년주(根)</strong>
-                      <div style={{ fontSize: '0.9em', color: '#4B5563', lineHeight: '1.5' }}>
-                        부모/조상 궁인 년주에 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.year?.stem_deity}</span>과(와) <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.year?.branch_deity}</span>의 기운이 흐릅니다. 12운성 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.year?.star_12?.term}</span>의 에너지를 띠며 초년의 가치관이 형성되었습니다.
-                        <div style={{ fontSize: '0.9em', color: '#6B7280', marginTop: '4px' }}>* {result.mechanics?.pillar_analysis?.year?.star_12?.meaning}</div>
-                      </div>
-                    </div>
-                    <div style={{ padding: '15px', backgroundColor: '#F9FAFB', borderRadius: '10px', borderLeft: '4px solid #3B82F6' }}>
-                      <strong style={{ color: '#1D4ED8', display: 'block', marginBottom: '5px' }}>청년기 (20~40세) - 월주(苗)</strong>
-                      <div style={{ fontSize: '0.9em', color: '#4B5563', lineHeight: '1.5' }}>
-                        사회적 무기이자 직업 궁인 월주에 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.month?.branch_deity}</span>의 에너지가 강하게 자리잡고 있습니다. 이 시기에는 12운성 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.month?.star_12?.term}</span>의 흐름 속에서 사회 진출과 경쟁을 경험합니다.
-                        <div style={{ fontSize: '0.9em', color: '#6B7280', marginTop: '4px' }}>* {result.mechanics?.pillar_analysis?.month?.star_12?.meaning}</div>
-                      </div>
-                    </div>
-                    <div style={{ padding: '15px', backgroundColor: '#F9FAFB', borderRadius: '10px', borderLeft: '4px solid #F59E0B' }}>
-                      <strong style={{ color: '#B45309', display: 'block', marginBottom: '5px' }}>중년기 (40~60세) - 일주(花)</strong>
-                      <div style={{ fontSize: '0.9em', color: '#4B5563', lineHeight: '1.5' }}>
-                        나 자신과 배우자를 뜻하는 일지에 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.day?.branch_deity}</span>이(가) 놓여 있습니다. 12운성 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.day?.star_12?.term}</span>의 양상으로 가정을 꾸리고 독립적인 자아 실현을 해 나갑니다.
-                        <div style={{ fontSize: '0.9em', color: '#6B7280', marginTop: '4px' }}>* {result.mechanics?.pillar_analysis?.day?.star_12?.meaning}</div>
-                      </div>
-                    </div>
-                    <div style={{ padding: '15px', backgroundColor: '#F9FAFB', borderRadius: '10px', borderLeft: '4px solid #8B5CF6' }}>
-                      <strong style={{ color: '#6D28D9', display: 'block', marginBottom: '5px' }}>말년기 (60세 이후) - 시주(實)</strong>
-                      <div style={{ fontSize: '0.9em', color: '#4B5563', lineHeight: '1.5' }}>
-                        인생의 최종 결실과 자녀운을 상징하는 시주에 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.hour?.branch_deity}</span>의 기운이 모여, 12운성 <span style={{ color: '#B59960', fontWeight: 'bold' }}>{result.mechanics?.pillar_analysis?.hour?.star_12?.term}</span>의 형태로 안정을 찾거나 새로운 변화를 맞이합니다.
-                        <div style={{ fontSize: '0.9em', color: '#6B7280', marginTop: '4px' }}>* {result.mechanics?.pillar_analysis?.hour?.star_12?.meaning}</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 5. 기운의 역동성 (통근, 허자, 충) */}
-                <div className="premium-card">
-                  <h3 style={{ margin: '0 0 15px 0', fontSize: '1.2em', color: '#1C2536' }}>⚡ 기운의 역동성 (Mechanics)</h3>
-                  <div style={{ marginBottom: '15px' }}>
-                    <h4 style={{ margin: '0 0 10px 0', fontSize: '0.9em', color: '#4B5563' }}>천간의 통근력 (뿌리)</h4>
-                    {result.mechanics?.tonggeun?.map((tg, idx) => (
-                      <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                        <strong style={{ color: getElementColor(tg.stem), width: '25px', fontSize: '1.2em' }}>{tg.stem}</strong>
-                        <div style={{ flex: 1, backgroundColor: '#F1F5F9', height: '12px', borderRadius: '6px', overflow: 'hidden' }}>
-                          <div style={{ width: `${Math.min(tg.power_score * 2.5, 100)}%`, backgroundColor: tg.is_tonggeun ? '#10B981' : '#CBD5E1', height: '100%', borderRadius: '6px' }}></div>
-                        </div>
-                        <span onClick={() => openModal(tg.meta?.term)} style={{ fontSize: '0.75em', cursor: 'pointer', padding: '3px 8px', backgroundColor: tg.is_tonggeun ? '#ECFDF5' : '#F8FAFC', color: tg.is_tonggeun ? '#059669' : '#64748B', borderRadius: '4px' }}>
-                          {tg.meta?.term || (tg.is_tonggeun ? '통근' : '허투')}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                     <div style={{ flex: 1, backgroundColor: '#F8FAFC', padding: '12px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                       <strong style={{ color: '#6366F1', display: 'block', marginBottom: '6px', fontSize: '0.9em' }}>보이지 않는 기운 (허자)</strong>
-                       <div style={{ fontSize: '1.1em', fontWeight: 'bold' }}>
-                         {result.mechanics?.heoja_gonghyeop?.length > 0 ? result.mechanics.heoja_gonghyeop.join(', ') : '발견되지 않음'}
-                       </div>
-                     </div>
-                     <div style={{ flex: 1, backgroundColor: '#FFF5F5', padding: '12px', borderRadius: '8px', border: '1px solid #FED7D7' }}>
-                       <strong style={{ color: '#E53E3E', display: 'block', marginBottom: '6px', fontSize: '0.9em' }}>충돌하는 기운 (충)</strong>
-                       <div style={{ fontSize: '0.9em', color: '#C53030' }}>
-                         {result.mechanics?.clash_analysis?.length > 0 
-                           ? result.mechanics.clash_analysis.map(c => c.target).join(', ') 
-                           : '충(沖) 없음 안전함'}
-                       </div>
-                     </div>
-                  </div>
-                </div>
-
-                {/* 6. 전문가 1:1 심층 사주풀이 (업상대체) - 잠금 해제됨! */}
-                <div className="premium-card" style={{ border: '2px solid #D4AF37', background: 'linear-gradient(to bottom, #FFFCF5, #FFFFFF)' }}>
-                  <h3 style={{ margin: '0 0 15px 0', fontSize: '1.3em', color: '#AA771C' }}>{t.expertTitle} (업상대체)</h3>
-                  {result.expert_prescription?.length > 0 ? (
-                    result.expert_prescription.map((rx, idx) => (
-                      <div key={idx} style={{ marginBottom: '20px', borderBottom: idx !== result.expert_prescription.length -1 ? '1px dashed #E5E0D8' : 'none', paddingBottom: '15px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-                          <span style={{ fontSize: '1.2em', fontWeight: '900', color: '#1C2536' }}>{rx.term}</span>
-                          <span style={{ fontSize: '0.85em', color: '#6B7280' }}>({rx.hanja})</span>
-                        </div>
-                        <div style={{ backgroundColor: '#FEF2F2', padding: '12px', borderRadius: '8px', marginBottom: '8px', borderLeft: '4px solid #EF4444' }}>
-                          <strong style={{ color: '#DC2626', fontSize: '0.9em', display: 'block' }}>⚠️ 직언 진단</strong>
-                          <span style={{ fontSize: '0.9em', color: '#4B5563' }}>{rx.disease_diagnosis}</span>
-                        </div>
-                        <div style={{ backgroundColor: '#ECFDF5', padding: '12px', borderRadius: '8px', marginBottom: '8px', borderLeft: '4px solid #10B981' }}>
-                          <strong style={{ color: '#059669', fontSize: '0.9em', display: 'block' }}>💊 개운법 처방</strong>
-                          <span style={{ fontSize: '0.9em', color: '#4B5563' }}>{rx.prescription_eopsang}</span>
-                        </div>
-                        <div style={{ backgroundColor: '#F0F9FF', padding: '12px', borderRadius: '8px', borderLeft: '4px solid #0EA5E9' }}>
-                          <strong style={{ color: '#0284C7', fontSize: '0.9em', display: 'block' }}>✨ 축언</strong>
-                          <span style={{ fontSize: '0.9em', color: '#4B5563' }}>{rx.final_blessing}</span>
-                        </div>
-                      </div>
-                    ))
-                  ) : ( 
-                    <p style={{ color: '#6B7280', fontSize: '0.95em' }}>현재 사주 원국에 강하게 발현된 흉살이 없어 평온한 기운을 유지하고 있습니다.</p> 
-                  )}
-                </div>
-
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* 💑 [2] 프리미엄 궁합 탭 */}
-        {activeTab === 'gunghap' && (
-          <div className="fade-in">
-            <form onSubmit={handleGunghapSubmit} className="premium-card">
-              <div style={{ backgroundColor: '#F9F8F6', padding: '20px', borderRadius: '12px', marginBottom: '20px', border: '1px solid #EFECE6' }}>
-                <h4 style={{ margin: '0 0 15px 0', color: '#1C2536', fontSize: '1.1em' }}>{t.myInfo}</h4>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
-                  <div style={{ flex: '1 1 140px' }}><label className="label-text">{t.gender}</label>
-                    <div style={{ display: 'flex', gap: '5px', height: '40px' }}>
-                      <button type="button" onClick={() => setGunghapData(prev => ({...prev, me: {...prev.me, gender: 'M'}}))} style={{ flex: 1, borderRadius: '6px', border: gunghapData.me.gender === 'M' ? '2px solid #1C2536' : '1px solid #E2DED5', background: gunghapData.me.gender === 'M' ? '#F3F4F6' : '#FAFAFA', fontWeight: gunghapData.me.gender === 'M' ? '700' : '500', color: gunghapData.me.gender === 'M' ? '#1C2536' : '#9CA3AF', cursor: 'pointer' }}>{t.male}</button>
-                      <button type="button" onClick={() => setGunghapData(prev => ({...prev, me: {...prev.me, gender: 'F'}}))} style={{ flex: 1, borderRadius: '6px', border: gunghapData.me.gender === 'F' ? '2px solid #1C2536' : '1px solid #E2DED5', background: gunghapData.me.gender === 'F' ? '#F3F4F6' : '#FAFAFA', fontWeight: gunghapData.me.gender === 'F' ? '700' : '500', color: gunghapData.me.gender === 'F' ? '#1C2536' : '#9CA3AF', cursor: 'pointer' }}>{t.female}</button>
-                    </div>
-                  </div>
-                  <div style={{ flex: '1 1 100%' }}>
-                    <label className="label-text">{t.cal}</label>
-                    <div style={{ display: 'flex', gap: '5px', height: '40px' }}>
-                      <button type="button" onClick={() => setGunghapData(prev => ({...prev, me: {...prev.me, is_lunar: false, is_leap_month: false}}))} style={{ flex: 1, borderRadius: '6px', border: !gunghapData.me.is_lunar ? '2px solid #1C2536' : '1px solid #E2DED5', background: !gunghapData.me.is_lunar ? '#F3F4F6' : '#FAFAFA', fontWeight: !gunghapData.me.is_lunar ? '700' : '500', color: !gunghapData.me.is_lunar ? '#1C2536' : '#9CA3AF', cursor: 'pointer', fontSize: '0.9em' }}>{t.solar}</button>
-                      <button type="button" onClick={() => setGunghapData(prev => ({...prev, me: {...prev.me, is_lunar: true, is_leap_month: false}}))} style={{ flex: 1, borderRadius: '6px', border: (gunghapData.me.is_lunar && !gunghapData.me.is_leap_month) ? '2px solid #1C2536' : '1px solid #E2DED5', background: (gunghapData.me.is_lunar && !gunghapData.me.is_leap_month) ? '#F3F4F6' : '#FAFAFA', fontWeight: (gunghapData.me.is_lunar && !gunghapData.me.is_leap_month) ? '700' : '500', color: (gunghapData.me.is_lunar && !gunghapData.me.is_leap_month) ? '#1C2536' : '#9CA3AF', cursor: 'pointer', fontSize: '0.9em' }}>{t.lunar}</button>
-                      <button type="button" onClick={() => setGunghapData(prev => ({...prev, me: {...prev.me, is_lunar: true, is_leap_month: true}}))} style={{ flex: 1, borderRadius: '6px', border: gunghapData.me.is_leap_month ? '2px solid #1C2536' : '1px solid #E2DED5', background: gunghapData.me.is_leap_month ? '#F3F4F6' : '#FAFAFA', fontWeight: gunghapData.me.is_leap_month ? '700' : '500', color: gunghapData.me.is_leap_month ? '#1C2536' : '#9CA3AF', cursor: 'pointer', fontSize: '0.9em' }}>{t.lunarLeap}</button>
-                    </div>
-                  </div>
-                  <div style={{ flex: '1 1 140px' }}><label className="label-text">{t.bDate}</label><input type="date" className="input-field" value={formatDate(gunghapData.me.year, gunghapData.me.month, gunghapData.me.day)} onChange={(e) => { if(!e.target.value) return; const [y, m, d] = e.target.value.split('-'); setGunghapData(prev => ({...prev, me: {...prev.me, year: parseInt(y), month: parseInt(m), day: parseInt(d)}})); }} /></div>
-                </div>
-              </div>
-
-              <div style={{ backgroundColor: '#FFF5F7', padding: '20px', borderRadius: '12px', marginBottom: '25px', border: '1px solid #FCE7F3' }}>
-                <h4 style={{ margin: '0 0 15px 0', color: '#BE185D', fontSize: '1.1em' }}>{t.ptInfo}</h4>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
-                  <div style={{ flex: '1 1 140px' }}><label className="label-text">{t.gender}</label>
-                    <div style={{ display: 'flex', gap: '5px', height: '40px' }}>
-                      <button type="button" onClick={() => setGunghapData(prev => ({...prev, partner: {...prev.partner, gender: 'M'}}))} style={{ flex: 1, borderRadius: '6px', border: gunghapData.partner.gender === 'M' ? '2px solid #BE185D' : '1px solid #FBCFE8', background: gunghapData.partner.gender === 'M' ? '#FDF2F8' : '#FAFAFA', fontWeight: gunghapData.partner.gender === 'M' ? '700' : '500', color: gunghapData.partner.gender === 'M' ? '#BE185D' : '#9CA3AF', cursor: 'pointer' }}>{t.male}</button>
-                      <button type="button" onClick={() => setGunghapData(prev => ({...prev, partner: {...prev.partner, gender: 'F'}}))} style={{ flex: 1, borderRadius: '6px', border: gunghapData.partner.gender === 'F' ? '2px solid #BE185D' : '1px solid #FBCFE8', background: gunghapData.partner.gender === 'F' ? '#FDF2F8' : '#FAFAFA', fontWeight: gunghapData.partner.gender === 'F' ? '700' : '500', color: gunghapData.partner.gender === 'F' ? '#BE185D' : '#9CA3AF', cursor: 'pointer' }}>{t.female}</button>
-                    </div>
-                  </div>
-                  <div style={{ flex: '1 1 100%' }}>
-                    <label className="label-text">{t.cal}</label>
-                    <div style={{ display: 'flex', gap: '5px', height: '40px' }}>
-                      <button type="button" onClick={() => setGunghapData(prev => ({...prev, partner: {...prev.partner, is_lunar: false, is_leap_month: false}}))} style={{ flex: 1, borderRadius: '6px', border: !gunghapData.partner.is_lunar ? '2px solid #BE185D' : '1px solid #FBCFE8', background: !gunghapData.partner.is_lunar ? '#FDF2F8' : '#FAFAFA', fontWeight: !gunghapData.partner.is_lunar ? '700' : '500', color: !gunghapData.partner.is_lunar ? '#BE185D' : '#9CA3AF', cursor: 'pointer', fontSize: '0.9em' }}>{t.solar}</button>
-                      <button type="button" onClick={() => setGunghapData(prev => ({...prev, partner: {...prev.partner, is_lunar: true, is_leap_month: false}}))} style={{ flex: 1, borderRadius: '6px', border: (gunghapData.partner.is_lunar && !gunghapData.partner.is_leap_month) ? '2px solid #BE185D' : '1px solid #FBCFE8', background: (gunghapData.partner.is_lunar && !gunghapData.partner.is_leap_month) ? '#FDF2F8' : '#FAFAFA', fontWeight: (gunghapData.partner.is_lunar && !gunghapData.partner.is_leap_month) ? '700' : '500', color: (gunghapData.partner.is_lunar && !gunghapData.partner.is_leap_month) ? '#BE185D' : '#9CA3AF', cursor: 'pointer', fontSize: '0.9em' }}>{t.lunar}</button>
-                      <button type="button" onClick={() => setGunghapData(prev => ({...prev, partner: {...prev.partner, is_lunar: true, is_leap_month: true}}))} style={{ flex: 1, borderRadius: '6px', border: gunghapData.partner.is_leap_month ? '2px solid #BE185D' : '1px solid #FBCFE8', background: gunghapData.partner.is_leap_month ? '#FDF2F8' : '#FAFAFA', fontWeight: gunghapData.partner.is_leap_month ? '700' : '500', color: gunghapData.partner.is_leap_month ? '#BE185D' : '#9CA3AF', cursor: 'pointer', fontSize: '0.9em' }}>{t.lunarLeap}</button>
-                    </div>
-                  </div>
-                  <div style={{ flex: '1 1 140px' }}><label className="label-text">{t.bDate}</label><input type="date" className="input-field" style={{ borderColor: '#FBCFE8' }} value={formatDate(gunghapData.partner.year, gunghapData.partner.month, gunghapData.partner.day)} onChange={(e) => { if(!e.target.value) return; const [y, m, d] = e.target.value.split('-'); setGunghapData(prev => ({...prev, partner: {...prev.partner, year: parseInt(y), month: parseInt(m), day: parseInt(d)}})); }} /></div>
-                </div>
-              </div>
-              <button type="submit" className="btn-primary" style={{ width: '100%', background: 'linear-gradient(135deg, #BE185D 0%, #9D174D 100%)', color: '#FFF' }} disabled={loading}>{loading ? <><div className="spinner" style={{ borderColor: 'rgba(255,255,255,0.3)', borderTopColor: '#FFF' }}></div> {t.loading}</> : t.btnGunghap}</button>
-            </form>
-
-            {/* 궁합 결과 렌더링 */}
-            {gunghapResult && (
-              <div className="fade-in premium-card" style={{ textAlign: 'center', borderColor: '#FCE7F3', boxShadow: '0 10px 30px rgba(190,24,93,0.05)' }}>
-                <h3 style={{ margin: '0 0 15px 0', color: '#831843', fontSize: '1.3em' }}>풍수 방위 궁합 분석 결과</h3>
-                
-                <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', marginBottom: '20px', padding: '15px', backgroundColor: '#FFF5F7', borderRadius: '12px' }}>
-                  <div>
-                    <div style={{ fontSize: '0.85em', color: '#9D174D', marginBottom: '5px' }}>나의 본명궁</div>
-                    <strong style={{ fontSize: '1.2em', color: '#BE185D' }}>{gunghapResult.my_profile?.gua_number}백성 {gunghapResult.my_profile?.gua_name}</strong>
-                  </div>
-                  <div style={{ fontSize: '2em', color: '#F472B6', margin: '0 10px' }}>♥</div>
-                  <div>
-                    <div style={{ fontSize: '0.85em', color: '#9D174D', marginBottom: '5px' }}>상대방 본명궁</div>
-                    <strong style={{ fontSize: '1.2em', color: '#BE185D' }}>{gunghapResult.partner_profile?.gua_number}백성 {gunghapResult.partner_profile?.gua_name}</strong>
-                  </div>
-                </div>
-
-                <div style={{ fontSize: '2em', fontWeight: '900', color: '#DB2777', textShadow: '2px 2px 0px #FDF2F8', lineHeight: '1.2' }}>{gunghapResult.match_analysis?.result}</div>
-                <div style={{ marginTop: '15px', backgroundColor: '#FDF2F8', padding: '16px', borderRadius: '12px', color: '#9D174D', fontWeight: '600', lineHeight: '1.6' }}>"{gunghapResult.match_analysis?.interpretation}"</div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* 단어 사전 모달창 */}
-      {modalInfo && (
-        <div className="fade-in modal-overlay" style={{ zIndex: 4000 }} onClick={() => setModalInfo(null)}>
-          <div style={{ backgroundColor: '#FFF', padding: '25px', borderRadius: '20px', maxWidth: '320px', width: '100%', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #F0ECE1', paddingBottom: '12px', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0, color: '#1C2536', fontSize: '1.3em', fontWeight: '800' }}>{modalInfo.title}</h3>
-              <button onClick={() => setModalInfo(null)} style={{ background: 'none', border: 'none', fontSize: '1.5em', cursor: 'pointer', color: '#9CA3AF' }}>&times;</button>
-            </div>
-            <p style={{ margin: 0, lineHeight: '1.7', color: '#4B5563', fontSize: '1em', wordBreak: 'keep-all' }}>{modalInfo.desc}</p>
-          </div>
-        </div>
-      )}
-    </>
-  );
 }
