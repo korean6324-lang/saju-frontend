@@ -160,7 +160,7 @@ export default function SajuCalculator() {
         return Object.entries(dataObj).map(([key, list]) => ({
             name: key,
             position: Array.isArray(list) ? list.join(', ') : list,
-            desc: "⚠️ 백엔드(logic_dynamics.py) 파일이 아직 예전 버전입니다. 깃허브에 코드를 덮어쓰기 하시면 전문가용 심층 분석이 출력됩니다!"
+            desc: "⚠️ 백엔드(logic_dynamics.py) 파일이 아직 예전 버전입니다."
         })).filter(item => item.position && item.position.length > 0);
     };
 
@@ -180,6 +180,7 @@ export default function SajuCalculator() {
                 
                 .app-container { font-family: "'Noto Serif KR', serif"; background: var(--bg-color); min-height: 100vh; color: var(--text-main); width: 100%; max-width: 100vw; overflow-x: hidden; }
                 
+                /* 메인 화면 */
                 .hero-section { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; background: radial-gradient(circle at center, #1a1e24 0%, var(--bg-color) 100%); text-align: center; position: relative; }
                 .hero-title { font-size: 3rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 10px; color: var(--gold-main); text-shadow: 0 4px 15px rgba(212,175,55,0.2); }
                 .hero-subtitle { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 40px; font-weight: 300; }
@@ -192,12 +193,12 @@ export default function SajuCalculator() {
                 input:focus, select:focus { border-color: var(--gold-main); outline: none; }
                 .btn-primary { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--gold-dark), var(--gold-main)); color: #000; border: none; border-radius: 6px; font-size: 16px; font-weight: 900; cursor: pointer; margin-top: 25px; transition: transform 0.2s, box-shadow 0.2s; }
                 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212,175,55,0.4); }
-                
                 .top-nav { position: absolute; top: 20px; right: 20px; z-index: 100; }
                 .btn-icon { background: rgba(255,255,255,0.1); color: white; border: 1px solid #333; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; transition: 0.3s; }
                 .btn-icon:hover { background: var(--gold-main); color: #000; border-color: var(--gold-main); }
                 
-                .dashboard { padding: 40px 20px; max-width: 1200px; margin: auto; width: 100%; box-sizing: border-box; }
+                /* 대시보드 공통 */
+                .dashboard { padding: 40px 20px; max-width: 1300px; margin: auto; width: 100%; box-sizing: border-box; }
                 .dash-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 30px; }
                 .dash-header h2 { margin: 0; color: var(--gold-main); font-weight: 900; }
                 
@@ -210,17 +211,17 @@ export default function SajuCalculator() {
                 .ten-god { font-size: 13px; color: var(--gold-main); margin-bottom: 5px; font-weight: 700; letter-spacing: 1px; }
                 .hidden-stems { font-size: 13px; color: #eee; margin-top: 15px; text-align: center !important; background: rgba(0,0,0,0.4); padding: 12px 5px; border-radius: 8px; font-weight: 500; letter-spacing: 2px; }
                 
-                /* 🚨 촘촘한 벽돌쌓기 레이아웃 (Masonry 방어막) */
+                /* 🚨 밀도 100% 벤토 박스 레이아웃 (Bento Box) */
                 .dashboard-layout { display: flex; flex-direction: column; gap: 20px; width: 100%; }
-                .masonry-grid { column-count: 3; column-gap: 20px; width: 100%; }
-                .masonry-grid > .panel { 
-                    -webkit-column-break-inside: avoid; page-break-inside: avoid; break-inside: avoid; 
-                    margin-bottom: 20px; display: inline-block; width: 100%; box-sizing: border-box; 
-                }
+                
+                .bento-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+                .bento-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+                .bento-col { display: flex; flex-direction: column; gap: 20px; }
                 
                 .panel { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid #222; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; text-align: left !important; width: 100%; min-width: 0; box-sizing: border-box; }
                 .panel h3 { margin-top: 0; color: var(--gold-main); font-size: 1.1rem; margin-bottom: 20px; display: flex; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; text-align: left !important; }
                 .highlight-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 3px solid var(--gold-main); margin-bottom: 15px; text-align: left !important; min-width: 0; }
+                .highlight-box:last-child { margin-bottom: 0; }
                 
                 .napeum-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
                 .gunghap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
@@ -231,6 +232,7 @@ export default function SajuCalculator() {
                 .timeline-card { flex: 0 0 100px; background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 8px; text-align: center !important; padding: 15px 10px; transition: 0.3s; user-select: none; }
                 .timeline-card.current-year { border: 2px solid var(--gold-main) !important; background: rgba(212,175,55,0.2) !important; box-shadow: 0 0 15px rgba(212,175,55,0.5); transform: scale(1.05); }
 
+                /* 뱃지 및 모달 */
                 .badge { display: inline-block; padding: 4px 8px; background: rgba(255,255,255,0.05); border: 1px solid #444; border-radius: 4px; font-size: 12px; margin: 3px; font-weight: 700; color: #ccc; }
                 .badge-good { border-color: var(--accent-green); color: var(--accent-green); background: rgba(46,204,113,0.1); }
                 .badge-bad { border-color: var(--accent-red); color: var(--accent-red); background: rgba(231,76,60,0.1); }
@@ -246,16 +248,19 @@ export default function SajuCalculator() {
                 .dict-results { overflow-y: auto; padding-right: 10px; margin-top: 15px; }
                 .dict-item { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 4px solid var(--gold-main); margin-bottom: 15px; }
 
-                /* 📱📱 🚨 모바일 전용 반응형 셋팅 🚨 📱📱 */
-                @media (max-width: 1100px) {
-                    .masonry-grid { column-count: 2; }
+                /* 📱📱 🚨 모바일 및 테블릿 벤토 반응형 제어 🚨 📱📱 */
+                @media (max-width: 1024px) {
+                    /* 테블릿: 3단을 2단으로 접음 */
+                    .bento-row-3 { grid-template-columns: 1fr 1fr; }
                 }
                 @media (max-width: 768px) {
+                    /* 모바일: 전부 1열로 예쁘게 쌓음 */
                     .hero-title { font-size: 1.8rem; }
                     .hero-subtitle { font-size: 0.9rem; word-break: keep-all; padding: 0 10px; }
                     .input-card { padding: 20px 15px; border-radius: 0; border-left: none; border-right: none; }
                     .form-grid { grid-template-columns: 1fr; gap: 15px; } 
                     .options-row { flex-direction: column; align-items: flex-start; gap: 10px; } 
+                    
                     .dashboard { padding: 15px 10px; overflow-x: hidden; }
                     .dash-header { flex-direction: column; gap: 10px; align-items: flex-start; }
                     .dash-header div { width: 100%; display: flex; justify-content: space-between; }
@@ -264,11 +269,10 @@ export default function SajuCalculator() {
                     .bazi-table td { padding: 10px 2px; }
                     .stem, .branch { font-size: 26px; }
                     .hidden-stems { font-size: 10px; padding: 8px 2px; letter-spacing: 0; word-break: break-all; }
-                    .panel { padding: 15px; border-radius: 8px; word-break: break-word; }
                     
-                    /* 모바일에서는 Masonry를 수직 1줄로 강제 변환 */
-                    .masonry-grid { column-count: 1; display: flex; flex-direction: column; gap: 15px; }
-                    .masonry-grid > .panel { margin-bottom: 0; display: flex; }
+                    /* 벤토 박스를 수직 1단으로 병합 */
+                    .bento-row-2, .bento-row-3 { grid-template-columns: 1fr; gap: 15px; }
+                    .panel { padding: 15px; border-radius: 8px; word-break: break-word; }
                     
                     .napeum-grid, .gunghap-grid, .practical-grid { grid-template-columns: 1fr !important; }
                     .highlight-box { padding: 12px; font-size: 0.95em; word-break: break-word; }
@@ -375,6 +379,7 @@ export default function SajuCalculator() {
                         <div style={{ background: 'rgba(231,76,60,0.1)', borderLeft: '3px solid var(--accent-red)', padding: '15px', borderRadius: '6px', marginBottom: '20px', fontSize: '13px' }}>⚠️ <b>고법(古法) 명리 적용:</b> 천문학적 절기를 무시하고 입력하신 음력 달로 월주가 덮어씌워졌습니다.</div>
                     )}
 
+                    {/* 원국 4기둥 */}
                     <div className="bazi-table-container">
                         <table className="bazi-table">
                             <thead><tr><th>연주 (Year)</th><th>월주 (Month)</th><th>일주 (Day)</th><th>시주 (Hour)</th></tr></thead>
@@ -411,9 +416,10 @@ export default function SajuCalculator() {
                         </table>
                     </div>
 
+                    {/* 🚨 궁극의 밀도: 벤토 박스 레이아웃 시작 */}
                     <div className="dashboard-layout">
                         
-                        {/* 1. 심층 간명지 (가로 꽉 채움) */}
+                        {/* [상단 그룹]: 심층 간명지 (가로 꽉 채움) */}
                         {resData.classical?.reading && (
                             <div className="panel">
                                 <h3>📜 전문가용 심층 고법 간명지</h3>
@@ -448,93 +454,93 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 🚨 상단 Masonry (빈 공간 완벽 차단 벽돌 쌓기) */}
-                        <div className="masonry-grid">
-                            
-                            {/* 2. 격국과 용신 */}
-                            {resData.yongshin && (
-                                <div className="panel">
-                                    <h3>⚖️ 격국(格局)과 용신(用神)</h3>
-                                    <div className="highlight-box">
-                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>나의 그릇</div>
-                                        <div style={{ fontSize: '18px', color: 'var(--gold-main)', fontWeight: 'bold', marginBottom: '5px' }}>{renderTooltipItem(resData.yongshin.geokguk.name.split('(')[0], false, resData.yongshin.geokguk.name)}</div>
-                                        <div style={{ fontSize: '13px' }}>{resData.yongshin.geokguk.desc}</div>
-                                    </div>
-                                    <div className="highlight-box" style={{ borderLeftColor: 'var(--accent-blue)' }}>
-                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>나의 내공</div>
-                                        <div className="status-blue" style={{ marginBottom: '5px' }}>{resData.yongshin.strength.status} <span style={{ fontSize: '12px', fontWeight: 'normal', color: '#777' }}>(아군:{resData.yongshin.strength.my_power} 적군:{resData.yongshin.strength.other_power})</span></div>
-                                        <div style={{ fontSize: '13px' }}>주체성과 에너지의 강약을 수치화했습니다.</div>
-                                    </div>
-                                    <div className="highlight-box" style={{ borderLeftColor: 'var(--accent-green)', marginBottom: 0 }}>
-                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>수호신 (조후/억부)</div>
-                                        <div style={{ fontSize: '13px', lineHeight: '1.6', marginTop: '5px' }}>
-                                            <span className="badge badge-good">용신</span> {resData.yongshin.yongshin.yongshin}<br />
-                                            <span className="badge" style={{ borderColor: 'var(--accent-blue)', color: 'var(--accent-blue)' }}>희신</span> {resData.yongshin.yongshin.huishin}<br />
-                                            <span className="badge badge-bad">기신</span> {resData.yongshin.yongshin.gishin}
+                        {/* [중단 1 그룹]: 2단 분할 (격국과 용신 / 운세) */}
+                        <div className="bento-row-2">
+                            {/* 좌측: 격국과 용신 */}
+                            <div className="bento-col">
+                                {resData.yongshin && (
+                                    <div className="panel" style={{ height: '100%' }}>
+                                        <h3>⚖️ 격국(格局)과 용신(用神)</h3>
+                                        <div className="highlight-box">
+                                            <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>나의 그릇</div>
+                                            <div style={{ fontSize: '18px', color: 'var(--gold-main)', fontWeight: 'bold', marginBottom: '5px' }}>{renderTooltipItem(resData.yongshin.geokguk.name.split('(')[0], false, resData.yongshin.geokguk.name)}</div>
+                                            <div style={{ fontSize: '13px' }}>{resData.yongshin.geokguk.desc}</div>
+                                        </div>
+                                        <div className="highlight-box" style={{ borderLeftColor: 'var(--accent-blue)' }}>
+                                            <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>나의 내공</div>
+                                            <div className="status-blue" style={{ marginBottom: '5px' }}>{resData.yongshin.strength.status} <span style={{ fontSize: '12px', fontWeight: 'normal', color: '#777' }}>(아군:{resData.yongshin.strength.my_power} 적군:{resData.yongshin.strength.other_power})</span></div>
+                                            <div style={{ fontSize: '13px' }}>주체성과 에너지의 강약을 수치화했습니다.</div>
+                                        </div>
+                                        <div className="highlight-box" style={{ borderLeftColor: 'var(--accent-green)', marginBottom: 0 }}>
+                                            <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>수호신 (조후/억부)</div>
+                                            <div style={{ fontSize: '13px', lineHeight: '1.6', marginTop: '5px' }}>
+                                                <span className="badge badge-good">용신</span> {resData.yongshin.yongshin.yongshin}<br />
+                                                <span className="badge" style={{ borderColor: 'var(--accent-blue)', color: 'var(--accent-blue)' }}>희신</span> {resData.yongshin.yongshin.huishin}<br />
+                                                <span className="badge badge-bad">기신</span> {resData.yongshin.yongshin.gishin}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            )}
-
-                            {/* 3. 올해 예측 */}
-                            {resData.unse?.year && (
-                                <div className="panel">
-                                    <h3>🎯 올해({new Date().getFullYear()}년) 예측</h3>
-                                    {(() => {
-                                        const y = resData.unse.year;
-                                        const isGood = y.overall_status.includes('발복') || y.overall_status.includes('무난') || y.overall_status.includes('성취');
-                                        const bc = isGood ? 'var(--accent-green)' : 'var(--accent-red)';
-                                        return (
-                                            <>
-                                                <div className="highlight-box" style={{ borderLeftColor: bc }}>
-                                                    <div className={isGood ? "status-green" : "status-red"} style={{ marginBottom: '5px' }}>{y.overall_status}</div>
-                                                    <div style={{ fontSize: '13px' }}>{y.overall_desc}</div>
-                                                </div>
-                                                {y.events.length > 0 ? y.events.map((ev, i) => {
-                                                    const ebc = ev.type === 'good' ? 'var(--accent-green)' : 'var(--accent-red)';
-                                                    return (
-                                                        <div className="highlight-box" style={{ borderLeftColor: ebc, padding: '10px' }} key={i}>
-                                                            <div style={{ color: ebc, fontWeight: 'bold', fontSize: '14px', marginBottom: '3px' }}>{ev.title}</div>
-                                                            <div style={{ fontSize: '12px', color: '#ccc' }}>{ev.desc}</div>
-                                                        </div>
-                                                    )
-                                                }) : <div style={{ fontSize: '12px', color: '#777' }}>올해는 큰 충/합이 없는 평탄한 시기입니다.</div>}
-                                            </>
-                                        )
-                                    })()}
-                                </div>
-                            )}
-
-                            {/* 4. 이달과 오늘의 운세 */}
-                            {resData.unse?.month && resData.unse?.day && (
-                                <div className="panel">
-                                    <h3>📅 이달과 오늘의 운세</h3>
-                                    {(() => {
-                                        const m = resData.unse.month;
-                                        const d = resData.unse.day;
-                                        const mGood = m.data.overall_status.includes('발복') || m.data.overall_status.includes('무난') || m.data.overall_status.includes('성취');
-                                        const dGood = d.data.overall_status.includes('발복') || d.data.overall_status.includes('무난') || d.data.overall_status.includes('성취');
-                                        return (
-                                            <>
-                                                <div className="highlight-box" style={{ borderLeftColor: mGood ? 'var(--accent-green)' : 'var(--accent-blue)' }}>
-                                                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '5px' }}>■ {m.month_num}월 이달의 운세 ({renderTooltipItem(m.stem, true)}{renderTooltipItem(m.branch, true)}월)</div>
-                                                    <div className={mGood ? "status-green" : "status-red"} style={{ marginBottom: '5px', fontSize: '1.1rem' }}>{m.data.overall_status}</div>
-                                                    <div style={{ fontSize: '13px' }}>{m.data.overall_desc}</div>
-                                                </div>
-                                                <div className="highlight-box" style={{ borderLeftColor: dGood ? 'var(--accent-green)' : 'var(--gold-main)', marginBottom: 0 }}>
-                                                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '5px' }}>■ {d.day_num}일 오늘의 운세 ({renderTooltipItem(d.stem, true)}{renderTooltipItem(d.branch, true)}일)</div>
-                                                    <div className={dGood ? "status-green" : "status-red"} style={{ marginBottom: '5px', fontSize: '1.1rem' }}>{d.data.overall_status}</div>
-                                                    <div style={{ fontSize: '13px' }}>{d.data.overall_desc}</div>
-                                                </div>
-                                            </>
-                                        )
-                                    })()}
-                                </div>
-                            )}
+                                )}
+                            </div>
+                            
+                            {/* 우측: 올해 및 이달의 운세 */}
+                            <div className="bento-col">
+                                {resData.unse?.year && (
+                                    <div className="panel">
+                                        <h3>🎯 올해({new Date().getFullYear()}년) 예측</h3>
+                                        {(() => {
+                                            const y = resData.unse.year;
+                                            const isGood = y.overall_status.includes('발복') || y.overall_status.includes('무난') || y.overall_status.includes('성취');
+                                            const bc = isGood ? 'var(--accent-green)' : 'var(--accent-red)';
+                                            return (
+                                                <>
+                                                    <div className="highlight-box" style={{ borderLeftColor: bc }}>
+                                                        <div className={isGood ? "status-green" : "status-red"} style={{ marginBottom: '5px' }}>{y.overall_status}</div>
+                                                        <div style={{ fontSize: '13px' }}>{y.overall_desc}</div>
+                                                    </div>
+                                                    {y.events.length > 0 ? y.events.map((ev, i) => {
+                                                        const ebc = ev.type === 'good' ? 'var(--accent-green)' : 'var(--accent-red)';
+                                                        return (
+                                                            <div className="highlight-box" style={{ borderLeftColor: ebc, padding: '10px' }} key={i}>
+                                                                <div style={{ color: ebc, fontWeight: 'bold', fontSize: '14px', marginBottom: '3px' }}>{ev.title}</div>
+                                                                <div style={{ fontSize: '12px', color: '#ccc' }}>{ev.desc}</div>
+                                                            </div>
+                                                        )
+                                                    }) : <div style={{ fontSize: '12px', color: '#777' }}>올해는 큰 충/합이 없는 평탄한 시기입니다.</div>}
+                                                </>
+                                            )
+                                        })()}
+                                    </div>
+                                )}
+                                {resData.unse?.month && resData.unse?.day && (
+                                    <div className="panel" style={{ flexGrow: 1 }}>
+                                        <h3>📅 이달과 오늘의 운세</h3>
+                                        {(() => {
+                                            const m = resData.unse.month;
+                                            const d = resData.unse.day;
+                                            const mGood = m.data.overall_status.includes('발복') || m.data.overall_status.includes('무난') || m.data.overall_status.includes('성취');
+                                            const dGood = d.data.overall_status.includes('발복') || d.data.overall_status.includes('무난') || d.data.overall_status.includes('성취');
+                                            return (
+                                                <>
+                                                    <div className="highlight-box" style={{ borderLeftColor: mGood ? 'var(--accent-green)' : 'var(--accent-blue)' }}>
+                                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '5px' }}>■ {m.month_num}월 이달의 운세 ({renderTooltipItem(m.stem, true)}{renderTooltipItem(m.branch, true)}월)</div>
+                                                        <div className={mGood ? "status-green" : "status-red"} style={{ marginBottom: '5px', fontSize: '1.1rem' }}>{m.data.overall_status}</div>
+                                                        <div style={{ fontSize: '13px' }}>{m.data.overall_desc}</div>
+                                                    </div>
+                                                    <div className="highlight-box" style={{ borderLeftColor: dGood ? 'var(--accent-green)' : 'var(--gold-main)', marginBottom: 0 }}>
+                                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '5px' }}>■ {d.day_num}일 오늘의 운세 ({renderTooltipItem(d.stem, true)}{renderTooltipItem(d.branch, true)}일)</div>
+                                                        <div className={dGood ? "status-green" : "status-red"} style={{ marginBottom: '5px', fontSize: '1.1rem' }}>{d.data.overall_status}</div>
+                                                        <div style={{ fontSize: '13px' }}>{d.data.overall_desc}</div>
+                                                    </div>
+                                                </>
+                                            )
+                                        })()}
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                        {/* ---------------- 상단 Masonry 끝 ---------------- */}
 
-                        {/* 5. 실용 통변 (가로 꽉 채움) */}
+                        {/* [중단 2 그룹]: 실용통변 (가로 꽉 채움) */}
                         {resData.practical && (
                             <div className="panel">
                                 <h3>💼 현대 실용 통변 (직업 & 헬스케어)</h3>
@@ -560,7 +566,7 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 6. 납음오행 (가로 꽉 채움) */}
+                        {/* 납음오행 (가로 꽉 채움) */}
                         {resData.napeum_reading && (
                             <div className="panel">
                                 <h3>🎵 납음오행(納音五行)의 숨은 파동</h3>
@@ -576,7 +582,7 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 7. 궁합 분석 (가로 꽉 채움) */}
+                        {/* 궁합 분석 (가로 꽉 채움) */}
                         {resData.gunghap && (
                             <div className="panel">
                                 <h3>💞 삼원갑자 및 심층 궁합 분석</h3>
@@ -605,7 +611,7 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 8. 인생 타임라인 (가로 꽉 채움) */}
+                        {/* 인생 타임라인 (가로 꽉 채움) */}
                         {resData.timeline && (
                             <div className="panel">
                                 <h3>⏳ 인생 타임라인 (스와이프 하여 확인)</h3>
@@ -640,105 +646,104 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 🚨 하단 Masonry (빈 공간 완벽 차단 벽돌 쌓기) */}
-                        <div className="masonry-grid">
-                            
-                            {/* 9. 오행 분포 */}
-                            {resData.mechanics?.elements_dist && (
-                                <div className="panel">
-                                    <h3>📊 오행 분포</h3>
-                                    <div className="elements-flex" style={{ display: 'flex', gap: '10px' }}>
-                                        {['목', '화', '토', '금', '수'].map((el) => {
-                                            const colors = { '목': '#2ecc71', '화': '#e74c3c', '토': '#f1c40f', '금': '#bdc3c7', '수': '#3498db' };
-                                            return (
-                                                <div style={{ flex: 1, background: 'rgba(255,255,255,0.05)', textAlign: 'center', padding: '10px', borderRadius: '6px', borderBottom: `3px solid ${colors[el]}` }} key={el}>
-                                                    <div style={{ fontSize: '12px', color: '#aaa' }}>{el}</div>
-                                                    <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{resData.mechanics.elements_dist[el] || 0}</div>
-                                                </div>
-                                            );
-                                        })}
+                        {/* 🚨 [하단 그룹]: 3단 분할 벤토 (가장 골칫거리였던 빈 공간 완벽 해결) */}
+                        <div className="bento-row-3">
+                            {/* 좌측 기둥: 기초 역학 지표 모음 */}
+                            <div className="bento-col">
+                                {resData.mechanics?.elements_dist && (
+                                    <div className="panel">
+                                        <h3>📊 오행 분포</h3>
+                                        <div className="elements-flex" style={{ display: 'flex', gap: '10px' }}>
+                                            {['목', '화', '토', '금', '수'].map((el) => {
+                                                const colors = { '목': '#2ecc71', '화': '#e74c3c', '토': '#f1c40f', '금': '#bdc3c7', '수': '#3498db' };
+                                                return (
+                                                    <div style={{ flex: 1, background: 'rgba(255,255,255,0.05)', textAlign: 'center', padding: '10px', borderRadius: '6px', borderBottom: `3px solid ${colors[el]}` }} key={el}>
+                                                        <div style={{ fontSize: '12px', color: '#aaa' }}>{el}</div>
+                                                        <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{resData.mechanics.elements_dist[el] || 0}</div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
+                                )}
+                                <div className="panel">
+                                    <h3>🌱 통근력 (아성)</h3>
+                                    {(() => {
+                                        let power = resData.mechanics.tonggeun?.total_power || 0;
+                                        let rootText = "";
+                                        if (!resData.mechanics.tonggeun?.has_root || power < 10) rootText = "지지에 뿌리가 극히 미약하거나 없어 주관이 흔들리기 쉽습니다.";
+                                        else if (power < 30) rootText = "지지에 미약하게나마 뿌리를 내리고 있어 간신히 버티는 형국입니다.";
+                                        else if (power < 60) rootText = "뿌리가 제법 튼튼하여 어지간한 풍파에도 휩쓸리지 않습니다.";
+                                        else rootText = "뿌리가 매우 깊고 강력하여 태풍이 불어도 절대 흔들리지 않는 굳건함이 있습니다.";
+                                        return <div style={{ fontSize: '13px' }}>총 파워: <b>{power}</b><br />{rootText}</div>
+                                    })()}
                                 </div>
-                            )}
-
-                            {/* 10. 통근력 */}
-                            <div className="panel">
-                                <h3>🌱 통근력 (아성)</h3>
-                                {(() => {
-                                    let power = resData.mechanics.tonggeun.total_power;
-                                    let rootText = "";
-                                    if (!resData.mechanics.tonggeun.has_root || power < 10) rootText = "지지에 뿌리가 극히 미약하거나 없어 주관이 흔들리기 쉽습니다.";
-                                    else if (power < 30) rootText = "지지에 미약하게나마 뿌리를 내리고 있어 간신히 버티는 형국입니다.";
-                                    else if (power < 60) rootText = "뿌리가 제법 튼튼하여 어지간한 풍파에도 휩쓸리지 않습니다.";
-                                    else rootText = "뿌리가 매우 깊고 강력하여 태풍이 불어도 절대 흔들리지 않는 굳건함이 있습니다.";
-                                    return <div style={{ fontSize: '13px' }}>총 파워: <b>{power}</b><br />{rootText}</div>
-                                })()}
+                                {resData.elements_imbalance && (
+                                    <div className="panel">
+                                        <h3>⚖️ 오행 과다/고립 분석</h3>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            {resData.elements_imbalance.map((item, i) => {
+                                                let cc = item.type === "과다" ? "var(--accent-red)" : (item.type === "고립(無)" ? "#aaa" : "var(--accent-green)");
+                                                return (
+                                                    <div style={{ background: 'rgba(255,255,255,0.03)', borderLeft: `3px solid ${cc}`, padding: '10px', borderRadius: '6px' }} key={i}>
+                                                        <div style={{ fontWeight: 'bold', fontSize: '13px', marginBottom: '3px', color: cc }}>[{item.element}] {item.type} <span style={{ fontSize: '11px', color: '#888', fontWeight: 'normal' }}>({item.count}개)</span></div>
+                                                        <div style={{ fontSize: '12px', color: '#ccc' }}>{item.desc}</div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
-                            {/* 11. 심층 신살 */}
-                            {specialStarsArray.length > 0 && (
-                                <div className="panel">
-                                    <h3>🌟 심층 신살</h3>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                                        {specialStarsArray.map((star, idx) => (
-                                            <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--gold-main)', padding: '15px' }} key={idx}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                                                    <span style={{ color: 'var(--gold-light)', fontWeight: 'bold', fontSize: '15px' }}>{renderTooltipItem(star.name.split('(')[0], false)}</span>
-                                                    <span className="badge" style={{ margin: 0, border: '1px solid var(--gold-dark)', color: 'var(--gold-main)', background: 'transparent' }}>{renderHanjaString(star.position)}</span>
+                            {/* 중앙 기둥: 심층 신살 */}
+                            <div className="bento-col">
+                                {specialStarsArray.length > 0 && (
+                                    <div className="panel" style={{ height: '100%' }}>
+                                        <h3>🌟 심층 신살</h3>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                                            {specialStarsArray.map((star, idx) => (
+                                                <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--gold-main)', padding: '15px' }} key={idx}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                                                        <span style={{ color: 'var(--gold-light)', fontWeight: 'bold', fontSize: '15px' }}>{renderTooltipItem(star.name.split('(')[0], false)}</span>
+                                                        <span className="badge" style={{ margin: 0, border: '1px solid var(--gold-dark)', color: 'var(--gold-main)', background: 'transparent' }}>{renderHanjaString(star.position)}</span>
+                                                    </div>
+                                                    <div style={{ fontSize: '13px', color: '#ccc', wordBreak: 'keep-all', lineHeight: '1.6' }}>
+                                                        {star.desc.split('\n').map((line, l_idx) => (
+                                                            <span key={l_idx} style={{ display: 'block', marginBottom: '4px' }}>{line}</span>
+                                                        ))}
+                                                    </div>
                                                 </div>
-                                                <div style={{ fontSize: '13px', color: '#ccc', wordBreak: 'keep-all', lineHeight: '1.6' }}>
-                                                    {star.desc.split('\n').map((line, l_idx) => (
-                                                        <span key={l_idx} style={{ display: 'block', marginBottom: '4px' }}>{line}</span>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        ))}
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
+                            </div>
 
-                            {/* 12. 오행 과다/고립 분석 */}
-                            {resData.elements_imbalance && (
-                                <div className="panel">
-                                    <h3>⚖️ 오행 과다/고립 분석</h3>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                        {resData.elements_imbalance.map((item, i) => {
-                                            let cc = item.type === "과다" ? "var(--accent-red)" : (item.type === "고립(無)" ? "#aaa" : "var(--accent-green)");
-                                            return (
-                                                <div style={{ background: 'rgba(255,255,255,0.03)', borderLeft: `3px solid ${cc}`, padding: '10px', borderRadius: '6px' }} key={i}>
-                                                    <div style={{ fontWeight: 'bold', fontSize: '13px', marginBottom: '3px', color: cc }}>[{item.element}] {item.type} <span style={{ fontSize: '11px', color: '#888', fontWeight: 'normal' }}>({item.count}개)</span></div>
-                                                    <div style={{ fontSize: '12px', color: '#ccc' }}>{item.desc}</div>
+                            {/* 우측 기둥: 흉액 진단 */}
+                            <div className="bento-col">
+                                {disastersArray.length > 0 && (
+                                    <div className="panel" style={{ height: '100%' }}>
+                                        <h3>⚠️ 상호작용 및 흉액 진단</h3>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                                            {disastersArray.map((dis, idx) => (
+                                                <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--accent-red)', padding: '15px' }} key={idx}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                                                        <span style={{ color: 'var(--accent-red)', fontWeight: 'bold', fontSize: '15px' }}>{renderTooltipItem(dis.name.split('(')[0], false, dis.name)}</span>
+                                                        <span className="badge badge-bad" style={{ margin: 0 }}>{renderHanjaString(dis.position)}</span>
+                                                    </div>
+                                                    <div style={{ fontSize: '13px', color: '#ccc', wordBreak: 'keep-all', lineHeight: '1.6' }}>
+                                                        {dis.desc.split('\n').map((line, l_idx) => (
+                                                            <span key={l_idx} style={{ display: 'block', marginBottom: '4px' }}>{line}</span>
+                                                        ))}
+                                                    </div>
                                                 </div>
-                                            );
-                                        })}
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            )}
-
-                            {/* 13. 상호작용 및 흉액 진단 */}
-                            {disastersArray.length > 0 && (
-                                <div className="panel">
-                                    <h3>⚠️ 상호작용 및 흉액 진단</h3>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                                        {disastersArray.map((dis, idx) => (
-                                            <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--accent-red)', padding: '15px' }} key={idx}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                                                    <span style={{ color: 'var(--accent-red)', fontWeight: 'bold', fontSize: '15px' }}>{renderTooltipItem(dis.name.split('(')[0], false, dis.name)}</span>
-                                                    <span className="badge badge-bad" style={{ margin: 0 }}>{renderHanjaString(dis.position)}</span>
-                                                </div>
-                                                <div style={{ fontSize: '13px', color: '#ccc', wordBreak: 'keep-all', lineHeight: '1.6' }}>
-                                                    {dis.desc.split('\n').map((line, l_idx) => (
-                                                        <span key={l_idx} style={{ display: 'block', marginBottom: '4px' }}>{line}</span>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
+                                )}
+                            </div>
                         </div>
-                        {/* ---------------- 하단 Masonry 끝 ---------------- */}
 
                     </div>
                 </div>
