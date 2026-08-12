@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 // 🔴 파이썬 백엔드 주소 (Render)
 const BACKEND_URL = "https://saju-backend-ffum.onrender.com"; 
 
-// 🚨 프론트엔드 UI 다국어 언어팩 (줄바꿈 \n 제거 후 안정화)
+// 🚨 프론트엔드 UI 다국어 언어팩 (사전 검색 안내 문구 추가 완료)
 const uiTexts = {
     ko: {
         btnDict: "📖 사전 열기", btnHome: "🏠 홈", btnProfile: "⚙️ 프로필 입력", btnSave: "🗂️ 저장한 명식", btnFaq: "❓ 자주 묻는 질문", btnCs: "🎧 고객센터", btnApp: "앱 다운로드", btnLogin: "로그인",
@@ -23,7 +23,8 @@ const uiTexts = {
         repTitle: "분석 리포트", repTime: "진태양시 보정", btnCopy: "📋 복사", btnRetry: "⟲ 다시하기",
         colYear: "연주 (Year)", colMonth: "월주 (Month)", colDay: "일주 (Day)", colHour: "시주 (Hour)",
         txtGongmang: "공망", txtHidden: "지장간", txtNapeum: "[납음]",
-        locSeoul: "🇰🇷 대한민국 (서울/표준: UTC+9, 127.0°)", locBusan: "🇰🇷 대한민국 (부산/동부: UTC+9, 129.0°)", locTokyo: "🇯🇵 일본 (도쿄: UTC+9, 139.7°)", locOsaka: "🇯🇵 일본 (오사카: UTC+9, 135.5°)", locBeijing: "🇨🇳 중국 (베이징: UTC+8, 116.4°)", locShanghai: "🇨🇳 중국 (상하이: UTC+8, 121.5°)", locHongKong: "🇭🇰 홍콩 (UTC+8, 114.0°)", locTaipei: "🇹🇼 대만 (타이베이: UTC+8, 121.5°)", locHanoi: "🇻🇳 베트남 (하노이: UTC+7, 105.8°)", locSydney: "🇦🇺 호주 (시드니: UTC+11, 151.2°E)", locLA: "🇺🇸 미국 (LA/서부: UTC-8, 118.2°W)", locNY: "🇺🇸 미국 (뉴욕/동부: UTC-5, 74.0°W)", locLondon: "🇬🇧 영국 (런던: UTC+0, 0.1°W)"
+        locSeoul: "🇰🇷 대한민국 (서울/표준: UTC+9, 127.0°)", locBusan: "🇰🇷 대한민국 (부산/동부: UTC+9, 129.0°)", locTokyo: "🇯🇵 일본 (도쿄: UTC+9, 139.7°)", locOsaka: "🇯🇵 일본 (오사카: UTC+9, 135.5°)", locBeijing: "🇨🇳 중국 (베이징: UTC+8, 116.4°)", locShanghai: "🇨🇳 중국 (상하이: UTC+8, 121.5°)", locHongKong: "🇭🇰 홍콩 (UTC+8, 114.0°)", locTaipei: "🇹🇼 대만 (타이베이: UTC+8, 121.5°)", locHanoi: "🇻🇳 베트남 (하노이: UTC+7, 105.8°)", locSydney: "🇦🇺 호주 (시드니: UTC+11, 151.2°E)", locLA: "🇺🇸 미국 (LA/서부: UTC-8, 118.2°W)", locNY: "🇺🇸 미국 (뉴욕/동부: UTC-5, 74.0°W)", locLondon: "🇬🇧 영국 (런던: UTC+0, 0.1°W)",
+        dictPlaceholder: "궁금한 용어나 한자를 입력하세요", dictEmpty: "검색어를 입력하시면 전문 해설이 나타납니다.", dictNoResult: "검색 결과가 없습니다."
     },
     ja: {
         btnDict: "📖 辞典を開く", btnHome: "🏠 ホーム", btnProfile: "⚙️ 入力フォーム", btnSave: "🗂️ 保存した命式", btnFaq: "❓ よくある質問", btnCs: "🎧 サポート", btnApp: "アプリ", btnLogin: "ログイン",
@@ -43,7 +44,8 @@ const uiTexts = {
         repTitle: "分析レポート", repTime: "真太陽時補正", btnCopy: "📋 コピー", btnRetry: "⟲ やり直す",
         colYear: "年柱 (Year)", colMonth: "月柱 (Month)", colDay: "日柱 (Day)", colHour: "時柱 (Hour)",
         txtGongmang: "空亡", txtHidden: "蔵干", txtNapeum: "[納音]",
-        locSeoul: "🇰🇷 韓国 (ソウル: UTC+9, 127.0°)", locBusan: "🇰🇷 韓国 (釜山: UTC+9, 129.0°)", locTokyo: "🇯🇵 日本 (東京: UTC+9, 139.7°)", locOsaka: "🇯🇵 日本 (大阪: UTC+9, 135.5°)", locBeijing: "🇨🇳 中国 (北京: UTC+8, 116.4°)", locShanghai: "🇨🇳 中国 (上海: UTC+8, 121.5°)", locHongKong: "🇭🇰 香港 (UTC+8, 114.0°)", locTaipei: "🇹🇼 台湾 (台北: UTC+8, 121.5°)", locHanoi: "🇻🇳 ベトナム (ハノイ: UTC+7, 105.8°)", locSydney: "🇦🇺 豪州 (シドニー: UTC+11, 151.2°E)", locLA: "🇺🇸 米国 (LA: UTC-8, 118.2°W)", locNY: "🇺🇸 米国 (NY: UTC-5, 74.0°W)", locLondon: "🇬🇧 英国 (ロンドン: UTC+0, 0.1°W)"
+        locSeoul: "🇰🇷 韓国 (ソウル: UTC+9, 127.0°)", locBusan: "🇰🇷 韓国 (釜山: UTC+9, 129.0°)", locTokyo: "🇯🇵 日本 (東京: UTC+9, 139.7°)", locOsaka: "🇯🇵 日本 (大阪: UTC+9, 135.5°)", locBeijing: "🇨🇳 中国 (北京: UTC+8, 116.4°)", locShanghai: "🇨🇳 中国 (上海: UTC+8, 121.5°)", locHongKong: "🇭🇰 香港 (UTC+8, 114.0°)", locTaipei: "🇹🇼 台湾 (台北: UTC+8, 121.5°)", locHanoi: "🇻🇳 ベトナム (ハノイ: UTC+7, 105.8°)", locSydney: "🇦🇺 豪州 (シドニー: UTC+11, 151.2°E)", locLA: "🇺🇸 米国 (LA: UTC-8, 118.2°W)", locNY: "🇺🇸 米国 (NY: UTC-5, 74.0°W)", locLondon: "🇬🇧 英国 (ロンドン: UTC+0, 0.1°W)",
+        dictPlaceholder: "気になる用語や漢字を入力してください", dictEmpty: "検索語を入力すると専門的な解説が表示されます。", dictNoResult: "検索結果がありません。"
     },
     'zh-CN': {
         btnDict: "📖 打开字典", btnHome: "🏠 首页", btnProfile: "⚙️ 填写资料", btnSave: "🗂️ 已存命盘", btnFaq: "❓ 常见问题", btnCs: "🎧 客服中心", btnApp: "下载 APP", btnLogin: "登录",
@@ -63,7 +65,8 @@ const uiTexts = {
         repTitle: "分析报告", repTime: "真太阳时校正", btnCopy: "📋 复制", btnRetry: "⟲ 重试",
         colYear: "年柱 (Year)", colMonth: "月柱 (Month)", colDay: "日柱 (Day)", colHour: "时柱 (Hour)",
         txtGongmang: "空亡", txtHidden: "地支藏干", txtNapeum: "[纳音]",
-        locSeoul: "🇰🇷 韩国 (首尔: UTC+9, 127.0°)", locBusan: "🇰🇷 韩国 (釜山: UTC+9, 129.0°)", locTokyo: "🇯🇵 日本 (东京: UTC+9, 139.7°)", locOsaka: "🇯🇵 日本 (大阪: UTC+9, 135.5°)", locBeijing: "🇨🇳 中国 (北京: UTC+8, 116.4°)", locShanghai: "🇨🇳 中国 (上海: UTC+8, 121.5°)", locHongKong: "🇭🇰 香港 (UTC+8, 114.0°)", locTaipei: "🇹🇼 台湾 (台北: UTC+8, 121.5°)", locHanoi: "🇻🇳 越南 (河内: UTC+7, 105.8°)", locSydney: "🇦🇺 澳洲 (悉尼: UTC+11, 151.2°E)", locLA: "🇺🇸 美国 (洛杉矶: UTC-8, 118.2°W)", locNY: "🇺🇸 美国 (纽约: UTC-5, 74.0°W)", locLondon: "🇬🇧 英国 (伦敦: UTC+0, 0.1°W)"
+        locSeoul: "🇰🇷 韩国 (首尔: UTC+9, 127.0°)", locBusan: "🇰🇷 韩国 (釜山: UTC+9, 129.0°)", locTokyo: "🇯🇵 日本 (东京: UTC+9, 139.7°)", locOsaka: "🇯🇵 日本 (大阪: UTC+9, 135.5°)", locBeijing: "🇨🇳 中国 (北京: UTC+8, 116.4°)", locShanghai: "🇨🇳 中国 (上海: UTC+8, 121.5°)", locHongKong: "🇭🇰 香港 (UTC+8, 114.0°)", locTaipei: "🇹🇼 台湾 (台北: UTC+8, 121.5°)", locHanoi: "🇻🇳 越南 (河内: UTC+7, 105.8°)", locSydney: "🇦🇺 澳洲 (悉尼: UTC+11, 151.2°E)", locLA: "🇺🇸 美国 (洛杉矶: UTC-8, 118.2°W)", locNY: "🇺🇸 美国 (纽约: UTC-5, 74.0°W)", locLondon: "🇬🇧 英国 (伦敦: UTC+0, 0.1°W)",
+        dictPlaceholder: "请输入想了解的术语或汉字", dictEmpty: "输入搜索词即可查看专业解析。", dictNoResult: "没有搜索结果。"
     },
     'zh-TW': {
         btnDict: "📖 打開字典", btnHome: "🏠 首頁", btnProfile: "⚙️ 填寫資料", btnSave: "🗂️ 已存命盤", btnFaq: "❓ 常見問題", btnCs: "🎧 客服中心", btnApp: "下載 APP", btnLogin: "登入",
@@ -83,7 +86,8 @@ const uiTexts = {
         repTitle: "分析報告", repTime: "真太陽時校正", btnCopy: "📋 複製", btnRetry: "⟲ 重試",
         colYear: "年柱 (Year)", colMonth: "月柱 (Month)", colDay: "日柱 (Day)", colHour: "時柱 (Hour)",
         txtGongmang: "空亡", txtHidden: "地支藏干", txtNapeum: "[納音]",
-        locSeoul: "🇰🇷 韓國 (首爾: UTC+9, 127.0°)", locBusan: "🇰🇷 韓國 (釜山: UTC+9, 129.0°)", locTokyo: "🇯🇵 日本 (東京: UTC+9, 139.7°)", locOsaka: "🇯🇵 日本 (大阪: UTC+9, 135.5°)", locBeijing: "🇨🇳 中國 (北京: UTC+8, 116.4°)", locShanghai: "🇨🇳 中國 (上海: UTC+8, 121.5°)", locHongKong: "🇭🇰 香港 (UTC+8, 114.0°)", locTaipei: "🇹🇼 台灣 (台北: UTC+8, 121.5°)", locHanoi: "🇻🇳 越南 (河內: UTC+7, 105.8°)", locSydney: "🇦🇺 澳洲 (悉尼: UTC+11, 151.2°E)", locLA: "🇺🇸 美國 (洛杉磯: UTC-8, 118.2°W)", locNY: "🇺🇸 美國 (紐約: UTC-5, 74.0°W)", locLondon: "🇬🇧 英國 (倫敦: UTC+0, 0.1°W)"
+        locSeoul: "🇰🇷 韓國 (首爾: UTC+9, 127.0°)", locBusan: "🇰🇷 韓國 (釜山: UTC+9, 129.0°)", locTokyo: "🇯🇵 日本 (東京: UTC+9, 139.7°)", locOsaka: "🇯🇵 日本 (大阪: UTC+9, 135.5°)", locBeijing: "🇨🇳 中國 (北京: UTC+8, 116.4°)", locShanghai: "🇨🇳 中國 (上海: UTC+8, 121.5°)", locHongKong: "🇭🇰 香港 (UTC+8, 114.0°)", locTaipei: "🇹🇼 台灣 (台北: UTC+8, 121.5°)", locHanoi: "🇻🇳 越南 (河內: UTC+7, 105.8°)", locSydney: "🇦🇺 澳洲 (悉尼: UTC+11, 151.2°E)", locLA: "🇺🇸 美國 (洛杉磯: UTC-8, 118.2°W)", locNY: "🇺🇸 美國 (紐約: UTC-5, 74.0°W)", locLondon: "🇬🇧 英國 (倫敦: UTC+0, 0.1°W)",
+        dictPlaceholder: "請輸入想了解的術語或漢字", dictEmpty: "輸入搜尋詞即可查看專業解析。", dictNoResult: "沒有搜尋結果。"
     }
 };
 
@@ -133,12 +137,13 @@ export default function SajuCalculator() {
         return () => window.removeEventListener('scroll', handleScroll, true);
     }, []);
 
+    // 🚨 사전 검색 시 백엔드에 선택된 언어(lang)를 전달합니다.
     const handleDictSearch = async (e) => {
         const keyword = e.target.value;
         setDictModal(prev => ({ ...prev, keyword }));
         if (!keyword) { setDictModal(prev => ({ ...prev, results: null })); return; }
         try {
-            const response = await fetch(`${BACKEND_URL}/api/dictionary?q=${encodeURIComponent(keyword)}`);
+            const response = await fetch(`${BACKEND_URL}/api/dictionary?q=${encodeURIComponent(keyword)}&lang=${lang}`);
             const results = await response.json();
             setDictModal(prev => ({ ...prev, results }));
         } catch (err) { console.error(err); }
@@ -205,9 +210,7 @@ export default function SajuCalculator() {
         }
     };
 
-    const handleCopy = () => {
-        alert("복사 기능은 구조 개편 중입니다.");
-    };
+    const handleCopy = () => { alert("복사 기능은 구조 개편 중입니다."); };
 
     const renderTooltipItem = (keyword, isChar = true, text = null) => {
         if (!resData) return text || keyword;
@@ -257,14 +260,13 @@ export default function SajuCalculator() {
     );
 
     return (
-        /* 🚨 언어 코드(lang)를 CSS 최상단에 주입하여 언어별 분기 처리 */
         <div className="app-container" lang={lang}>
             <style>{`
                 :root { --bg-color: #0d0f12; --card-bg: #16181d; --text-main: #f1f2f6; --text-muted: #95a5a6; --gold-light: #f1c40f; --gold-main: #d4af37; --gold-dark: #b5952f; --accent-red: #e74c3c; --accent-blue: #3498db; --accent-green: #2ecc71; }
                 html, body, #root, #__next { margin: 0 !important; padding: 0 !important; background-color: var(--bg-color) !important; width: 100%; max-width: 100vw; min-height: 100vh; overflow-x: hidden; }
-                * { box-sizing: border-box; }
+                * { box-sizing: border-box; overflow-wrap: break-word !important; word-wrap: break-word !important; }
+                div, p, span, h1, h2, h3, h4 { word-break: keep-all; } 
                 
-                /* 🚨 [무결점 CSS 방어] 한국어는 단어 보존, 일본어/중국어는 자연스러운 줄바꿈 허용 */
                 .app-container:lang(ko) { word-break: keep-all; overflow-wrap: break-word; }
                 .app-container:not(:lang(ko)) { word-break: normal; overflow-wrap: anywhere; line-break: strict; }
                 
@@ -297,10 +299,9 @@ export default function SajuCalculator() {
                 .sidebar-login { display: flex; align-items: center; gap: 10px; color: #aaa; cursor: pointer; font-size: 14px; margin-top: 15px; font-weight: bold; transition: 0.2s; }
                 .sidebar-login:hover { color: var(--gold-light); }
 
-                /* 🚨 대문 랜딩 페이지 (천장 잘림 방지 15vh 여백 + flex-start 구조 유지) */
                 .landing-section { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; padding: 15vh 20px 80px 20px; background: radial-gradient(circle at center, #1a1e24 0%, var(--bg-color) 100%); text-align: center; }
                 .landing-hero { max-width: 900px; margin-bottom: 50px; animation: fadeIn 1s ease-out; }
-                .landing-title { font-size: 3.5rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 20px; color: #fff; line-height: 1.3; }
+                .landing-title { font-size: 3.5rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 20px; color: #fff; line-height: 1.3; white-space: pre-wrap; }
                 .landing-title span { color: var(--gold-main); text-shadow: 0 0 20px rgba(212,175,55,0.3); }
                 .landing-subtitle { font-size: 1.2rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 40px; font-weight: 300; white-space: pre-wrap; }
                 .btn-cta { background: linear-gradient(135deg, var(--gold-dark), var(--gold-main)); color: #000; border: none; border-radius: 50px; padding: 20px 40px; font-size: 1.2rem; font-weight: 900; cursor: pointer; box-shadow: 0 10px 30px rgba(212,175,55,0.3); transition: all 0.3s; animation: pulse 2s infinite; }
@@ -320,7 +321,6 @@ export default function SajuCalculator() {
                 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(212,175,55,0.4); } 70% { box-shadow: 0 0 0 15px rgba(212,175,55,0); } 100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); } }
                 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-                /* 프로필 입력 화면 */
                 .hero-section { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; padding: 12vh 20px 80px 20px; background: var(--bg-color); text-align: center; position: relative; }
                 .hero-title { font-size: 2.5rem; font-weight: 900; letter-spacing: 2px; margin-top: 0; margin-bottom: 20px; color: var(--gold-main); text-shadow: 0 4px 15px rgba(212,175,55,0.2); }
                 .hero-subtitle { font-size: 1rem; color: var(--text-muted); margin-bottom: 40px; font-weight: 300; line-height: 1.6; }
@@ -342,7 +342,6 @@ export default function SajuCalculator() {
                 .btn-icon { background: rgba(255,255,255,0.1); color: white; border: 1px solid #333; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; transition: 0.3s; }
                 .btn-icon:hover { background: var(--gold-main); color: #000; border-color: var(--gold-main); }
                 
-                /* 대시보드 */
                 .dashboard { padding: 60px 20px 40px 20px; max-width: 1300px; margin: auto; width: 100%; box-sizing: border-box; }
                 .dash-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 30px; }
                 .dash-header h2 { margin: 0; color: var(--gold-main); font-weight: 900; }
@@ -381,13 +380,14 @@ export default function SajuCalculator() {
                 .hanja-tooltip { display: inline-block; cursor: pointer; color: var(--gold-main); border-bottom: 1px dashed rgba(212,175,55,0.5); }
                 .hanja-tooltip.char-tooltip { color: #fff; border-bottom: none; }
                 
+                /* 🚨 사전 모달창 높이 고정으로 검색 시 흔들림(Jitter) 완벽 방어 */
                 .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 4000; backdrop-filter: blur(5px); }
-                .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); width: 90%; max-width: 600px; max-height: 80vh; border-radius: 12px; padding: 25px; display: flex; flex-direction: column; border: 1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: left; }
+                .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); width: 90%; max-width: 600px; height: 80vh; border-radius: 12px; padding: 25px; display: flex; flex-direction: column; border: 1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: left; }
                 .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
                 .modal-header h3 { margin: 0; color: var(--gold-main); }
                 .close-btn { background: none; border: none; font-size: 28px; color: #888; cursor: pointer; }
                 .dict-search-box input { width: 100%; padding: 15px; font-size: 15px; background: #000; border-radius: 8px; color: white; border: 1px solid #333; }
-                .dict-results { overflow-y: auto; padding-right: 10px; margin-top: 15px; }
+                .dict-results { flex: 1; overflow-y: auto; padding-right: 10px; margin-top: 15px; }
                 .dict-item { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 4px solid var(--gold-main); margin-bottom: 15px; }
 
                 /* 📱📱 모바일 및 테블릿 반응형 제어 📱📱 */
@@ -479,9 +479,11 @@ export default function SajuCalculator() {
                 <div className="modal-overlay">
                     <div className="modal-content">
                         <div className="modal-header"><h3>{t.btnDict}</h3><button className="close-btn" onClick={() => setDictModal({ show: false, keyword: "", results: null })}>×</button></div>
-                        <div className="dict-search-box"><input type="text" placeholder="궁금한 용어나 한자를 입력하세요" onChange={handleDictSearch} autoFocus /></div>
+                        <div className="dict-search-box">
+                            <input type="text" placeholder={t.dictPlaceholder} onChange={handleDictSearch} autoFocus />
+                        </div>
                         <div className="dict-results">
-                            {!dictModal.results ? (<div style={{ textAlign: 'center', color: '#555', marginTop: '30px' }}>검색어를 입력하시면 전문 해설이 나타납니다.</div>) : dictModal.results.length === 0 ? (<div style={{ textAlign: 'center', color: '#888', marginTop: '30px' }}>검색 결과가 없습니다.</div>) : (
+                            {!dictModal.results ? (<div style={{ textAlign: 'center', color: '#555', marginTop: '30px' }}>{t.dictEmpty}</div>) : dictModal.results.length === 0 ? (<div style={{ textAlign: 'center', color: '#888', marginTop: '30px' }}>{t.dictNoResult}</div>) : (
                                 dictModal.results.map((r, idx) => (
                                     <div className="dict-item" key={idx}>
                                         <h4 style={{ margin: '0 0 8px 0', color: '#fff', fontSize: '16px' }}>{r.term} {r.hanja ? `(${r.hanja})` : ''} <span style={{ fontSize: '11px', background: 'rgba(212,175,55,0.2)', padding: '3px 8px', borderRadius: '4px', color: 'var(--gold-main)', marginLeft: '10px' }}>{r.category}</span></h4><p style={{ margin: 0 }}>{r.meaning}</p>
@@ -495,7 +497,7 @@ export default function SajuCalculator() {
 
             {errorModal.show && (
                 <div className="modal-overlay" style={{ zIndex: 4000 }}>
-                    <div className="modal-content" style={{ borderLeft: '4px solid var(--accent-red)' }}>
+                    <div className="modal-content" style={{ borderLeft: '4px solid var(--accent-red)', height: 'auto' }}>
                         <div className="modal-header"><h3 style={{ color: 'var(--accent-red)' }}>⚠️ System Error</h3><button className="close-btn" onClick={() => setErrorModal({ show: false, msg: "" })}>×</button></div>
                         <div style={{ marginBottom: '15px' }}><textarea readOnly value={errorModal.msg} style={{ width: '100%', height: '150px', background: '#000', color: 'var(--accent-red)', padding: '10px', border: '1px solid #333', borderRadius: '6px', fontFamily: 'monospace', resize: 'none' }}></textarea></div>
                         <button className="btn-primary" style={{ marginTop: 0, background: 'var(--accent-red)', color: '#fff', border: 'none' }} onClick={() => navigator.clipboard.writeText(errorModal.msg)}>Copy Error Log</button>
@@ -508,7 +510,6 @@ export default function SajuCalculator() {
                 <div className="landing-section">
                     <div className="top-nav"><button className="btn-icon" onClick={() => setDictModal(prev => ({ ...prev, show: true }))}>{t.btnDict}</button></div>
                     <div className="landing-hero">
-                        {/* 🚨 [무결점 레이아웃] 명시적 줄바꿈 태그(<br/>) 적용으로 브라우저 오작동 100% 방지 */}
                         <h1 className="landing-title">
                             {t.landingTitle1}<br/>
                             <span>{t.landingTitle2}</span>{t.landingTitle3}
