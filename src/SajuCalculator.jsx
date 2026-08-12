@@ -21,7 +21,7 @@ export default function SajuCalculator() {
         calendar_type: 'solar', dt_input: '1946-12-07T04:30', gender: 'M',
         opt_daewun: false, daewun_num: '', 
         use_traditional: false, lunar_month: 11,
-        use_partner: true, p_calendar_type: 'solar', p_dt_input: '1950-05-12T12:00', p_gender: 'F'
+        use_partner: false, p_calendar_type: 'solar', p_dt_input: '1950-05-12T12:00', p_gender: 'F'
     });
 
     const handleInputChange = (e) => {
@@ -54,8 +54,8 @@ export default function SajuCalculator() {
     const showTooltip = (e, meta) => {
         if (!meta) return;
         const rect = e.target.getBoundingClientRect();
-        let top = rect.top - 120; // 툴팁 대략적 높이
-        let left = rect.left + (rect.width / 2) - 130; // 260px의 절반
+        let top = rect.top - 120;
+        let left = rect.left + (rect.width / 2) - 130;
         if (top < 10) top = rect.bottom + 10;
         if (left < 10) left = 10;
         if (left + 260 > window.innerWidth - 10) left = window.innerWidth - 270;
@@ -239,8 +239,8 @@ export default function SajuCalculator() {
             <style>{`
                 :root { --bg-color: #0d0f12; --card-bg: #16181d; --text-main: #f1f2f6; --text-muted: #95a5a6; --gold-light: #f1c40f; --gold-main: #d4af37; --gold-dark: #b5952f; --accent-red: #e74c3c; --accent-blue: #3498db; --accent-green: #2ecc71; }
                 
-                /* 🚨 1. 하얀 여백 완벽 제거 */
-                html, body { margin: 0 !important; padding: 0 !important; background-color: var(--bg-color) !important; width: 100%; overflow-x: hidden; }
+                /* 🚨 1. 하얀 여백 완벽 제거 (root, body 모두 커버) */
+                html, body, #root, #__next { margin: 0 !important; padding: 0 !important; background-color: var(--bg-color) !important; width: 100%; min-height: 100vh; overflow-x: hidden; }
                 * { box-sizing: border-box; }
                 ::-webkit-scrollbar { width: 6px; height: 6px; }
                 ::-webkit-scrollbar-track { background: var(--bg-color); }
@@ -266,25 +266,29 @@ export default function SajuCalculator() {
                 .bazi-table-container { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid #222; margin-bottom: 30px; }
                 .bazi-table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: center; }
                 .bazi-table th { color: var(--text-muted); font-size: 13px; padding-bottom: 15px; border-bottom: 1px solid #333; font-weight: 400; }
-                .bazi-table td { padding: 20px 10px; border-right: 1px solid #222; }
+                .bazi-table td { padding: 15px 10px; border-right: 1px solid #222; } /* 패딩 조절로 4기둥 테이블 여백 최적화 */
                 .bazi-table td:last-child { border-right: none; }
                 .stem, .branch { font-size: 38px; font-weight: 900; color: #fff; line-height: 1.2; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
                 .ten-god { font-size: 13px; color: var(--gold-main); margin-bottom: 5px; font-weight: 700; letter-spacing: 1px; }
-                .hidden-stems { font-size: 12px; color: #777; margin-top: 15px; text-align: left; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; }
-                .panel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
                 
-                /* 🚨 2. 모든 패널 내 글씨를 무조건 '왼쪽 정렬'로 강제 고정 */
+                /* 🚨 2. 지장간 가독성 및 가운데 정렬 완벽 개선 */
+                .hidden-stems { font-size: 13px; color: #eee; margin-top: 15px; text-align: center !important; background: rgba(0,0,0,0.4); padding: 12px 10px; border-radius: 8px; font-weight: 500; letter-spacing: 2px; }
+                
+                /* 🚨 3. 그리드 빈공간 제거 (밀도 있는 디자인) - align-items: start 적용 */
+                .panel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; align-items: start; }
+                
                 .panel { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid #222; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; text-align: left !important; }
                 .panel-full { grid-column: 1 / -1; }
                 .panel h3 { margin-top: 0; color: var(--gold-main); font-size: 1.1rem; margin-bottom: 20px; display: flex; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; text-align: left !important; }
                 .highlight-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 3px solid var(--gold-main); margin-bottom: 15px; text-align: left !important; }
                 
-                .swipe-container { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; cursor: grab; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+                /* 🚨 4. 세운 강조 시 잘림 방지용 패딩(padding) 추가 */
+                .swipe-container { display: flex; gap: 15px; overflow-x: auto; padding: 10px 5px 25px 5px; cursor: grab; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
                 .swipe-container::-webkit-scrollbar { display: none; }
                 .timeline-card { flex: 0 0 100px; background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 8px; text-align: center !important; padding: 15px 10px; transition: 0.3s; user-select: none; }
                 .timeline-card:hover { background: rgba(212,175,55,0.1); border-color: var(--gold-dark); transform: translateY(-3px); }
                 
-                /* 🚨 3. 올해 세운 황금색 강조 테두리 효과 */
+                /* 올해 세운 황금색 강조 테두리 효과 */
                 .timeline-card.current-year { border: 2px solid var(--gold-main) !important; background: rgba(212,175,55,0.2) !important; box-shadow: 0 0 15px rgba(212,175,55,0.5); transform: scale(1.05); }
 
                 .badge { display: inline-block; padding: 4px 8px; background: rgba(255,255,255,0.05); border: 1px solid #444; border-radius: 4px; font-size: 12px; margin: 3px; font-weight: 700; color: #ccc; }
@@ -499,7 +503,7 @@ export default function SajuCalculator() {
                                                 </div>
 
                                                 <div className="hidden-stems">
-                                                    <span style={{ color: 'var(--gold-main)' }}>지장간</span><br />
+                                                    <span style={{ color: 'var(--gold-main)', fontSize: '11px', display: 'block', marginBottom: '5px' }}>지장간</span>
                                                     {safeStem(hidden.initial, false)} · {safeStem(hidden.middle, false)} · {safeStem(hidden.main, true)}
                                                 </div>
                                             </td>
@@ -654,7 +658,7 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 🚨 6. 납음오행: 4칸 일렬 정렬 강제 고정! */}
+                        {/* 🚨 납음오행 4칸 일렬정렬 강제 지정 */}
                         {resData.napeum_reading && (
                             <div className="panel panel-full">
                                 <h3>🎵 납음오행(納音五行)의 숨은 파동</h3>
@@ -699,7 +703,7 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 🚨 8. 인생 타임라인 (올해 세운 강조 효과 추가) */}
+                        {/* 🚨 8. 인생 타임라인 (올해 세운 강조 효과) */}
                         {resData.timeline && (
                             <div className="panel panel-full">
                                 <h3>⏳ 인생 타임라인 (스와이프 하여 확인)</h3>
@@ -718,7 +722,7 @@ export default function SajuCalculator() {
                                 <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '15px', marginBottom: '5px' }}>■ 최근 10년 세운 (과거 4년 ~ 미래 5년)</div>
                                 <div className="swipe-container" ref={el => attachSwipe(el)}>
                                     {resData.timeline.sewun.map((sw, i) => {
-                                        const isCurrent = sw.year === new Date().getFullYear(); // 현재 연도 판별
+                                        const isCurrent = sw.year === new Date().getFullYear();
                                         return (
                                             <div className={`timeline-card ${isCurrent ? 'current-year' : ''}`} key={i}>
                                                 <div className="timeline-age" style={{ fontWeight: isCurrent ? '900' : 'normal', color: isCurrent ? 'var(--gold-main)' : '#ccc' }}>
