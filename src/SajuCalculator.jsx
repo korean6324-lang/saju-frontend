@@ -239,7 +239,7 @@ export default function SajuCalculator() {
             <style>{`
                 :root { --bg-color: #0d0f12; --card-bg: #16181d; --text-main: #f1f2f6; --text-muted: #95a5a6; --gold-light: #f1c40f; --gold-main: #d4af37; --gold-dark: #b5952f; --accent-red: #e74c3c; --accent-blue: #3498db; --accent-green: #2ecc71; }
                 
-                /* 🚨 1. 하얀 여백 완벽 제거 (root, body 모두 커버) */
+                /* 하얀 여백 완벽 제거 (root, body 모두 커버) */
                 html, body, #root, #__next { margin: 0 !important; padding: 0 !important; background-color: var(--bg-color) !important; width: 100%; min-height: 100vh; overflow-x: hidden; }
                 * { box-sizing: border-box; }
                 ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -266,15 +266,15 @@ export default function SajuCalculator() {
                 .bazi-table-container { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid #222; margin-bottom: 30px; }
                 .bazi-table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: center; }
                 .bazi-table th { color: var(--text-muted); font-size: 13px; padding-bottom: 15px; border-bottom: 1px solid #333; font-weight: 400; }
-                .bazi-table td { padding: 15px 10px; border-right: 1px solid #222; } /* 패딩 조절로 4기둥 테이블 여백 최적화 */
+                .bazi-table td { padding: 15px 10px; border-right: 1px solid #222; }
                 .bazi-table td:last-child { border-right: none; }
                 .stem, .branch { font-size: 38px; font-weight: 900; color: #fff; line-height: 1.2; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
                 .ten-god { font-size: 13px; color: var(--gold-main); margin-bottom: 5px; font-weight: 700; letter-spacing: 1px; }
                 
-                /* 🚨 2. 지장간 가독성 및 가운데 정렬 완벽 개선 */
+                /* 지장간 가독성 개선 */
                 .hidden-stems { font-size: 13px; color: #eee; margin-top: 15px; text-align: center !important; background: rgba(0,0,0,0.4); padding: 12px 10px; border-radius: 8px; font-weight: 500; letter-spacing: 2px; }
                 
-                /* 🚨 3. 그리드 빈공간 제거 (밀도 있는 디자인) - align-items: start 적용 */
+                /* 그리드 밀도 강화를 위해 align-items: start 유지 */
                 .panel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; align-items: start; }
                 
                 .panel { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid #222; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; text-align: left !important; }
@@ -282,7 +282,7 @@ export default function SajuCalculator() {
                 .panel h3 { margin-top: 0; color: var(--gold-main); font-size: 1.1rem; margin-bottom: 20px; display: flex; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; text-align: left !important; }
                 .highlight-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 3px solid var(--gold-main); margin-bottom: 15px; text-align: left !important; }
                 
-                /* 🚨 4. 세운 강조 시 잘림 방지용 패딩(padding) 추가 */
+                /* 세운 강조 시 잘림 방지 패딩 유지 */
                 .swipe-container { display: flex; gap: 15px; overflow-x: auto; padding: 10px 5px 25px 5px; cursor: grab; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
                 .swipe-container::-webkit-scrollbar { display: none; }
                 .timeline-card { flex: 0 0 100px; background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 8px; text-align: center !important; padding: 15px 10px; transition: 0.3s; user-select: none; }
@@ -658,7 +658,7 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 🚨 납음오행 4칸 일렬정렬 강제 지정 */}
+                        {/* 납음오행 4칸 일렬정렬 강제 지정 */}
                         {resData.napeum_reading && (
                             <div className="panel panel-full">
                                 <h3>🎵 납음오행(納音五行)의 숨은 파동</h3>
@@ -703,7 +703,7 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 🚨 8. 인생 타임라인 (올해 세운 강조 효과) */}
+                        {/* 8. 인생 타임라인 (올해 세운 강조 효과) */}
                         {resData.timeline && (
                             <div className="panel panel-full">
                                 <h3>⏳ 인생 타임라인 (스와이프 하여 확인)</h3>
@@ -786,9 +786,9 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 10. 신살 및 흉액 */}
+                        {/* 🚨 10. 신살 및 흉액 (panel-full 속성 제거하여 그리드 안으로 삽입) */}
                         {resData.dynamics && Object.keys(resData.dynamics.special_stars).length > 0 && (
-                            <div className="panel panel-full">
+                            <div className="panel">
                                 <h3>🌟 심층 신살</h3>
                                 <div>
                                     {Object.entries(resData.dynamics.special_stars).map(([sType, list]) => 
@@ -801,7 +801,7 @@ export default function SajuCalculator() {
                         )}
 
                         {resData.dynamics && Object.keys(resData.dynamics.disasters).length > 0 && (
-                            <div className="panel panel-full">
+                            <div className="panel">
                                 <h3>⚠️ 상호작용 및 흉액 진단</h3>
                                 <div>
                                     {Object.entries(resData.dynamics.disasters).map(([dType, list]) => {
