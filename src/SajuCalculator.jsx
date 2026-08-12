@@ -257,7 +257,7 @@ export default function SajuCalculator() {
         el.onmousemove = (e) => { if (!isDown) return; e.preventDefault(); const walk = (e.pageX - el.offsetLeft - startX) * 2; el.scrollLeft = scrollLeft - walk; };
     };
 
-    // 🚨 [핵심 복구] 이전에 실수로 누락했던 신살 및 흉액 파싱 함수 3줄 완벽 복구
+    // 🚨 신살 및 흉액 파싱 함수
     const normalizeDynamics = (dataObj) => {
         if (!dataObj) return [];
         if (Array.isArray(dataObj)) return dataObj; 
@@ -409,6 +409,7 @@ export default function SajuCalculator() {
                 .hanja-tooltip { display: inline-block; cursor: pointer; color: var(--gold-main); border-bottom: 1px dashed rgba(212,175,55,0.5); }
                 .hanja-tooltip.char-tooltip { color: #fff; border-bottom: none; }
                 
+                /* 고정된 높이의 안전한 모달창 */
                 .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 4000; backdrop-filter: blur(5px); }
                 .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); width: 90%; max-width: 600px; height: 80vh; border-radius: 12px; padding: 25px; display: flex; flex-direction: column; border: 1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: left; }
                 .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
@@ -418,9 +419,11 @@ export default function SajuCalculator() {
                 .dict-results { flex: 1; overflow-y: auto; padding-right: 10px; margin-top: 15px; }
                 .dict-item { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 4px solid var(--gold-main); margin-bottom: 15px; }
                 
-                .faq-q { color: var(--gold-light); font-weight: 900; font-size: 1.1rem; margin-bottom: 8px; line-height: 1.4; }
-                .faq-a { color: #ccc; font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
+                /* 🚨 [디테일 강화] FAQ 텍스트 UI 최적화 */
+                .faq-q { color: var(--gold-main); font-weight: 900; font-size: 1.05rem; margin-bottom: 12px; line-height: 1.5; border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 8px;}
+                .faq-a { color: #eee; font-size: 0.95rem; line-height: 1.7; white-space: pre-wrap; padding-left: 10px; border-left: 2px solid #555;}
 
+                /* 📱📱 모바일 및 테블릿 반응형 제어 📱📱 */
                 @media (max-width: 1024px) {
                     .bento-row-3 { grid-template-columns: 1fr 1fr; }
                     .bento-features { grid-template-columns: 1fr; }
@@ -539,7 +542,7 @@ export default function SajuCalculator() {
                                 <div style={{ textAlign: 'center', color: '#888', marginTop: '30px' }}>Error fetching FAQ.</div>
                             ) : (
                                 faqModal.data.map((faq, idx) => (
-                                    <div className="dict-item" key={idx}>
+                                    <div className="dict-item" key={idx} style={{ padding: '20px' }}>
                                         <div className="faq-q">Q. {faq.q}</div>
                                         <div className="faq-a">A. {faq.a}</div>
                                     </div>
@@ -758,7 +761,22 @@ export default function SajuCalculator() {
                     </div>
 
                     <div className="dashboard-layout">
-                        
+                        {/* 🚨 [복구 1] 납음오행 심층 해설 완벽 복구 */}
+                        {resData.napeum_reading && resData.napeum_reading.length > 0 && (
+                            <div className="panel">
+                                <h3>🎵 납음오행(納音五行) 심층 해설</h3>
+                                <div className="napeum-grid">
+                                    {resData.napeum_reading.map((n, i) => (
+                                        <div className="highlight-box" style={{ margin: 0 }} key={i}>
+                                            <div style={{ color: 'var(--gold-main)', fontWeight: 'bold', marginBottom: '5px' }}>{n.pillar}</div>
+                                            <div style={{ fontSize: '18px', fontWeight: '900', color: '#fff', marginBottom: '8px' }}>{n.full}</div>
+                                            <div style={{ fontSize: '13px', lineHeight: '1.5', color: '#ccc' }}>{n.desc}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         {resData.classical?.reading && (
                             <div className="panel">
                                 <h3>📜 전문가용 심층 고법 간명지</h3>
@@ -807,8 +825,38 @@ export default function SajuCalculator() {
                             </div>
                             
                             <div className="bento-col">
+                                {resData.practical && (
+                                    <div className="panel" style={{ height: '100%' }}>
+                                        <h3>💼 현대 실용 통변 (직업 & 헬스케어)</h3>
+                                        <div className="practical-grid" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                                            <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--accent-blue)' }}>
+                                                <div style={{ color: 'var(--accent-blue)', fontWeight: 'bold', fontSize: '15px', marginBottom: '5px' }}>🎯 추천 직무: {resData.practical.career?.core_trait || '-'}</div>
+                                                <div style={{ fontSize: '13px', marginBottom: '8px' }}>{resData.practical.career?.recommended_jobs || '-'}</div>
+                                                <div style={{ fontSize: '12px', color: '#aaa', background: 'rgba(0,0,0,0.4)', padding: '8px', borderRadius: '4px' }}>{resData.practical.career?.work_environment || '-'}</div>
+                                            </div>
+                                            <div style={{ marginTop: '15px' }}>
+                                                {resData.practical.health?.map((h, i) => {
+                                                    const bc = h.status.includes('양호') ? 'var(--accent-green)' : 'var(--accent-red)';
+                                                    return (
+                                                        <div className="highlight-box" style={{ marginBottom: '10px', padding: '10px', borderLeftColor: bc }} key={i}>
+                                                            <div style={{ color: bc, fontWeight: 'bold', fontSize: '13px' }}>[{h.element}] {h.status}</div>
+                                                            <div style={{ fontSize: '12px', margin: '3px 0' }}>장기: {h.organ} / 증상: {h.symptom}</div>
+                                                            <div style={{ fontSize: '11px', color: '#888' }}>{h.advice}</div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* 🚨 [복구 2] 올해, 이달, 오늘의 운세를 3단 그리드로 깔끔하게 복원 완료 */}
+                        <div className="bento-row-3">
+                            <div className="bento-col">
                                 {resData.unse?.year && (
-                                    <div className="panel">
+                                    <div className="panel" style={{ height: '100%' }}>
                                         <h3>🎯 올해 예측</h3>
                                         {(() => {
                                             const y = resData.unse.year;
@@ -817,7 +865,7 @@ export default function SajuCalculator() {
                                             return (
                                                 <>
                                                     <div className="highlight-box" style={{ borderLeftColor: bc }}>
-                                                        <div className={isGood ? "status-green" : "status-red"} style={{ marginBottom: '5px' }}>{y.overall_status}</div>
+                                                        <div className={isGood ? "status-green" : "status-red"} style={{ marginBottom: '5px', fontWeight: 'bold', color: bc }}>{y.overall_status}</div>
                                                         <div style={{ fontSize: '13px' }}>{y.overall_desc}</div>
                                                     </div>
                                                     {y.events && y.events.length > 0 ? y.events.map((ev, i) => {
@@ -835,32 +883,43 @@ export default function SajuCalculator() {
                                     </div>
                                 )}
                             </div>
-                        </div>
-
-                        {resData.practical && (
-                            <div className="panel">
-                                <h3>💼 현대 실용 통변 (직업 & 헬스케어)</h3>
-                                <div className="practical-grid">
-                                    <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--accent-blue)' }}>
-                                        <div style={{ color: 'var(--accent-blue)', fontWeight: 'bold', fontSize: '15px', marginBottom: '5px' }}>🎯 추천 직무: {resData.practical.career?.core_trait || '-'}</div>
-                                        <div style={{ fontSize: '13px', marginBottom: '8px' }}>{resData.practical.career?.recommended_jobs || '-'}</div>
-                                        <div style={{ fontSize: '12px', color: '#aaa', background: 'rgba(0,0,0,0.4)', padding: '8px', borderRadius: '4px' }}>{resData.practical.career?.work_environment || '-'}</div>
-                                    </div>
-                                    <div>
-                                        {resData.practical.health?.map((h, i) => {
-                                            const bc = h.status.includes('양호') ? 'var(--accent-green)' : 'var(--accent-red)';
+                            <div className="bento-col">
+                                {resData.unse?.month && (
+                                    <div className="panel" style={{ height: '100%' }}>
+                                        <h3>🗓️ 이달의 운세 ({resData.unse.month.month_num}월)</h3>
+                                        {(() => {
+                                            const md = resData.unse.month.data;
+                                            const isGood = md.overall_status?.includes('발복') || md.overall_status?.includes('무난') || md.overall_status?.includes('성취') || false;
+                                            const bc = isGood ? 'var(--accent-blue)' : 'var(--accent-red)';
                                             return (
-                                                <div className="highlight-box" style={{ marginBottom: '10px', padding: '10px', borderLeftColor: bc }} key={i}>
-                                                    <div style={{ color: bc, fontWeight: 'bold', fontSize: '13px' }}>[{h.element}] {h.status}</div>
-                                                    <div style={{ fontSize: '12px', margin: '3px 0' }}>장기: {h.organ} / 증상: {h.symptom}</div>
-                                                    <div style={{ fontSize: '11px', color: '#888' }}>{h.advice}</div>
+                                                <div className="highlight-box" style={{ borderLeftColor: bc }}>
+                                                    <div style={{ marginBottom: '5px', fontWeight: 'bold', color: bc }}>{md.overall_status}</div>
+                                                    <div style={{ fontSize: '13px' }}>{md.overall_desc}</div>
                                                 </div>
-                                            );
-                                        })}
+                                            )
+                                        })()}
                                     </div>
-                                </div>
+                                )}
                             </div>
-                        )}
+                            <div className="bento-col">
+                                {resData.unse?.day && (
+                                    <div className="panel" style={{ height: '100%' }}>
+                                        <h3>☀️ 오늘의 운세 ({resData.unse.day.day_num}일)</h3>
+                                        {(() => {
+                                            const dd = resData.unse.day.data;
+                                            const isGood = dd.overall_status?.includes('발복') || dd.overall_status?.includes('무난') || dd.overall_status?.includes('성취') || false;
+                                            const bc = isGood ? 'var(--gold-main)' : 'var(--accent-red)';
+                                            return (
+                                                <div className="highlight-box" style={{ borderLeftColor: bc }}>
+                                                    <div style={{ marginBottom: '5px', fontWeight: 'bold', color: bc }}>{dd.overall_status}</div>
+                                                    <div style={{ fontSize: '13px' }}>{dd.overall_desc}</div>
+                                                </div>
+                                            )
+                                        })()}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
 
                         {resData.gunghap && (
                             <div className="panel">
@@ -886,6 +945,33 @@ export default function SajuCalculator() {
                                 <div className="highlight-box" style={{ borderLeftColor: '#9b59b6', margin: 0 }}>
                                     <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#9b59b6', marginBottom: '5px' }}>🔥 일지(日支) 속궁합: {resData.gunghap.inner?.relation || '-'} - {resData.gunghap.inner?.status || '-'}</div>
                                     <div style={{ fontSize: '13px' }}>{resData.gunghap.inner?.desc || '-'}</div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 🚨 [복구 3] 사라졌던 대운 및 세운 타임라인(스와이프 레이아웃) 완벽 복구 */}
+                        {resData.timeline && (
+                            <div className="panel">
+                                <h3 style={{ marginBottom: '15px' }}>⏳ 대운(大運) 흐름 (10년 주기)</h3>
+                                <div className="swipe-container" ref={el => attachSwipe(el)}>
+                                    {resData.timeline.daewun.timeline.map((dw, i) => (
+                                        <div className={`timeline-card ${dw.is_current ? 'current-year' : ''}`} key={i}>
+                                            <div style={{ fontSize: '11px', color: '#aaa' }}>{dw.age}세 ({dw.year}~)</div>
+                                            <div style={{ fontSize: '20px', fontWeight: 'bold', margin: '5px 0' }}>{renderTooltipItem(dw.stem, true)} {renderTooltipItem(dw.branch, true)}</div>
+                                            <div style={{ fontSize: '11px', color: 'var(--gold-main)' }}>{renderTooltipItem(dw.stem_tg, false)} {renderTooltipItem(dw.branch_tg, false)}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                                
+                                <h3 style={{ marginTop: '20px', marginBottom: '15px' }}>🏃 세운(歲運) 흐름 (1년 주기)</h3>
+                                <div className="swipe-container" ref={el => attachSwipe(el)}>
+                                    {resData.timeline.sewun.map((sw, i) => (
+                                        <div className={`timeline-card ${sw.is_current ? 'current-year' : ''}`} key={i}>
+                                            <div style={{ fontSize: '11px', color: '#aaa' }}>{sw.year}년</div>
+                                            <div style={{ fontSize: '20px', fontWeight: 'bold', margin: '5px 0' }}>{renderTooltipItem(sw.stem, true)} {renderTooltipItem(sw.branch, true)}</div>
+                                            <div style={{ fontSize: '11px', color: 'var(--gold-main)' }}>{renderTooltipItem(sw.stem_tg, false)} {renderTooltipItem(sw.branch_tg, false)}</div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         )}
