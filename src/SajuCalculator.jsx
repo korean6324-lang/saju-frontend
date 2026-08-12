@@ -211,7 +211,6 @@ export default function SajuCalculator() {
 
             const res = await response.json();
             
-            // 🚨 [철통 방어] 백엔드에서 200 OK를 주더라도 status가 error면 무조건 컷!
             if (!response.ok || res.status === "error" || res.detail) {
                 throw new Error(res.message || res.detail || "서버 연산 중 알 수 없는 오류가 발생했습니다.");
             }
@@ -231,7 +230,6 @@ export default function SajuCalculator() {
 
     const renderTooltipItem = (keyword, isChar = true, text = null) => {
         if (!resData) return text || keyword;
-        // 안전한 객체 접근 (?.)
         const metaDict = resData.mechanics?.metadata || {};
         const meta = metaDict[keyword];
         const display = text || keyword;
@@ -258,6 +256,18 @@ export default function SajuCalculator() {
         el.onmouseup = () => { isDown = false; el.style.cursor = 'grab'; };
         el.onmousemove = (e) => { if (!isDown) return; e.preventDefault(); const walk = (e.pageX - el.offsetLeft - startX) * 2; el.scrollLeft = scrollLeft - walk; };
     };
+
+    // 🚨 [핵심 복구] 이전에 실수로 누락했던 신살 및 흉액 파싱 함수 3줄 완벽 복구
+    const normalizeDynamics = (dataObj) => {
+        if (!dataObj) return [];
+        if (Array.isArray(dataObj)) return dataObj; 
+        return Object.entries(dataObj).map(([key, list]) => ({
+            name: key, position: Array.isArray(list) ? list.join(', ') : list, desc: ""
+        })).filter(item => item.position && item.position.length > 0);
+    };
+
+    const specialStarsArray = resData ? normalizeDynamics(resData.dynamics?.special_stars) : [];
+    const disastersArray = resData ? normalizeDynamics(resData.dynamics?.disasters) : [];
 
     const renderLocationOptions = () => (
         <>
@@ -286,7 +296,7 @@ export default function SajuCalculator() {
                 * { box-sizing: border-box; }
                 div, p, span, h1, h2, h3, h4 { word-break: keep-all; overflow-wrap: break-word; } 
                 .app-container:lang(ko) { word-break: keep-all; overflow-wrap: break-word; }
-                .app-container:not(:lang(ko)) { word-break: normal; overflow-wrap: break-word; line-break: strict; }
+                .app-container:not(:lang(ko)) { word-break: normal !important; overflow-wrap: break-word !important; line-break: strict; }
                 
                 ::-webkit-scrollbar { width: 6px; height: 6px; }
                 ::-webkit-scrollbar-track { background: var(--bg-color); }
@@ -399,7 +409,6 @@ export default function SajuCalculator() {
                 .hanja-tooltip { display: inline-block; cursor: pointer; color: var(--gold-main); border-bottom: 1px dashed rgba(212,175,55,0.5); }
                 .hanja-tooltip.char-tooltip { color: #fff; border-bottom: none; }
                 
-                /* 고정된 높이의 안전한 모달창 */
                 .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 4000; backdrop-filter: blur(5px); }
                 .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); width: 90%; max-width: 600px; height: 80vh; border-radius: 12px; padding: 25px; display: flex; flex-direction: column; border: 1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: left; }
                 .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
@@ -409,11 +418,9 @@ export default function SajuCalculator() {
                 .dict-results { flex: 1; overflow-y: auto; padding-right: 10px; margin-top: 15px; }
                 .dict-item { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 4px solid var(--gold-main); margin-bottom: 15px; }
                 
-                /* FAQ 텍스트 최적화 */
                 .faq-q { color: var(--gold-light); font-weight: 900; font-size: 1.1rem; margin-bottom: 8px; line-height: 1.4; }
                 .faq-a { color: #ccc; font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
 
-                /* 📱📱 모바일 및 테블릿 반응형 제어 📱📱 */
                 @media (max-width: 1024px) {
                     .bento-row-3 { grid-template-columns: 1fr 1fr; }
                     .bento-features { grid-template-columns: 1fr; }
@@ -518,7 +525,6 @@ export default function SajuCalculator() {
                 </div>
             )}
 
-            {/* FAQ 독립 모달창 */}
             {faqModal.show && (
                 <div className="modal-overlay">
                     <div className="modal-content">
@@ -780,20 +786,20 @@ export default function SajuCalculator() {
                                         <h3>⚖️ 격국과 용신</h3>
                                         <div className="highlight-box">
                                             <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>나의 그릇</div>
-                                            <div style={{ fontSize: '18px', color: 'var(--gold-main)', fontWeight: 'bold', marginBottom: '5px' }}>{renderTooltipItem(resData.yongshin.geokguk.name.split('(')[0], false, resData.yongshin.geokguk.name)}</div>
-                                            <div style={{ fontSize: '13px' }}>{resData.yongshin.geokguk.desc}</div>
+                                            <div style={{ fontSize: '18px', color: 'var(--gold-main)', fontWeight: 'bold', marginBottom: '5px' }}>{renderTooltipItem(resData.yongshin.geokguk?.name?.split('(')[0] || '-', false, resData.yongshin.geokguk?.name)}</div>
+                                            <div style={{ fontSize: '13px' }}>{resData.yongshin.geokguk?.desc || '-'}</div>
                                         </div>
                                         <div className="highlight-box" style={{ borderLeftColor: 'var(--accent-blue)' }}>
                                             <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>나의 내공</div>
-                                            <div className="status-blue" style={{ marginBottom: '5px' }}>{resData.yongshin.strength.status} <span style={{ fontSize: '12px', fontWeight: 'normal', color: '#777' }}>(아군:{resData.yongshin.strength.my_power} 적군:{resData.yongshin.strength.other_power})</span></div>
+                                            <div className="status-blue" style={{ marginBottom: '5px' }}>{resData.yongshin.strength?.status || '-'} <span style={{ fontSize: '12px', fontWeight: 'normal', color: '#777' }}>(아군:{resData.yongshin.strength?.my_power || 0} 적군:{resData.yongshin.strength?.other_power || 0})</span></div>
                                             <div style={{ fontSize: '13px' }}>주체성과 에너지의 강약을 수치화했습니다.</div>
                                         </div>
                                         <div className="highlight-box" style={{ borderLeftColor: 'var(--accent-green)', marginBottom: 0 }}>
                                             <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>수호신 (조후/억부)</div>
                                             <div style={{ fontSize: '13px', lineHeight: '1.6', marginTop: '5px' }}>
-                                                <span className="badge badge-good">용신</span> {resData.yongshin.yongshin.yongshin}<br />
-                                                <span className="badge" style={{ borderColor: 'var(--accent-blue)', color: 'var(--accent-blue)' }}>희신</span> {resData.yongshin.yongshin.huishin}<br />
-                                                <span className="badge badge-bad">기신</span> {resData.yongshin.yongshin.gishin}
+                                                <span className="badge badge-good">용신</span> {resData.yongshin.yongshin?.yongshin || '-'}<br />
+                                                <span className="badge" style={{ borderColor: 'var(--accent-blue)', color: 'var(--accent-blue)' }}>희신</span> {resData.yongshin.yongshin?.huishin || '-'}<br />
+                                                <span className="badge badge-bad">기신</span> {resData.yongshin.yongshin?.gishin || '-'}
                                             </div>
                                         </div>
                                     </div>
@@ -806,7 +812,7 @@ export default function SajuCalculator() {
                                         <h3>🎯 올해 예측</h3>
                                         {(() => {
                                             const y = resData.unse.year;
-                                            const isGood = y.overall_status.includes('발복') || y.overall_status.includes('무난') || y.overall_status.includes('성취');
+                                            const isGood = y.overall_status?.includes('발복') || y.overall_status?.includes('무난') || y.overall_status?.includes('성취') || false;
                                             const bc = isGood ? 'var(--accent-green)' : 'var(--accent-red)';
                                             return (
                                                 <>
@@ -814,7 +820,7 @@ export default function SajuCalculator() {
                                                         <div className={isGood ? "status-green" : "status-red"} style={{ marginBottom: '5px' }}>{y.overall_status}</div>
                                                         <div style={{ fontSize: '13px' }}>{y.overall_desc}</div>
                                                     </div>
-                                                    {y.events.length > 0 ? y.events.map((ev, i) => {
+                                                    {y.events && y.events.length > 0 ? y.events.map((ev, i) => {
                                                         const ebc = ev.type === 'good' ? 'var(--accent-green)' : 'var(--accent-red)';
                                                         return (
                                                             <div className="highlight-box" style={{ borderLeftColor: ebc, padding: '10px' }} key={i}>
@@ -836,12 +842,12 @@ export default function SajuCalculator() {
                                 <h3>💼 현대 실용 통변 (직업 & 헬스케어)</h3>
                                 <div className="practical-grid">
                                     <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--accent-blue)' }}>
-                                        <div style={{ color: 'var(--accent-blue)', fontWeight: 'bold', fontSize: '15px', marginBottom: '5px' }}>🎯 추천 직무: {resData.practical.career.core_trait}</div>
-                                        <div style={{ fontSize: '13px', marginBottom: '8px' }}>{resData.practical.career.recommended_jobs}</div>
-                                        <div style={{ fontSize: '12px', color: '#aaa', background: 'rgba(0,0,0,0.4)', padding: '8px', borderRadius: '4px' }}>{resData.practical.career.work_environment}</div>
+                                        <div style={{ color: 'var(--accent-blue)', fontWeight: 'bold', fontSize: '15px', marginBottom: '5px' }}>🎯 추천 직무: {resData.practical.career?.core_trait || '-'}</div>
+                                        <div style={{ fontSize: '13px', marginBottom: '8px' }}>{resData.practical.career?.recommended_jobs || '-'}</div>
+                                        <div style={{ fontSize: '12px', color: '#aaa', background: 'rgba(0,0,0,0.4)', padding: '8px', borderRadius: '4px' }}>{resData.practical.career?.work_environment || '-'}</div>
                                     </div>
                                     <div>
-                                        {resData.practical.health.map((h, i) => {
+                                        {resData.practical.health?.map((h, i) => {
                                             const bc = h.status.includes('양호') ? 'var(--accent-green)' : 'var(--accent-red)';
                                             return (
                                                 <div className="highlight-box" style={{ marginBottom: '10px', padding: '10px', borderLeftColor: bc }} key={i}>
@@ -862,24 +868,24 @@ export default function SajuCalculator() {
                                 <div className="gunghap-grid">
                                     <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--accent-blue)' }}>
                                         <div style={{ fontSize: '12px', color: '#aaa' }}>나의 영혼 기운</div>
-                                        <div style={{ fontSize: '14px' }}>{resData.gunghap.my_samwon.name} / <b style={{ color: 'var(--accent-blue)' }}>{resData.gunghap.my_star.name}</b></div>
+                                        <div style={{ fontSize: '14px' }}>{resData.gunghap.my_samwon?.name || '-'} / <b style={{ color: 'var(--accent-blue)' }}>{resData.gunghap.my_star?.name || '-'}</b></div>
                                     </div>
                                     <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--accent-red)' }}>
                                         <div style={{ fontSize: '12px', color: '#aaa' }}>상대방 영혼 기운</div>
-                                        <div style={{ fontSize: '14px' }}>{resData.gunghap.partner_samwon.name} / <b style={{ color: 'var(--accent-red)' }}>{resData.gunghap.partner_star.name}</b></div>
+                                        <div style={{ fontSize: '14px' }}>{resData.gunghap.partner_samwon?.name || '-'} / <b style={{ color: 'var(--accent-red)' }}>{resData.gunghap.partner_star?.name || '-'}</b></div>
                                     </div>
                                 </div>
                                 <div className="highlight-box" style={{ borderLeftColor: 'var(--gold-main)' }}>
-                                    <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--gold-main)', marginBottom: '5px' }}>✨ 구궁(九宮) 겉궁합: {resData.gunghap.gugung.status} ({resData.gunghap.gugung.score}점)</div>
-                                    <div style={{ fontSize: '13px', marginBottom: '10px', whiteSpace: 'pre-wrap' }}>{resData.gunghap.gugung.desc}</div>
+                                    <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--gold-main)', marginBottom: '5px' }}>✨ 구궁(九宮) 겉궁합: {resData.gunghap.gugung?.status || '-'} ({resData.gunghap.gugung?.score || 0}점)</div>
+                                    <div style={{ fontSize: '13px', marginBottom: '10px', whiteSpace: 'pre-wrap' }}>{resData.gunghap.gugung?.desc || '-'}</div>
                                     <div style={{ background: 'rgba(0,0,0,0.5)', padding: '10px', borderRadius: '4px', fontSize: '12px' }}>
-                                        <b style={{ color: 'var(--gold-light)' }}>📜 고서 비결:</b> {resData.gunghap.gugung.classical}<br /><br />
-                                        <b style={{ color: 'var(--accent-green)' }}>⏰ 발현 응기:</b> {resData.gunghap.gugung.timing}
+                                        <b style={{ color: 'var(--gold-light)' }}>📜 고서 비결:</b> {resData.gunghap.gugung?.classical || '-'}<br /><br />
+                                        <b style={{ color: 'var(--accent-green)' }}>⏰ 발현 응기:</b> {resData.gunghap.gugung?.timing || '-'}
                                     </div>
                                 </div>
                                 <div className="highlight-box" style={{ borderLeftColor: '#9b59b6', margin: 0 }}>
-                                    <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#9b59b6', marginBottom: '5px' }}>🔥 일지(日支) 속궁합: {resData.gunghap.inner.relation} - {resData.gunghap.inner.status}</div>
-                                    <div style={{ fontSize: '13px' }}>{resData.gunghap.inner.desc}</div>
+                                    <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#9b59b6', marginBottom: '5px' }}>🔥 일지(日支) 속궁합: {resData.gunghap.inner?.relation || '-'} - {resData.gunghap.inner?.status || '-'}</div>
+                                    <div style={{ fontSize: '13px' }}>{resData.gunghap.inner?.desc || '-'}</div>
                                 </div>
                             </div>
                         )}
