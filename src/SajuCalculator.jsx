@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 const BACKEND_URL = "https://saju-backend-ffum.onrender.com"; 
 
 export default function SajuCalculator() {
-    const [view, setView] = useState("hero"); // "hero" | "dashboard"
+    const [view, setView] = useState("hero"); 
     const [loading, setLoading] = useState(false);
     const [resData, setResData] = useState(null);
     const [copyFormattedText, setCopyFormattedText] = useState("");
@@ -30,6 +30,24 @@ export default function SajuCalculator() {
     };
 
     // ----------------------------------------------------
+    // 🚨 [필수] 모바일 잘림 방지 뷰포트 강제 주입 로직
+    // ----------------------------------------------------
+    useEffect(() => {
+        let metaViewport = document.querySelector("meta[name=viewport]");
+        if (!metaViewport) {
+            metaViewport = document.createElement("meta");
+            metaViewport.name = "viewport";
+            document.head.appendChild(metaViewport);
+        }
+        // 화면 고정 및 잘림을 방지하는 모바일 최적화 비율 강제 설정
+        metaViewport.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
+        
+        const handleScroll = () => hideTooltip();
+        window.addEventListener('scroll', handleScroll, true);
+        return () => window.removeEventListener('scroll', handleScroll, true);
+    }, []);
+
+    // ----------------------------------------------------
     // 1. 사전 기능
     // ----------------------------------------------------
     const handleDictSearch = async (e) => {
@@ -49,7 +67,7 @@ export default function SajuCalculator() {
     };
 
     // ----------------------------------------------------
-    // 2. 툴팁 기능 (마우스 오버 이벤트)
+    // 2. 툴팁 기능
     // ----------------------------------------------------
     const showTooltip = (e, meta) => {
         if (!meta) return;
@@ -57,7 +75,6 @@ export default function SajuCalculator() {
         let top = rect.top - 120;
         let left = rect.left + (rect.width / 2) - 130;
         
-        // 모바일 화면 밖으로 넘어가지 않도록 방어 로직 추가
         if (top < 10) top = rect.bottom + 10;
         if (left < 10) left = 10;
         if (left + 260 > window.innerWidth - 10) left = window.innerWidth - 270;
@@ -65,12 +82,6 @@ export default function SajuCalculator() {
         setTooltip({ show: true, meta, top, left });
     };
     const hideTooltip = () => setTooltip(prev => ({ ...prev, show: false }));
-
-    useEffect(() => {
-        const handleScroll = () => hideTooltip();
-        window.addEventListener('scroll', handleScroll, true);
-        return () => window.removeEventListener('scroll', handleScroll, true);
-    }, []);
 
     // ----------------------------------------------------
     // 3. 메인 스캔 (엔진 호출)
@@ -236,19 +247,35 @@ export default function SajuCalculator() {
     };
 
     return (
-        <div style={{ fontFamily: "'Noto Serif KR', serif", background: "var(--bg-color)", minHeight: "100vh", color: "var(--text-main)" }}>
+        <div className="app-container">
             {/* ===================== CSS 스타일 내장 ===================== */}
             <style>{`
                 :root { --bg-color: #0d0f12; --card-bg: #16181d; --text-main: #f1f2f6; --text-muted: #95a5a6; --gold-light: #f1c40f; --gold-main: #d4af37; --gold-dark: #b5952f; --accent-red: #e74c3c; --accent-blue: #3498db; --accent-green: #2ecc71; }
                 
-                /* 하얀 여백 완벽 제거 */
-                html, body, #root, #__next { margin: 0 !important; padding: 0 !important; background-color: var(--bg-color) !important; width: 100%; min-height: 100vh; overflow-x: hidden; }
+                /* PC & 기본 환경 공통 초기화 */
+                html, body, #root, #__next { 
+                    margin: 0 !important; 
+                    padding: 0 !important; 
+                    background-color: var(--bg-color) !important; 
+                    width: 100%; 
+                    height: 100%;
+                }
                 * { box-sizing: border-box; }
                 ::-webkit-scrollbar { width: 6px; height: 6px; }
                 ::-webkit-scrollbar-track { background: var(--bg-color); }
                 ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
-                /* 레이아웃 공통 */
+                /* 레이아웃 방어막 (가로 스크롤 완전 차단) */
+                .app-container {
+                    font-family: "'Noto Serif KR', serif";
+                    background: var(--bg-color);
+                    min-height: 100vh;
+                    color: var(--text-main);
+                    width: 100%;
+                    max-width: 100vw;
+                    overflow-x: hidden;
+                }
+
                 .hero-section { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; background: radial-gradient(circle at center, #1a1e24 0%, var(--bg-color) 100%); text-align: center; position: relative; }
                 .hero-title { font-size: 3rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 10px; color: var(--gold-main); text-shadow: 0 4px 15px rgba(212,175,55,0.2); }
                 .hero-subtitle { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 40px; font-weight: 300; }
@@ -257,6 +284,8 @@ export default function SajuCalculator() {
                 .input-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, var(--gold-main), transparent); }
                 
                 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; text-align: left; }
+                .options-row { display: flex; gap: 15px; margin-top: 20px; font-size: 13px; }
+                
                 label { font-size: 13px; font-weight: 700; color: var(--gold-light); margin-bottom: 5px; display: block; }
                 input, select { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid #333; color: white; border-radius: 6px; font-family: inherit; font-size: 14px; transition: all 0.3s; }
                 input:focus, select:focus { border-color: var(--gold-main); outline: none; }
@@ -268,13 +297,13 @@ export default function SajuCalculator() {
                 .btn-icon { background: rgba(255,255,255,0.1); color: white; border: 1px solid #333; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; transition: 0.3s; }
                 .btn-icon:hover { background: var(--gold-main); color: #000; border-color: var(--gold-main); }
                 
-                .dashboard { padding: 40px 20px; max-width: 1200px; margin: auto; }
+                .dashboard { padding: 40px 20px; max-width: 1200px; margin: auto; width: 100%; box-sizing: border-box; }
                 .dash-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 30px; }
                 .dash-header h2 { margin: 0; color: var(--gold-main); font-weight: 900; }
                 
                 /* 사주 4기둥 테이블 */
-                .bazi-table-container { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid #222; margin-bottom: 30px; overflow-x: auto; }
-                .bazi-table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: center; min-width: 400px; }
+                .bazi-table-container { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid #222; margin-bottom: 30px; overflow-x: auto; width: 100%; }
+                .bazi-table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: center; }
                 .bazi-table th { color: var(--text-muted); font-size: 13px; padding-bottom: 15px; border-bottom: 1px solid #333; font-weight: 400; }
                 .bazi-table td { padding: 15px 10px; border-right: 1px solid #222; }
                 .bazi-table td:last-child { border-right: none; }
@@ -283,14 +312,14 @@ export default function SajuCalculator() {
                 .hidden-stems { font-size: 13px; color: #eee; margin-top: 15px; text-align: center !important; background: rgba(0,0,0,0.4); padding: 12px 5px; border-radius: 8px; font-weight: 500; letter-spacing: 2px; }
                 
                 /* 그리드 및 패널 레이아웃 */
-                .panel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; align-items: start; }
-                .panel { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid #222; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; text-align: left !important; }
+                .panel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; align-items: start; width: 100%; }
+                .panel { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid #222; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; text-align: left !important; width: 100%; box-sizing: border-box; }
                 .panel-full { grid-column: 1 / -1; }
                 .panel h3 { margin-top: 0; color: var(--gold-main); font-size: 1.1rem; margin-bottom: 20px; display: flex; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; text-align: left !important; }
                 
                 .highlight-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 3px solid var(--gold-main); margin-bottom: 15px; text-align: left !important; }
                 
-                /* 반응형 내부 그리드 클래스화 */
+                /* 내부 그리드 제어 */
                 .napeum-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
                 .gunghap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
                 .practical-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
@@ -318,35 +347,43 @@ export default function SajuCalculator() {
                 .dict-results { overflow-y: auto; padding-right: 10px; margin-top: 15px; }
                 .dict-item { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 4px solid var(--gold-main); margin-bottom: 15px; }
 
-                /* 📱 🚨 반응형 모바일 (미디어 쿼리) 🚨 📱 */
+
+                /* 📱📱 🚨 모바일 전용 반응형 셋팅 (768px 이하 스마트폰 화면) 🚨 📱📱 */
                 @media (max-width: 768px) {
-                    .hero-title { font-size: 2rem; }
-                    .hero-subtitle { font-size: 0.95rem; }
-                    .input-card { padding: 20px; }
-                    .form-grid { grid-template-columns: 1fr; gap: 15px; } /* 인풋 필드 1줄로 쌓기 */
-                    .options-row { flex-wrap: wrap; gap: 10px; } /* 체크박스 줄바꿈 허용 */
+                    .hero-title { font-size: 1.8rem; }
+                    .hero-subtitle { font-size: 0.9rem; word-break: keep-all; padding: 0 10px; }
+                    .input-card { padding: 20px 15px; border-radius: 0; border-left: none; border-right: none; }
                     
-                    .dashboard { padding: 20px 10px; }
-                    .dash-header { flex-direction: column; align-items: flex-start; gap: 15px; }
-                    .dash-header > div { width: 100%; display: flex; justify-content: space-between; }
+                    /* 폼 입력창 및 체크박스 1줄 정렬 */
+                    .form-grid { grid-template-columns: 1fr; gap: 15px; } 
+                    .options-row { flex-direction: column; align-items: flex-start; gap: 10px; } 
                     
-                    /* 사주 기둥 축소 및 패딩 조정 */
-                    .bazi-table th { font-size: 11px; padding-bottom: 10px; }
-                    .bazi-table td { padding: 10px 5px; }
-                    .stem, .branch { font-size: 28px; }
-                    .hidden-stems { font-size: 11px; letter-spacing: 1px; padding: 8px 3px; }
+                    /* 패널 여백 축소 */
+                    .dashboard { padding: 15px 10px; }
+                    .dash-header { flex-direction: column; gap: 10px; align-items: flex-start; }
+                    .dash-header div { width: 100%; display: flex; justify-content: space-between; }
                     
-                    .panel { padding: 15px; }
-                    .panel-grid { grid-template-columns: 1fr; } /* 패널들 1열로 나열 */
+                    /* 사주 기둥 축소 및 가로 꽉 채움 */
+                    .bazi-table-container { padding: 15px 5px; border-radius: 8px; }
+                    .bazi-table th { font-size: 11px; padding-bottom: 8px; }
+                    .bazi-table td { padding: 10px 2px; }
+                    .stem, .branch { font-size: 26px; }
+                    .hidden-stems { font-size: 10px; padding: 8px 2px; letter-spacing: 0; }
                     
-                    /* 그리드 레이아웃 모바일용으로 분할 */
-                    .napeum-grid { grid-template-columns: repeat(2, 1fr); } /* 납음오행 모바일선 2개씩 2줄 */
-                    .gunghap-grid { grid-template-columns: 1fr; } /* 궁합 박스 1줄로 */
-                    .practical-grid { grid-template-columns: 1fr; } /* 실용통변 박스 1줄로 */
+                    /* 🚨 모든 다중 그리드를 1줄로 예쁘게 쌓기 */
+                    .panel { padding: 15px; border-radius: 8px; }
+                    .panel-grid { grid-template-columns: 1fr; gap: 15px; }
+                    .napeum-grid { grid-template-columns: 1fr !important; }
+                    .gunghap-grid { grid-template-columns: 1fr !important; }
+                    .practical-grid { grid-template-columns: 1fr !important; }
                     
-                    /* 오행 분포 박스 반응형 조절 */
-                    .elements-flex { flex-wrap: wrap; }
-                    .elements-flex > div { flex: 1 1 30%; min-width: 60px; }
+                    /* 세운 타임라인 터치 최적화 */
+                    .swipe-container { gap: 10px; padding: 5px 0 15px 0; }
+                    .timeline-card { flex: 0 0 85px; padding: 12px 5px; }
+                    
+                    /* 오행 분포 박스 자동 줄바꿈 최적화 */
+                    .elements-flex { flex-wrap: wrap; gap: 5px !important; }
+                    .elements-flex > div { flex: 1 1 30%; min-width: 50px; padding: 8px !important; }
                 }
             `}</style>
 
@@ -443,7 +480,7 @@ export default function SajuCalculator() {
                             </div>
                         </div>
 
-                        <div className="options-row" style={{ display: 'flex', gap: '15px', marginTop: '20px', fontSize: '13px' }}>
+                        <div className="options-row">
                             <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
                                 <input type="checkbox" name="opt_daewun" checked={form.opt_daewun} onChange={handleInputChange} style={{ width: 'auto' }} /> 대운수 수동지정
                             </label>
@@ -812,7 +849,21 @@ export default function SajuCalculator() {
                             })()}
                         </div>
 
-                        {/* 11. 오행 과다/고립 분석 */}
+                        {/* 11. 심층 신살 */}
+                        {resData.dynamics && Object.keys(resData.dynamics.special_stars).length > 0 && (
+                            <div className="panel">
+                                <h3>🌟 심층 신살</h3>
+                                <div>
+                                    {Object.entries(resData.dynamics.special_stars).map(([sType, list]) => 
+                                        list.length > 0 ? list.map((item, idx) => (
+                                            <span className="badge" key={`${sType}-${idx}`}>{renderTooltipItem(sType, false)}: {renderHanjaString(item)}</span>
+                                        )) : null
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 12. 오행 과다/고립 분석 */}
                         {resData.elements_imbalance && (
                             <div className="panel">
                                 <h3>⚖️ 오행 과다/고립 분석</h3>
@@ -830,21 +881,7 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 12. 심층 신살 (그리드 내부로 쏙 들어감) */}
-                        {resData.dynamics && Object.keys(resData.dynamics.special_stars).length > 0 && (
-                            <div className="panel">
-                                <h3>🌟 심층 신살</h3>
-                                <div>
-                                    {Object.entries(resData.dynamics.special_stars).map(([sType, list]) => 
-                                        list.length > 0 ? list.map((item, idx) => (
-                                            <span className="badge" key={`${sType}-${idx}`}>{renderTooltipItem(sType, false)}: {renderHanjaString(item)}</span>
-                                        )) : null
-                                    )}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* 13. 상호작용 및 흉액 진단 (그리드 내부로 쏙 들어감) */}
+                        {/* 13. 상호작용 및 흉액 진단 */}
                         {resData.dynamics && Object.keys(resData.dynamics.disasters).length > 0 && (
                             <div className="panel">
                                 <h3>⚠️ 상호작용 및 흉액 진단</h3>
