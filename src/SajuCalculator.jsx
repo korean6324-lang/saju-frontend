@@ -3,50 +3,121 @@ import React, { useState, useEffect, useRef } from 'react';
 // 🔴 파이썬 백엔드 주소 (Render)
 const BACKEND_URL = "https://saju-backend-ffum.onrender.com"; 
 
+// 🚨 [신규] 프론트엔드 UI 다국어 언어팩 (한국어, 일본어, 중국어 간체, 중국어 번체)
+const uiTexts = {
+    ko: {
+        btnDict: "📖 사전 열기", btnHome: "🏠 홈", btnProfile: "⚙️ 프로필 입력", btnSave: "🗂️ 저장한 명식", btnFaq: "❓ 자주 묻는 질문", btnCs: "🎧 고객센터", btnApp: "앱 다운로드", btnLogin: "로그인",
+        landingTitle1: "당신의 운명,\n", landingTitle2: "데이터와 알고리즘", landingTitle3: "으로 해독하다",
+        landingDesc: "대한민국 상위 1% 대가들의 심층 간명 비법을\n10개의 다이내믹 엔진으로 완벽하게 구현한 초정밀 예측 시스템",
+        btnStart: "내 운명 스캔 시작하기",
+        feature1Title: "초정밀 사주 명리", feature1Desc: "단순한 키워드 나열이 아닙니다. 격국, 용신, 조후, 12성 당사주까지. 고서의 비결을 현대적 팩트폭행으로 치환한 심층 간명지를 제공합니다.",
+        feature2Title: "영혼을 꿰뚫는 심층 궁합", feature2Desc: "구궁(九宮) 겉궁합과 일지(日支) 속궁합의 완벽한 크로스체크. 삼원갑자를 기반으로 인연의 깊이와 파국의 타이밍까지 적나라하게 분석합니다.",
+        feature3Title: "현대 실용 통변 & 풍수", feature3Desc: "나의 기질에 맞는 최적의 직무, 취약한 건강 장기와 업상대체법. 그리고 일상에 적용할 수 있는 오행 밸런스 지표를 제시합니다.",
+        systemStatus: "10-Core Master Engine 정상 가동 중",
+        inputTitle: "프로필 입력", inputDesc: "정확한 연산을 위해 운명을 스캔할 정보를 입력해 주세요.",
+        lblBirth: "본인 생년월일시", lblGender: "본인 성별", lblLocation: "태어난 지역 (글로벌 표준시 및 진태양시 정밀 보정)",
+        optSolar: "양력", optLunar: "음력(평달)", optLunarLeap: "음력(윤달)", optMale: "남성 (Male)", optFemale: "여성 (Female)",
+        chkUnknownTime: "🕒 시간 모름", chkDaewun: "대운수 수동지정", chkGoBeob: "고법 둔월법", chkPartner: "💘 파트너 궁합",
+        lblPartner: "💘 상대방 (궁합용)", lblPartnerLoc: "상대방 태어난 지역",
+        btnScan: "운명 스캔 시작 (SCAN)", btnScanning: "연산 중 (Processing...)",
+        repTitle: "분석 리포트", repTime: "진태양시 보정", btnCopy: "📋 복사", btnRetry: "⟲ 다시하기",
+        colYear: "연주 (Year)", colMonth: "월주 (Month)", colDay: "일주 (Day)", colHour: "시주 (Hour)",
+        txtGongmang: "공망", txtHidden: "지장간", txtNapeum: "[납음]",
+        locSeoul: "🇰🇷 대한민국 (서울/표준: UTC+9, 127.0°)", locBusan: "🇰🇷 대한민국 (부산/동부: UTC+9, 129.0°)", locTokyo: "🇯🇵 일본 (도쿄: UTC+9, 139.7°)", locOsaka: "🇯🇵 일본 (오사카: UTC+9, 135.5°)", locBeijing: "🇨🇳 중국 (베이징: UTC+8, 116.4°)", locShanghai: "🇨🇳 중국 (상하이: UTC+8, 121.5°)", locHongKong: "🇭🇰 홍콩 (UTC+8, 114.0°)", locTaipei: "🇹🇼 대만 (타이베이: UTC+8, 121.5°)", locHanoi: "🇻🇳 베트남 (하노이: UTC+7, 105.8°)", locSydney: "🇦🇺 호주 (시드니: UTC+11, 151.2°E)", locLA: "🇺🇸 미국 (LA/서부: UTC-8, 118.2°W)", locNY: "🇺🇸 미국 (뉴욕/동부: UTC-5, 74.0°W)", locLondon: "🇬🇧 영국 (런던: UTC+0, 0.1°W)"
+    },
+    ja: {
+        btnDict: "📖 辞典を開く", btnHome: "🏠 ホーム", btnProfile: "⚙️ 入力フォーム", btnSave: "🗂️ 保存した命式", btnFaq: "❓ よくある質問", btnCs: "🎧 サポート", btnApp: "アプリ", btnLogin: "ログイン",
+        landingTitle1: "あなたの運命を、\n", landingTitle2: "データとアルゴリズム", landingTitle3: "で解読する",
+        landingDesc: "上位1%の大家の深層鑑定秘法を\n10のダイナミックエンジンで完璧に具現化した超精密予測システム",
+        btnStart: "運命のスキャンを開始する",
+        feature1Title: "超精密 四柱推命", feature1Desc: "単純なキーワードの羅列ではありません。格局、用神、調候から十二星まで。古書の秘訣を現代的かつ直説的に変換した深層鑑定書を提供します。",
+        feature2Title: "魂を見抜く深層相性", feature2Desc: "九宮の表相性と日支の裏相性を完璧にクロスチェック。三元甲子に基づき、縁の深さと破局のタイミングまで赤裸々に分析します。",
+        feature3Title: "現代実用通変＆風水", feature3Desc: "あなたの気質に合った最適な職務、脆弱な健康臓器と業障代替法。そして日常に応用できる五行バランス指標を提示します。",
+        systemStatus: "10-Core Master Engine 正常稼働中",
+        inputTitle: "プロフィール入力", inputDesc: "正確な演算のため、運命をスキャンする情報を入力してください。",
+        lblBirth: "本人の生年月日と時間", lblGender: "本人の性別", lblLocation: "生まれた地域 (グローバル標準時・真太陽時補正)",
+        optSolar: "陽暦", optLunar: "陰暦(平月)", optLunarLeap: "陰暦(閏月)", optMale: "男性 (Male)", optFemale: "女性 (Female)",
+        chkUnknownTime: "🕒 時間不明", chkDaewun: "大運数 手動指定", chkGoBeob: "古法 遁月法", chkPartner: "💘 パートナー相性",
+        lblPartner: "💘 相手 (相性用)", lblPartnerLoc: "相手の生まれた地域",
+        btnScan: "運命スキャン開始 (SCAN)", btnScanning: "演算中 (Processing...)",
+        repTitle: "分析レポート", repTime: "真太陽時補正", btnCopy: "📋 コピー", btnRetry: "⟲ やり直す",
+        colYear: "年柱 (Year)", colMonth: "月柱 (Month)", colDay: "日柱 (Day)", colHour: "時柱 (Hour)",
+        txtGongmang: "空亡", txtHidden: "蔵干", txtNapeum: "[納音]",
+        locSeoul: "🇰🇷 韓国 (ソウル: UTC+9, 127.0°)", locBusan: "🇰🇷 韓国 (釜山: UTC+9, 129.0°)", locTokyo: "🇯🇵 日本 (東京: UTC+9, 139.7°)", locOsaka: "🇯🇵 日本 (大阪: UTC+9, 135.5°)", locBeijing: "🇨🇳 中国 (北京: UTC+8, 116.4°)", locShanghai: "🇨🇳 中国 (上海: UTC+8, 121.5°)", locHongKong: "🇭🇰 香港 (UTC+8, 114.0°)", locTaipei: "🇹🇼 台湾 (台北: UTC+8, 121.5°)", locHanoi: "🇻🇳 ベトナム (ハノイ: UTC+7, 105.8°)", locSydney: "🇦🇺 豪州 (シドニー: UTC+11, 151.2°E)", locLA: "🇺🇸 米国 (LA: UTC-8, 118.2°W)", locNY: "🇺🇸 米国 (NY: UTC-5, 74.0°W)", locLondon: "🇬🇧 英国 (ロンドン: UTC+0, 0.1°W)"
+    },
+    'zh-CN': {
+        btnDict: "📖 打开字典", btnHome: "🏠 首页", btnProfile: "⚙️ 填写资料", btnSave: "🗂️ 已存命盘", btnFaq: "❓ 常见问题", btnCs: "🎧 客服中心", btnApp: "下载 APP", btnLogin: "登录",
+        landingTitle1: "您的命运，\n", landingTitle2: "通过数据与算法", landingTitle3: "来解读",
+        landingDesc: "将前1%命理大家的深层论命秘法\n通过10个动态引擎完美实现的超精密预测系统",
+        btnStart: "开始扫描我的命运",
+        feature1Title: "超精密 四柱八字", feature1Desc: "绝非简单的关键词堆砌。从格局、用神、调候到十二星。将古书秘诀转化为现代的直白解析，提供深层论命报告。",
+        feature2Title: "洞穿灵魂的深层合婚", feature2Desc: "九宫外合与日支内合的完美交叉比对。基于三元甲子，赤裸裸地分析缘分的深浅与破局的时机。",
+        feature3Title: "现代实用通变与风水", feature3Desc: "契合您气质的最佳职务、脆弱的健康脏器与化解之法。并提供可应用于日常的五行平衡指标。",
+        systemStatus: "10-Core Master Engine 正常运行中",
+        inputTitle: "填写资料", inputDesc: "为了精准运算，请输入用于扫描命运的信息。",
+        lblBirth: "本人生辰八字", lblGender: "本人性别", lblLocation: "出生地区 (全球标准时与真太阳时校正)",
+        optSolar: "公历", optLunar: "农历(平月)", optLunarLeap: "农历(闰月)", optMale: "男性 (Male)", optFemale: "女性 (Female)",
+        chkUnknownTime: "🕒 未知时间", chkDaewun: "大运数手动指定", chkGoBeob: "古法 遁月法", chkPartner: "💘 伴侣合婚",
+        lblPartner: "💘 对方 (合婚用)", lblPartnerLoc: "对方出生地区",
+        btnScan: "开始命运扫描 (SCAN)", btnScanning: "运算中 (Processing...)",
+        repTitle: "分析报告", repTime: "真太阳时校正", btnCopy: "📋 复制", btnRetry: "⟲ 重试",
+        colYear: "年柱 (Year)", colMonth: "月柱 (Month)", colDay: "日柱 (Day)", colHour: "时柱 (Hour)",
+        txtGongmang: "空亡", txtHidden: "地支藏干", txtNapeum: "[纳音]",
+        locSeoul: "🇰🇷 韩国 (首尔: UTC+9, 127.0°)", locBusan: "🇰🇷 韩国 (釜山: UTC+9, 129.0°)", locTokyo: "🇯🇵 日本 (东京: UTC+9, 139.7°)", locOsaka: "🇯🇵 日本 (大阪: UTC+9, 135.5°)", locBeijing: "🇨🇳 中国 (北京: UTC+8, 116.4°)", locShanghai: "🇨🇳 中国 (上海: UTC+8, 121.5°)", locHongKong: "🇭🇰 香港 (UTC+8, 114.0°)", locTaipei: "🇹🇼 台湾 (台北: UTC+8, 121.5°)", locHanoi: "🇻🇳 越南 (河内: UTC+7, 105.8°)", locSydney: "🇦🇺 澳洲 (悉尼: UTC+11, 151.2°E)", locLA: "🇺🇸 美国 (洛杉矶: UTC-8, 118.2°W)", locNY: "🇺🇸 美国 (纽约: UTC-5, 74.0°W)", locLondon: "🇬🇧 英国 (伦敦: UTC+0, 0.1°W)"
+    },
+    'zh-TW': {
+        btnDict: "📖 打開字典", btnHome: "🏠 首頁", btnProfile: "⚙️ 填寫資料", btnSave: "🗂️ 已存命盤", btnFaq: "❓ 常見問題", btnCs: "🎧 客服中心", btnApp: "下載 APP", btnLogin: "登入",
+        landingTitle1: "您的命運，\n", landingTitle2: "透過數據與演算法", landingTitle3: "來解讀",
+        landingDesc: "將前1%命理大家的深層論命秘法\n透過10個動態引擎完美實現的超精密預測系統",
+        btnStart: "開始掃描我的命運",
+        feature1Title: "超精密 四柱八字", feature1Desc: "絕非簡單的關鍵詞堆砌。從格局、用神、調候到十二星。將古書秘訣轉化為現代的直白解析，提供深層論命報告。",
+        feature2Title: "洞穿靈魂的深層合婚", feature2Desc: "九宮外合與日支內合的完美交叉比對。基於三元甲子，赤裸裸地分析緣分的深淺與破局的時機。",
+        feature3Title: "現代實用通變與風水", feature3Desc: "契合您氣質的最佳職務、脆弱的健康臟器與化解之法。並提供可應用於日常的五行平衡指標。",
+        systemStatus: "10-Core Master Engine 正常運作中",
+        inputTitle: "填寫資料", inputDesc: "為了精準運算，請輸入用於掃描命運的資訊。",
+        lblBirth: "本人生辰八字", lblGender: "本人性別", lblLocation: "出生地區 (全球標準時與真太陽時校正)",
+        optSolar: "公曆", optLunar: "農曆(平月)", optLunarLeap: "農曆(閏月)", optMale: "男性 (Male)", optFemale: "女性 (Female)",
+        chkUnknownTime: "🕒 未知時間", chkDaewun: "大運數手動指定", chkGoBeob: "古法 遁月法", chkPartner: "💘 伴侶合婚",
+        lblPartner: "💘 對方 (合婚用)", lblPartnerLoc: "對方出生地區",
+        btnScan: "開始命運掃描 (SCAN)", btnScanning: "運算中 (Processing...)",
+        repTitle: "分析報告", repTime: "真太陽時校正", btnCopy: "📋 複製", btnRetry: "⟲ 重試",
+        colYear: "年柱 (Year)", colMonth: "月柱 (Month)", colDay: "日柱 (Day)", colHour: "時柱 (Hour)",
+        txtGongmang: "空亡", txtHidden: "地支藏干", txtNapeum: "[納音]",
+        locSeoul: "🇰🇷 韓國 (首爾: UTC+9, 127.0°)", locBusan: "🇰🇷 韓國 (釜山: UTC+9, 129.0°)", locTokyo: "🇯🇵 日本 (東京: UTC+9, 139.7°)", locOsaka: "🇯🇵 日本 (大阪: UTC+9, 135.5°)", locBeijing: "🇨🇳 中國 (北京: UTC+8, 116.4°)", locShanghai: "🇨🇳 中國 (上海: UTC+8, 121.5°)", locHongKong: "🇭🇰 香港 (UTC+8, 114.0°)", locTaipei: "🇹🇼 台灣 (台北: UTC+8, 121.5°)", locHanoi: "🇻🇳 越南 (河內: UTC+7, 105.8°)", locSydney: "🇦🇺 澳洲 (悉尼: UTC+11, 151.2°E)", locLA: "🇺🇸 美國 (洛杉磯: UTC-8, 118.2°W)", locNY: "🇺🇸 美國 (紐約: UTC-5, 74.0°W)", locLondon: "🇬🇧 英國 (倫敦: UTC+0, 0.1°W)"
+    }
+};
+
 export default function SajuCalculator() {
     const [view, setView] = useState("home"); 
     const [loading, setLoading] = useState(false);
     const [resData, setResData] = useState(null);
-    const [copyFormattedText, setCopyFormattedText] = useState("");
     
+    // 🚨 [신규] 글로벌 언어 상태 (기본값: 한국어)
+    const [lang, setLang] = useState("ko");
+    const t = uiTexts[lang]; // 현재 언어 텍스트 객체
+
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [errorModal, setErrorModal] = useState({ show: false, msg: "" });
     const [dictModal, setDictModal] = useState({ show: false, keyword: "", results: null });
     const [tooltip, setTooltip] = useState({ show: false, meta: null, top: 0, left: 0 });
 
-    // 🚨 파트너용 체크리스트 상태 추가
     const [form, setForm] = useState({
         calendar_type: 'solar', dt_input: '1946-12-07T12:00', gender: 'M',
-        location: '127.0|+9', 
-        unknown_time: false,
-        opt_daewun: false, daewun_num: '', 
-        use_traditional: false, lunar_month: 11,
-        use_partner: false, 
+        location: '127.0|+9', unknown_time: false, opt_daewun: false, daewun_num: '', 
+        use_traditional: false, lunar_month: 11, use_partner: false, 
         p_calendar_type: 'solar', p_dt_input: '1950-05-12T12:00', p_gender: 'F',
-        p_location: '127.0|+9',
-        p_unknown_time: false, 
-        p_opt_daewun: false, p_daewun_num: '', 
+        p_location: '127.0|+9', p_unknown_time: false, p_opt_daewun: false, p_daewun_num: '', 
         p_use_traditional: false, p_lunar_month: 11
     });
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
-        
         if (name === 'unknown_time') {
-            setForm(prev => ({
-                ...prev, unknown_time: checked,
-                dt_input: checked ? prev.dt_input.split('T')[0] : prev.dt_input.split('T')[0] + 'T12:00'
-            })); return;
+            setForm(prev => ({ ...prev, unknown_time: checked, dt_input: checked ? prev.dt_input.split('T')[0] : prev.dt_input.split('T')[0] + 'T12:00' })); return;
         }
-        
-        // 🚨 파트너 시간 모름 처리
         if (name === 'p_unknown_time') {
-            setForm(prev => ({
-                ...prev, p_unknown_time: checked,
-                p_dt_input: checked ? prev.p_dt_input.split('T')[0] : prev.p_dt_input.split('T')[0] + 'T12:00'
-            })); return;
+            setForm(prev => ({ ...prev, p_unknown_time: checked, p_dt_input: checked ? prev.p_dt_input.split('T')[0] : prev.p_dt_input.split('T')[0] + 'T12:00' })); return;
         }
-        
         setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     };
 
@@ -56,13 +127,8 @@ export default function SajuCalculator() {
 
     useEffect(() => {
         let metaViewport = document.querySelector("meta[name=viewport]");
-        if (!metaViewport) {
-            metaViewport = document.createElement("meta");
-            metaViewport.name = "viewport";
-            document.head.appendChild(metaViewport);
-        }
+        if (!metaViewport) { metaViewport = document.createElement("meta"); metaViewport.name = "viewport"; document.head.appendChild(metaViewport); }
         metaViewport.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
-        
         const handleScroll = () => hideTooltip();
         window.addEventListener('scroll', handleScroll, true);
         return () => window.removeEventListener('scroll', handleScroll, true);
@@ -71,24 +137,18 @@ export default function SajuCalculator() {
     const handleDictSearch = async (e) => {
         const keyword = e.target.value;
         setDictModal(prev => ({ ...prev, keyword }));
-        if (!keyword) {
-            setDictModal(prev => ({ ...prev, results: null }));
-            return;
-        }
+        if (!keyword) { setDictModal(prev => ({ ...prev, results: null })); return; }
         try {
             const response = await fetch(`${BACKEND_URL}/api/dictionary?q=${encodeURIComponent(keyword)}`);
             const results = await response.json();
             setDictModal(prev => ({ ...prev, results }));
-        } catch (err) {
-            console.error(err);
-        }
+        } catch (err) { console.error(err); }
     };
 
     const showTooltip = (e, meta) => {
         if (!meta) return;
         const rect = e.target.getBoundingClientRect();
-        let top = rect.top - 120;
-        let left = rect.left + (rect.width / 2) - 130;
+        let top = rect.top - 120; let left = rect.left + (rect.width / 2) - 130;
         if (top < 10) top = rect.bottom + 10;
         if (left < 10) left = 10;
         if (left + 260 > window.innerWidth - 10) left = window.innerWidth - 270;
@@ -104,26 +164,21 @@ export default function SajuCalculator() {
             
             const payload = {
                 datetime_str: form.unknown_time ? form.dt_input.split('T')[0] + ' 12:00' : form.dt_input.replace('T', ' '),
-                calendar_type: form.calendar_type,
-                gender: form.gender,
-                longitude: parseFloat(longitudeStr),
-                timezone: parseInt(timezoneStr),
+                calendar_type: form.calendar_type, gender: form.gender,
+                longitude: parseFloat(longitudeStr), timezone: parseInt(timezoneStr),
                 unknown_time: form.unknown_time,
                 apply_true_solar: true, apply_yaja: true,
-                apply_traditional_lunar: form.use_traditional,
-                lunar_month: form.use_traditional ? parseInt(form.lunar_month) : null
+                apply_traditional_lunar: form.use_traditional, lunar_month: form.use_traditional ? parseInt(form.lunar_month) : null,
+                language: lang // 🚨 [신규] 선택된 언어 코드를 백엔드로 전송
             };
             
             if (form.opt_daewun && form.daewun_num !== '') payload.daewun_num = parseInt(form.daewun_num);
             
-            // 🚨 파트너 상세 페이로드 데이터 추가
             if (form.use_partner) {
                 const [pLonStr, pTzStr] = form.p_location.split('|');
                 payload.partner_datetime_str = form.p_unknown_time ? form.p_dt_input.split('T')[0] + ' 12:00' : form.p_dt_input.replace('T', ' ');
-                payload.partner_calendar_type = form.p_calendar_type;
-                payload.partner_gender = form.p_gender;
-                payload.partner_longitude = parseFloat(pLonStr);
-                payload.partner_timezone = parseInt(pTzStr);
+                payload.partner_calendar_type = form.p_calendar_type; payload.partner_gender = form.p_gender;
+                payload.partner_longitude = parseFloat(pLonStr); payload.partner_timezone = parseInt(pTzStr);
                 payload.partner_unknown_time = form.p_unknown_time;
                 payload.partner_apply_traditional_lunar = form.p_use_traditional;
                 payload.partner_lunar_month = form.p_use_traditional ? parseInt(form.p_lunar_month) : null;
@@ -141,7 +196,6 @@ export default function SajuCalculator() {
 
             const res = await response.json();
             setResData(res);
-            generateCopyText(res); 
             setView("dashboard");
             window.scrollTo(0, 0);
 
@@ -152,15 +206,8 @@ export default function SajuCalculator() {
         }
     };
 
-    const generateCopyText = (res) => {
-        setCopyFormattedText("명식 복사 기능은 전체 텍스트 구조 개편으로 인해 현재 점검 중입니다.");
-    };
-
     const handleCopy = () => {
-        if (!copyFormattedText) return alert("복사할 데이터가 없습니다.");
-        navigator.clipboard.writeText(copyFormattedText)
-            .then(() => alert("분석 결과가 복사되었습니다."))
-            .catch(err => alert("복사 실패: " + err));
+        alert("복사 기능은 구조 개편 중입니다.");
     };
 
     const renderTooltipItem = (keyword, isChar = true, text = null) => {
@@ -196,37 +243,35 @@ export default function SajuCalculator() {
         if (!dataObj) return [];
         if (Array.isArray(dataObj)) return dataObj; 
         return Object.entries(dataObj).map(([key, list]) => ({
-            name: key,
-            position: Array.isArray(list) ? list.join(', ') : list,
-            desc: "⚠️ 백엔드(logic_dynamics.py) 파일이 아직 예전 버전입니다. 깃허브에 코드를 덮어쓰기 하시면 전문가용 심층 분석이 출력됩니다!"
+            name: key, position: Array.isArray(list) ? list.join(', ') : list, desc: "백엔드 업데이트 필요"
         })).filter(item => item.position && item.position.length > 0);
     };
 
     const specialStarsArray = resData ? normalizeDynamics(resData.dynamics?.special_stars) : [];
     const disastersArray = resData ? normalizeDynamics(resData.dynamics?.disasters) : [];
 
-    // 공통 글로벌 지역 옵션
     const renderLocationOptions = () => (
         <>
-            <option value="127.0|+9">🇰🇷 대한민국 (서울/표준: UTC+9, 경도 127.0°)</option>
-            <option value="129.0|+9">🇰🇷 대한민국 (부산/동부: UTC+9, 경도 129.0°)</option>
-            <option value="139.7|+9">🇯🇵 일본 (도쿄: UTC+9, 경도 139.7°)</option>
-            <option value="135.5|+9">🇯🇵 일본 (오사카: UTC+9, 경도 135.5°)</option>
-            <option value="116.4|+8">🇨🇳 중국 (베이징: UTC+8, 경도 116.4°)</option>
-            <option value="121.5|+8">🇨🇳 중국 (상하이: UTC+8, 경도 121.5°)</option>
-            <option value="114.0|+8">🇭🇰 홍콩 (UTC+8, 경도 114.0°)</option>
-            <option value="121.5|+8">🇹🇼 대만 (타이베이: UTC+8, 경도 121.5°)</option>
-            <option value="105.8|+7">🇻🇳 베트남 (하노이: UTC+7, 경도 105.8°)</option>
-            <option value="151.2|+11">🇦🇺 호주 (시드니: UTC+11, 경도 151.2°E)</option>
-            <option value="-118.2|-8">🇺🇸 미국 (LA/서부: UTC-8, 경도 118.2°W)</option>
-            <option value="-74.0|-5">🇺🇸 미국 (뉴욕/동부: UTC-5, 경도 74.0°W)</option>
-            <option value="-0.1|+0">🇬🇧 영국 (런던: UTC+0, 경도 0.1°W)</option>
+            <option value="127.0|+9">{t.locSeoul}</option>
+            <option value="129.0|+9">{t.locBusan}</option>
+            <option value="139.7|+9">{t.locTokyo}</option>
+            <option value="135.5|+9">{t.locOsaka}</option>
+            <option value="116.4|+8">{t.locBeijing}</option>
+            <option value="121.5|+8">{t.locShanghai}</option>
+            <option value="114.0|+8">{t.locHongKong}</option>
+            <option value="121.5|+8">{t.locTaipei}</option>
+            <option value="105.8|+7">{t.locHanoi}</option>
+            <option value="151.2|+11">{t.locSydney}</option>
+            <option value="-118.2|-8">{t.locLA}</option>
+            <option value="-74.0|-5">{t.locNY}</option>
+            <option value="-0.1|+0">{t.locLondon}</option>
         </>
     );
 
     return (
         <div className="app-container">
             <style>{`
+                /* 기존 벤토 박스 레이아웃 완벽 보존 */
                 :root { --bg-color: #0d0f12; --card-bg: #16181d; --text-main: #f1f2f6; --text-muted: #95a5a6; --gold-light: #f1c40f; --gold-main: #d4af37; --gold-dark: #b5952f; --accent-red: #e74c3c; --accent-blue: #3498db; --accent-green: #2ecc71; }
                 html, body, #root, #__next { margin: 0 !important; padding: 0 !important; background-color: var(--bg-color) !important; width: 100%; max-width: 100vw; min-height: 100vh; overflow-x: hidden; }
                 * { box-sizing: border-box; overflow-wrap: break-word !important; word-wrap: break-word !important; }
@@ -236,6 +281,20 @@ export default function SajuCalculator() {
                 ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
                 
                 .app-container { font-family: "'Noto Serif KR', serif"; background: var(--bg-color); min-height: 100vh; color: var(--text-main); width: 100%; max-width: 100vw; overflow-x: hidden; }
+                
+                /* 🚨 [신규] 글로벌 언어 스위치 버튼 */
+                .lang-switcher {
+                    position: fixed; top: 20px; right: 70px; z-index: 1000;
+                    display: flex; align-items: center; background: rgba(255,255,255,0.05);
+                    border: 1px solid #333; border-radius: 6px; padding: 6px 10px;
+                    backdrop-filter: blur(5px);
+                }
+                .lang-switcher span { margin-right: 5px; font-size: 16px; }
+                .lang-switcher select {
+                    background: transparent; color: white; border: none; font-size: 13px; font-weight: bold;
+                    outline: none; cursor: pointer; appearance: none;
+                }
+                .lang-switcher select option { background: #16181d; color: white; }
                 
                 .hamburger-btn { position: fixed; top: 20px; right: 20px; z-index: 1000; background: rgba(255,255,255,0.05); border: 1px solid #333; color: white; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 20px; transition: 0.3s; backdrop-filter: blur(5px); }
                 .hamburger-btn:hover { background: rgba(212,175,55,0.2); color: var(--gold-main); border-color: var(--gold-main); }
@@ -255,12 +314,12 @@ export default function SajuCalculator() {
                 .sidebar-login { display: flex; align-items: center; gap: 10px; color: #aaa; cursor: pointer; font-size: 14px; margin-top: 15px; font-weight: bold; transition: 0.2s; }
                 .sidebar-login:hover { color: var(--gold-light); }
 
-                /* 대문(Home) 랜딩 페이지 */
+                /* 대문 랜딩 페이지 */
                 .landing-section { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 60px 20px; background: radial-gradient(circle at center, #1a1e24 0%, var(--bg-color) 100%); text-align: center; }
                 .landing-hero { max-width: 900px; margin-bottom: 50px; animation: fadeIn 1s ease-out; }
                 .landing-title { font-size: 3.5rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 20px; color: #fff; line-height: 1.3; }
                 .landing-title span { color: var(--gold-main); text-shadow: 0 0 20px rgba(212,175,55,0.3); }
-                .landing-subtitle { font-size: 1.2rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 40px; font-weight: 300; }
+                .landing-subtitle { font-size: 1.2rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 40px; font-weight: 300; white-space: pre-wrap; }
                 .btn-cta { background: linear-gradient(135deg, var(--gold-dark), var(--gold-main)); color: #000; border: none; border-radius: 50px; padding: 20px 40px; font-size: 1.2rem; font-weight: 900; cursor: pointer; box-shadow: 0 10px 30px rgba(212,175,55,0.3); transition: all 0.3s; animation: pulse 2s infinite; }
                 .btn-cta:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(212,175,55,0.5); animation: none; }
                 
@@ -355,6 +414,7 @@ export default function SajuCalculator() {
                     .landing-title { font-size: 2.5rem; }
                 }
                 @media (max-width: 768px) {
+                    .lang-switcher { right: 60px; top: 15px; padding: 4px 8px; }
                     .hamburger-btn { top: 15px; right: 15px; font-size: 18px; padding: 6px 10px; }
                     .top-nav { left: 15px; top: 15px; }
                     .sidebar-menu { width: 85vw; max-width: 320px; }
@@ -394,6 +454,17 @@ export default function SajuCalculator() {
                 }
             `}</style>
 
+            {/* 🚨 언어 선택 스위처 (우측 상단 햄버거 메뉴 옆) */}
+            <div className="lang-switcher">
+                <span>🌐</span>
+                <select value={lang} onChange={(e) => setLang(e.target.value)}>
+                    <option value="ko">한국어</option>
+                    <option value="ja">日本語</option>
+                    <option value="zh-CN">简体中文</option>
+                    <option value="zh-TW">繁體中文</option>
+                </select>
+            </div>
+
             <button className="hamburger-btn" onClick={() => setIsSidebarOpen(true)}>☰</button>
 
             <div className={`sidebar-overlay ${isSidebarOpen ? 'open' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
@@ -403,16 +474,16 @@ export default function SajuCalculator() {
                     <button className="sidebar-close-btn" onClick={() => setIsSidebarOpen(false)}>×</button>
                 </div>
                 <div className="sidebar-content">
-                    <div className="sidebar-item" onClick={() => { setView("home"); setIsSidebarOpen(false); window.scrollTo(0,0); }}>🏠 홈</div>
-                    <div className="sidebar-item" onClick={() => { setView("input"); setIsSidebarOpen(false); window.scrollTo(0,0); }}>⚙️ 프로필 입력</div>
-                    <div className="sidebar-item" onClick={() => { setDictModal({ show: true, keyword: "", results: null }); setIsSidebarOpen(false); }}>📖 마스터 백과사전</div>
-                    <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>🗂️ 저장한 명식</div>
-                    <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>❓ 자주 묻는 질문</div>
-                    <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>🎧 고객센터</div>
+                    <div className="sidebar-item" onClick={() => { setView("home"); setIsSidebarOpen(false); window.scrollTo(0,0); }}>{t.btnHome}</div>
+                    <div className="sidebar-item" onClick={() => { setView("input"); setIsSidebarOpen(false); window.scrollTo(0,0); }}>{t.btnProfile}</div>
+                    <div className="sidebar-item" onClick={() => { setDictModal({ show: true, keyword: "", results: null }); setIsSidebarOpen(false); }}>{t.btnDict}</div>
+                    <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>{t.btnSave}</div>
+                    <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>{t.btnFaq}</div>
+                    <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>{t.btnCs}</div>
                 </div>
                 <div className="sidebar-footer">
-                    <button className="btn-primary" style={{ marginTop: 0, padding: '12px' }} onClick={() => alert('앱 출시 준비 중입니다.')}>앱 다운로드</button>
-                    <div className="sidebar-login" onClick={() => alert('로그인 기능 준비 중입니다.')}><span>🚪</span> 로그인</div>
+                    <button className="btn-primary" style={{ marginTop: 0, padding: '12px' }} onClick={() => alert('앱 출시 준비 중입니다.')}>{t.btnApp}</button>
+                    <div className="sidebar-login" onClick={() => alert('로그인 기능 준비 중입니다.')}><span>🚪</span> {t.btnLogin}</div>
                 </div>
             </div>
 
@@ -425,7 +496,7 @@ export default function SajuCalculator() {
             {dictModal.show && (
                 <div className="modal-overlay">
                     <div className="modal-content">
-                        <div className="modal-header"><h3>📖 마스터 백과사전</h3><button className="close-btn" onClick={() => setDictModal({ show: false, keyword: "", results: null })}>×</button></div>
+                        <div className="modal-header"><h3>{t.btnDict}</h3><button className="close-btn" onClick={() => setDictModal({ show: false, keyword: "", results: null })}>×</button></div>
                         <div className="dict-search-box"><input type="text" placeholder="궁금한 용어나 한자를 입력하세요" onChange={handleDictSearch} autoFocus /></div>
                         <div className="dict-results">
                             {!dictModal.results ? (<div style={{ textAlign: 'center', color: '#555', marginTop: '30px' }}>검색어를 입력하시면 전문 해설이 나타납니다.</div>) : dictModal.results.length === 0 ? (<div style={{ textAlign: 'center', color: '#888', marginTop: '30px' }}>검색 결과가 없습니다.</div>) : (
@@ -443,9 +514,9 @@ export default function SajuCalculator() {
             {errorModal.show && (
                 <div className="modal-overlay" style={{ zIndex: 4000 }}>
                     <div className="modal-content" style={{ borderLeft: '4px solid var(--accent-red)' }}>
-                        <div className="modal-header"><h3 style={{ color: 'var(--accent-red)' }}>⚠️ 시스템 오류 안내</h3><button className="close-btn" onClick={() => setErrorModal({ show: false, msg: "" })}>×</button></div>
+                        <div className="modal-header"><h3 style={{ color: 'var(--accent-red)' }}>⚠️ System Error</h3><button className="close-btn" onClick={() => setErrorModal({ show: false, msg: "" })}>×</button></div>
                         <div style={{ marginBottom: '15px' }}><textarea readOnly value={errorModal.msg} style={{ width: '100%', height: '150px', background: '#000', color: 'var(--accent-red)', padding: '10px', border: '1px solid #333', borderRadius: '6px', fontFamily: 'monospace', resize: 'none' }}></textarea></div>
-                        <button className="btn-primary" style={{ marginTop: 0, background: 'var(--accent-red)', color: '#fff', border: 'none' }} onClick={() => navigator.clipboard.writeText(errorModal.msg)}>오류 내용 복사하기</button>
+                        <button className="btn-primary" style={{ marginTop: 0, background: 'var(--accent-red)', color: '#fff', border: 'none' }} onClick={() => navigator.clipboard.writeText(errorModal.msg)}>Copy Error Log</button>
                     </div>
                 </div>
             )}
@@ -453,46 +524,46 @@ export default function SajuCalculator() {
             {/* ===================== VIEW 1: 대문(Home) 랜딩 페이지 ===================== */}
             {view === "home" && (
                 <div className="landing-section">
-                    <div className="top-nav"><button className="btn-icon" onClick={() => setDictModal(prev => ({ ...prev, show: true }))}>📖 사전 열기</button></div>
+                    <div className="top-nav"><button className="btn-icon" onClick={() => setDictModal(prev => ({ ...prev, show: true }))}>{t.btnDict}</button></div>
                     <div className="landing-hero">
-                        <h1 className="landing-title">당신의 운명,<br/><span>데이터와 알고리즘</span>으로 해독하다</h1>
-                        <p className="landing-subtitle">대한민국 상위 1% 대가들의 심층 간명 비법을<br/>10개의 다이내믹 엔진으로 완벽하게 구현한 초정밀 예측 시스템</p>
-                        <button className="btn-cta" onClick={() => { setView("input"); window.scrollTo(0,0); }}>내 운명 스캔 시작하기</button>
+                        <h1 className="landing-title">{t.landingTitle1}<span>{t.landingTitle2}</span>{t.landingTitle3}</h1>
+                        <p className="landing-subtitle">{t.landingDesc}</p>
+                        <button className="btn-cta" onClick={() => { setView("input"); window.scrollTo(0,0); }}>{t.btnStart}</button>
                     </div>
                     <div className="bento-features">
                         <div className="feature-card">
                             <div className="feature-icon">🔮</div>
-                            <h3>초정밀 사주 명리</h3>
-                            <p>단순한 키워드 나열이 아닙니다. 격국, 용신, 조후, 12성 당사주까지. 고서의 비결을 현대적 팩트폭행으로 치환한 심층 간명지를 제공합니다.</p>
+                            <h3>{t.feature1Title}</h3>
+                            <p>{t.feature1Desc}</p>
                         </div>
                         <div className="feature-card">
                             <div className="feature-icon">💞</div>
-                            <h3>영혼을 꿰뚫는 심층 궁합</h3>
-                            <p>구궁(九宮) 겉궁합과 일지(日支) 속궁합의 완벽한 크로스체크. 삼원갑자를 기반으로 인연의 깊이와 파국의 타이밍까지 적나라하게 분석합니다.</p>
+                            <h3>{t.feature2Title}</h3>
+                            <p>{t.feature2Desc}</p>
                         </div>
                         <div className="feature-card">
                             <div className="feature-icon">🧭</div>
-                            <h3>현대 실용 통변 & 풍수</h3>
-                            <p>나의 기질에 맞는 최적의 직무, 취약한 건강 장기와 업상대체법. 그리고 일상에 적용할 수 있는 오행 밸런스 지표를 제시합니다.</p>
+                            <h3>{t.feature3Title}</h3>
+                            <p>{t.feature3Desc}</p>
                         </div>
                     </div>
-                    <div className="system-status"><span className="status-dot"></span> 10-Core Master Engine 정상 가동 중</div>
+                    <div className="system-status"><span className="status-dot"></span> {t.systemStatus}</div>
                 </div>
             )}
 
             {/* ===================== VIEW 2: 프로필 입력폼 ===================== */}
             {view === "input" && (
                 <div className="hero-section">
-                    <div className="top-nav"><button className="btn-icon" onClick={() => setDictModal(prev => ({ ...prev, show: true }))}>📖 사전 열기</button></div>
-                    <h1 className="hero-title">프로필 입력</h1>
-                    <div className="hero-subtitle">정확한 연산을 위해 운명을 스캔할 정보를 입력해 주세요.</div>
+                    <div className="top-nav"><button className="btn-icon" onClick={() => setDictModal(prev => ({ ...prev, show: true }))}>{t.btnDict}</button></div>
+                    <h1 className="hero-title">{t.inputTitle}</h1>
+                    <div className="hero-subtitle">{t.inputDesc}</div>
                     
                     <form className="input-card" onSubmit={handleSubmit}>
                         <div className="form-grid">
                             <div>
-                                <label>본인 생년월일시</label>
+                                <label>{t.lblBirth}</label>
                                 <div style={{ display: 'flex', gap: '10px' }}>
-                                    <select name="calendar_type" value={form.calendar_type} onChange={handleInputChange} style={{ width: '35%' }}><option value="solar">양력</option><option value="lunar">음력(평달)</option><option value="lunar_leap">음력(윤달)</option></select>
+                                    <select name="calendar_type" value={form.calendar_type} onChange={handleInputChange} style={{ width: '35%' }}><option value="solar">{t.optSolar}</option><option value="lunar">{t.optLunar}</option><option value="lunar_leap">{t.optLunarLeap}</option></select>
                                     <input 
                                         type={form.unknown_time ? "date" : "datetime-local"} 
                                         name="dt_input" 
@@ -504,12 +575,12 @@ export default function SajuCalculator() {
                                 </div>
                             </div>
                             <div>
-                                <label>본인 성별</label>
-                                <select name="gender" value={form.gender} onChange={handleInputChange}><option value="M">남성 (Male)</option><option value="F">여성 (Female)</option></select>
+                                <label>{t.lblGender}</label>
+                                <select name="gender" value={form.gender} onChange={handleInputChange}><option value="M">{t.optMale}</option><option value="F">{t.optFemale}</option></select>
                             </div>
 
                             <div className="full-width">
-                                <label>태어난 지역 (글로벌 표준시 및 진태양시 정밀 보정)</label>
+                                <label>{t.lblLocation}</label>
                                 <select name="location" value={form.location} onChange={handleInputChange}>
                                     {renderLocationOptions()}
                                 </select>
@@ -518,35 +589,34 @@ export default function SajuCalculator() {
 
                         <div className="options-row">
                             <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', color: 'var(--gold-main)' }}>
-                                <input type="checkbox" name="unknown_time" checked={form.unknown_time} onChange={handleInputChange} style={{ width: 'auto' }} /> 🕒 시간 모름
+                                <input type="checkbox" name="unknown_time" checked={form.unknown_time} onChange={handleInputChange} style={{ width: 'auto' }} /> {t.chkUnknownTime}
                             </label>
                             <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
-                                <input type="checkbox" name="opt_daewun" checked={form.opt_daewun} onChange={handleInputChange} style={{ width: 'auto' }} /> 대운수 수동지정
+                                <input type="checkbox" name="opt_daewun" checked={form.opt_daewun} onChange={handleInputChange} style={{ width: 'auto' }} /> {t.chkDaewun}
                             </label>
                             <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
-                                <input type="checkbox" name="use_traditional" checked={form.use_traditional} onChange={handleInputChange} style={{ width: 'auto' }} /> 고법 둔월법
+                                <input type="checkbox" name="use_traditional" checked={form.use_traditional} onChange={handleInputChange} style={{ width: 'auto' }} /> {t.chkGoBeob}
                             </label>
                             <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', color: 'var(--accent-red)' }}>
-                                <input type="checkbox" name="use_partner" checked={form.use_partner} onChange={handleInputChange} style={{ width: 'auto' }} /> 💘 파트너 궁합
+                                <input type="checkbox" name="use_partner" checked={form.use_partner} onChange={handleInputChange} style={{ width: 'auto' }} /> {t.chkPartner}
                             </label>
                         </div>
 
                         {form.opt_daewun && (
-                            <div style={{ marginTop: '15px', background: 'rgba(0,0,0,0.2)', padding: '15px', borderRadius: '6px' }}><label>대운수 지정 (미입력시 자동)</label><input type="number" name="daewun_num" value={form.daewun_num} onChange={handleInputChange} min="0" max="10" placeholder="0~10 입력" /></div>
+                            <div style={{ marginTop: '15px', background: 'rgba(0,0,0,0.2)', padding: '15px', borderRadius: '6px' }}><label>0~10</label><input type="number" name="daewun_num" value={form.daewun_num} onChange={handleInputChange} min="0" max="10" placeholder="0~10" /></div>
                         )}
 
                         {form.use_traditional && (
-                            <div style={{ marginTop: '15px', background: 'rgba(0,0,0,0.2)', padding: '15px', borderRadius: '6px' }}><label>고법(古法) 음력 월 강제 지정</label><input type="number" name="lunar_month" value={form.lunar_month} onChange={handleInputChange} min="1" max="12" /></div>
+                            <div style={{ marginTop: '15px', background: 'rgba(0,0,0,0.2)', padding: '15px', borderRadius: '6px' }}><label>1~12</label><input type="number" name="lunar_month" value={form.lunar_month} onChange={handleInputChange} min="1" max="12" /></div>
                         )}
 
-                        {/* 🚨 파트너 입력 구역 */}
                         {form.use_partner && (
                             <div style={{ marginTop: '25px', background: 'rgba(231,76,60,0.05)', border: '1px solid rgba(231,76,60,0.2)', padding: '20px', borderRadius: '8px' }}>
-                                <label style={{ color: 'var(--accent-red)', fontSize: '15px', marginBottom: '15px' }}>💘 상대방 (궁합용)</label>
+                                <label style={{ color: 'var(--accent-red)', fontSize: '15px', marginBottom: '15px' }}>{t.lblPartner}</label>
                                 
                                 <div className="form-grid" style={{ marginBottom: '15px' }}>
                                     <div style={{ display: 'flex', gap: '10px' }}>
-                                        <select name="p_calendar_type" value={form.p_calendar_type} onChange={handleInputChange} style={{ width: '35%' }}><option value="solar">양력</option><option value="lunar">음력(평달)</option><option value="lunar_leap">음력(윤달)</option></select>
+                                        <select name="p_calendar_type" value={form.p_calendar_type} onChange={handleInputChange} style={{ width: '35%' }}><option value="solar">{t.optSolar}</option><option value="lunar">{t.optLunar}</option><option value="lunar_leap">{t.optLunarLeap}</option></select>
                                         <input 
                                             type={form.p_unknown_time ? "date" : "datetime-local"} 
                                             name="p_dt_input" 
@@ -555,45 +625,37 @@ export default function SajuCalculator() {
                                             style={{ width: '65%' }} 
                                         />
                                     </div>
-                                    <select name="p_gender" value={form.p_gender} onChange={handleInputChange}><option value="F">여성 (Female)</option><option value="M">남성 (Male)</option></select>
+                                    <select name="p_gender" value={form.p_gender} onChange={handleInputChange}><option value="F">{t.optFemale}</option><option value="M">{t.optMale}</option></select>
                                 </div>
                                 
                                 <div className="full-width" style={{ marginBottom: '15px' }}>
-                                    <label style={{ color: 'var(--accent-red)' }}>상대방 태어난 지역</label>
+                                    <label style={{ color: 'var(--accent-red)' }}>{t.lblPartnerLoc}</label>
                                     <select name="p_location" value={form.p_location} onChange={handleInputChange}>
                                         {renderLocationOptions()}
                                     </select>
                                 </div>
 
-                                {/* 🚨 파트너 전용 체크리스트 */}
                                 <div className="options-row" style={{ marginTop: '10px', paddingTop: '15px', borderTop: '1px dashed rgba(231,76,60,0.3)' }}>
                                     <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', color: 'var(--gold-main)' }}>
-                                        <input type="checkbox" name="p_unknown_time" checked={form.p_unknown_time} onChange={handleInputChange} style={{ width: 'auto' }} /> 🕒 시간 모름
+                                        <input type="checkbox" name="p_unknown_time" checked={form.p_unknown_time} onChange={handleInputChange} style={{ width: 'auto' }} /> {t.chkUnknownTime}
                                     </label>
                                     <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
-                                        <input type="checkbox" name="p_opt_daewun" checked={form.p_opt_daewun} onChange={handleInputChange} style={{ width: 'auto' }} /> 대운수 수동지정
+                                        <input type="checkbox" name="p_opt_daewun" checked={form.p_opt_daewun} onChange={handleInputChange} style={{ width: 'auto' }} /> {t.chkDaewun}
                                     </label>
                                     <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
-                                        <input type="checkbox" name="p_use_traditional" checked={form.p_use_traditional} onChange={handleInputChange} style={{ width: 'auto' }} /> 고법 둔월법
+                                        <input type="checkbox" name="p_use_traditional" checked={form.p_use_traditional} onChange={handleInputChange} style={{ width: 'auto' }} /> {t.chkGoBeob}
                                     </label>
                                 </div>
 
-                                {/* 파트너 전용 조건부 입력칸 */}
                                 {form.p_opt_daewun && (
-                                    <div style={{ marginTop: '15px', background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '6px' }}>
-                                        <label>상대방 대운수 지정 (미입력시 자동)</label>
-                                        <input type="number" name="p_daewun_num" value={form.p_daewun_num} onChange={handleInputChange} min="0" max="10" placeholder="0~10 입력" />
-                                    </div>
+                                    <div style={{ marginTop: '15px', background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '6px' }}><label>0~10</label><input type="number" name="p_daewun_num" value={form.p_daewun_num} onChange={handleInputChange} min="0" max="10" placeholder="0~10" /></div>
                                 )}
                                 {form.p_use_traditional && (
-                                    <div style={{ marginTop: '15px', background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '6px' }}>
-                                        <label>상대방 고법(古法) 음력 월 강제 지정</label>
-                                        <input type="number" name="p_lunar_month" value={form.p_lunar_month} onChange={handleInputChange} min="1" max="12" />
-                                    </div>
+                                    <div style={{ marginTop: '15px', background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '6px' }}><label>1~12</label><input type="number" name="p_lunar_month" value={form.p_lunar_month} onChange={handleInputChange} min="1" max="12" /></div>
                                 )}
                             </div>
                         )}
-                        <button type="submit" className="btn-primary" disabled={loading} style={{ opacity: loading ? 0.7 : 1 }}>{loading ? "연산 중 (Processing...)" : "운명 스캔 시작 (SCAN)"}</button>
+                        <button type="submit" className="btn-primary" disabled={loading} style={{ opacity: loading ? 0.7 : 1 }}>{loading ? t.btnScanning : t.btnScan}</button>
                     </form>
                 </div>
             )}
@@ -602,21 +664,17 @@ export default function SajuCalculator() {
             {view === "dashboard" && resData && (
                 <div className="dashboard">
                     <div className="dash-header">
-                        <h2>분석 리포트</h2>
+                        <h2>{t.repTitle}</h2>
                         <div>
-                            <span style={{ fontSize: '12px', color: '#777', marginRight: '15px' }}>진태양시 보정: <span style={{ color: '#fff' }}>{resData.corrected_time}</span></span>
-                            <button className="btn-icon" onClick={handleCopy} style={{ marginRight: '8px' }}>📋 복사</button>
-                            <button className="btn-icon" onClick={() => { hideTooltip(); setView("input"); window.scrollTo(0,0); }} style={{ background: '#333' }}>⟲ 다시하기</button>
+                            <span style={{ fontSize: '12px', color: '#777', marginRight: '15px' }}>{t.repTime}: <span style={{ color: '#fff' }}>{resData.corrected_time}</span></span>
+                            <button className="btn-icon" onClick={handleCopy} style={{ marginRight: '8px' }}>{t.btnCopy}</button>
+                            <button className="btn-icon" onClick={() => { hideTooltip(); setView("input"); window.scrollTo(0,0); }} style={{ background: '#333' }}>{t.btnRetry}</button>
                         </div>
                     </div>
 
-                    {resData.applied_traditional && (
-                        <div style={{ background: 'rgba(231,76,60,0.1)', borderLeft: '3px solid var(--accent-red)', padding: '15px', borderRadius: '6px', marginBottom: '20px', fontSize: '13px' }}>⚠️ <b>고법(古法) 명리 적용:</b> 천문학적 절기를 무시하고 입력하신 음력 달로 월주가 덮어씌워졌습니다.</div>
-                    )}
-
                     <div className="bazi-table-container">
                         <table className="bazi-table">
-                            <thead><tr><th>연주 (Year)</th><th>월주 (Month)</th><th>일주 (Day)</th><th>시주 (Hour)</th></tr></thead>
+                            <thead><tr><th>{t.colYear}</th><th>{t.colMonth}</th><th>{t.colDay}</th><th>{t.colHour}</th></tr></thead>
                             <tbody>
                                 <tr>
                                     {['year', 'month', 'day', 'hour'].map(p => {
@@ -634,12 +692,12 @@ export default function SajuCalculator() {
                                                 <div className="stem">{renderTooltipItem(bazi.stem, true)}</div>
                                                 <div className="branch">{renderTooltipItem(bazi.branch, true)}</div>
                                                 <div className="ten-god" style={{ color: 'var(--text-muted)' }}>{renderTooltipItem(bazi.branch_tg, false)}</div>
-                                                <div style={{ fontSize: '11px', color: '#555', marginTop: '5px' }}>[납음] {bazi.napeum}</div>
+                                                <div style={{ fontSize: '11px', color: '#555', marginTop: '5px' }}>{t.txtNapeum} {bazi.napeum}</div>
                                                 <div style={{ height: '24px', margin: '10px 0 5px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                    {isGm && <div className="badge badge-bad" style={{ margin: 0 }}>{renderTooltipItem('공망', false)}</div>}
+                                                    {isGm && <div className="badge badge-bad" style={{ margin: 0 }}>{renderTooltipItem('공망', false, t.txtGongmang)}</div>}
                                                 </div>
                                                 <div className="hidden-stems">
-                                                    <span style={{ color: 'var(--gold-main)', fontSize: '11px', display: 'block', marginBottom: '5px' }}>지장간</span>
+                                                    <span style={{ color: 'var(--gold-main)', fontSize: '11px', display: 'block', marginBottom: '5px' }}>{t.txtHidden}</span>
                                                     {safeStem(hidden.initial, false)} · {safeStem(hidden.middle, false)} · {safeStem(hidden.main, true)}
                                                 </div>
                                             </td>
@@ -663,26 +721,12 @@ export default function SajuCalculator() {
                                                 <div style={{ marginBottom: '10px' }} key={j}>
                                                     {item.title && <div style={{ color: 'var(--accent-blue)', fontWeight: 'bold', fontSize: '14px', marginBottom: '3px' }}>{item.title}</div>}
                                                     {item.hanja && <div style={{ fontSize: '16px', fontWeight: 'bold', letterSpacing: '1px', marginBottom: '3px', color: '#fff' }}>{renderHanjaString(item.hanja)}</div>}
-                                                    <div style={{ fontSize: '13px', color: '#ccc', lineHeight: '1.5' }}>{item.text}</div>
+                                                    <div style={{ fontSize: '13px', color: '#ccc', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>{item.text}</div>
                                                 </div>
                                             ))}
                                         </div>
                                     ))}
                                 </div>
-                                {resData.classical.stars && (
-                                    <>
-                                        <h4 style={{ marginTop: '20px', color: 'var(--text-muted)', fontSize: '13px' }}>[참고] 당사주 12성 흐름</h4>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                                            {Object.entries(resData.classical.stars).map(([pillar, star]) => (
-                                                <div style={{ flex: 1, minWidth: '120px', background: 'rgba(0,0,0,0.4)', padding: '10px', borderRadius: '6px', border: '1px solid #333' }} key={pillar}>
-                                                    <div style={{ fontSize: '11px', color: '#777' }}>{pillar === 'year' ? '초년(연)' : pillar === 'month' ? '청년(월)' : pillar === 'day' ? '중년(일)' : '말년(시)'}</div>
-                                                    <div style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--gold-dark)' }}>{star.name}</div>
-                                                    <div style={{ fontSize: '12px', color: '#ccc', marginTop: '5px', lineHeight: '1.4' }}>{star.desc}</div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </>
-                                )}
                             </div>
                         )}
 
@@ -690,7 +734,7 @@ export default function SajuCalculator() {
                             <div className="bento-col">
                                 {resData.yongshin && (
                                     <div className="panel" style={{ height: '100%' }}>
-                                        <h3>⚖️ 격국(格局)과 용신(用神)</h3>
+                                        <h3>⚖️ 격국과 용신</h3>
                                         <div className="highlight-box">
                                             <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>나의 그릇</div>
                                             <div style={{ fontSize: '18px', color: 'var(--gold-main)', fontWeight: 'bold', marginBottom: '5px' }}>{renderTooltipItem(resData.yongshin.geokguk.name.split('(')[0], false, resData.yongshin.geokguk.name)}</div>
@@ -716,7 +760,7 @@ export default function SajuCalculator() {
                             <div className="bento-col">
                                 {resData.unse?.year && (
                                     <div className="panel">
-                                        <h3>🎯 올해({new Date().getFullYear()}년) 예측</h3>
+                                        <h3>🎯 올해 예측</h3>
                                         {(() => {
                                             const y = resData.unse.year;
                                             const isGood = y.overall_status.includes('발복') || y.overall_status.includes('무난') || y.overall_status.includes('성취');
@@ -736,31 +780,6 @@ export default function SajuCalculator() {
                                                             </div>
                                                         )
                                                     }) : <div style={{ fontSize: '12px', color: '#777' }}>올해는 큰 충/합이 없는 평탄한 시기입니다.</div>}
-                                                </>
-                                            )
-                                        })()}
-                                    </div>
-                                )}
-                                {resData.unse?.month && resData.unse?.day && (
-                                    <div className="panel" style={{ flexGrow: 1 }}>
-                                        <h3>📅 이달과 오늘의 운세</h3>
-                                        {(() => {
-                                            const m = resData.unse.month;
-                                            const d = resData.unse.day;
-                                            const mGood = m.data.overall_status.includes('발복') || m.data.overall_status.includes('무난') || m.data.overall_status.includes('성취');
-                                            const dGood = d.data.overall_status.includes('발복') || d.data.overall_status.includes('무난') || d.data.overall_status.includes('성취');
-                                            return (
-                                                <>
-                                                    <div className="highlight-box" style={{ borderLeftColor: mGood ? 'var(--accent-green)' : 'var(--accent-blue)' }}>
-                                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '5px' }}>■ {m.month_num}월 이달의 운세 ({renderTooltipItem(m.stem, true)}{renderTooltipItem(m.branch, true)}월)</div>
-                                                        <div className={mGood ? "status-green" : "status-red"} style={{ marginBottom: '5px', fontSize: '1.1rem' }}>{m.data.overall_status}</div>
-                                                        <div style={{ fontSize: '13px' }}>{m.data.overall_desc}</div>
-                                                    </div>
-                                                    <div className="highlight-box" style={{ borderLeftColor: dGood ? 'var(--accent-green)' : 'var(--gold-main)', marginBottom: 0 }}>
-                                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '5px' }}>■ {d.day_num}일 오늘의 운세 ({renderTooltipItem(d.stem, true)}{renderTooltipItem(d.branch, true)}일)</div>
-                                                        <div className={dGood ? "status-green" : "status-red"} style={{ marginBottom: '5px', fontSize: '1.1rem' }}>{d.data.overall_status}</div>
-                                                        <div style={{ fontSize: '13px' }}>{d.data.overall_desc}</div>
-                                                    </div>
                                                 </>
                                             )
                                         })()}
@@ -794,21 +813,6 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {resData.napeum_reading && (
-                            <div className="panel">
-                                <h3>🎵 납음오행(納音五行)의 숨은 파동</h3>
-                                <div className="napeum-grid">
-                                    {resData.napeum_reading.map((n, i) => (
-                                        <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--gold-main)', padding: '15px' }} key={i}>
-                                            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '3px' }}>{n.pillar}</div>
-                                            <div style={{ color: 'var(--gold-light)', fontWeight: 'bold', fontSize: '15px', marginBottom: '5px' }}>[납음] {n.full}</div>
-                                            <div style={{ fontSize: '12px', color: '#ccc', wordBreak: 'keep-all', lineHeight: '1.4' }}>{n.desc}</div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
                         {resData.gunghap && (
                             <div className="panel">
                                 <h3>💞 삼원갑자 및 심층 궁합 분석</h3>
@@ -824,7 +828,7 @@ export default function SajuCalculator() {
                                 </div>
                                 <div className="highlight-box" style={{ borderLeftColor: 'var(--gold-main)' }}>
                                     <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--gold-main)', marginBottom: '5px' }}>✨ 구궁(九宮) 겉궁합: {resData.gunghap.gugung.status} ({resData.gunghap.gugung.score}점)</div>
-                                    <div style={{ fontSize: '13px', marginBottom: '10px' }}>{resData.gunghap.gugung.desc}</div>
+                                    <div style={{ fontSize: '13px', marginBottom: '10px', whiteSpace: 'pre-wrap' }}>{resData.gunghap.gugung.desc}</div>
                                     <div style={{ background: 'rgba(0,0,0,0.5)', padding: '10px', borderRadius: '4px', fontSize: '12px' }}>
                                         <b style={{ color: 'var(--gold-light)' }}>📜 고서 비결:</b> {resData.gunghap.gugung.classical}<br /><br />
                                         <b style={{ color: 'var(--accent-green)' }}>⏰ 발현 응기:</b> {resData.gunghap.gugung.timing}
@@ -833,40 +837,6 @@ export default function SajuCalculator() {
                                 <div className="highlight-box" style={{ borderLeftColor: '#9b59b6', margin: 0 }}>
                                     <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#9b59b6', marginBottom: '5px' }}>🔥 일지(日支) 속궁합: {resData.gunghap.inner.relation} - {resData.gunghap.inner.status}</div>
                                     <div style={{ fontSize: '13px' }}>{resData.gunghap.inner.desc}</div>
-                                </div>
-                            </div>
-                        )}
-
-                        {resData.timeline && (
-                            <div className="panel">
-                                <h3>⏳ 인생 타임라인 (스와이프 하여 확인)</h3>
-                                <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '5px' }}>■ 대운 (10년 주기 / {resData.timeline.daewun.direction})</div>
-                                <div className="swipe-container" ref={el => attachSwipe(el)}>
-                                    {resData.timeline.daewun.timeline.map((dw, i) => (
-                                        <div className="timeline-card" key={i}>
-                                            <div className="timeline-age">{dw.age}세~</div>
-                                            <div style={{ fontSize: '11px', color: 'var(--gold-main)', marginBottom: '2px' }}>{renderTooltipItem(dw.stem_tg, false)}</div>
-                                            <div className="timeline-ganzhi">{renderTooltipItem(dw.stem, true)}<br />{renderTooltipItem(dw.branch, true)}</div>
-                                            <div style={{ fontSize: '11px', color: 'var(--gold-main)', marginTop: '2px' }}>{renderTooltipItem(dw.branch_tg, false)}</div>
-                                        </div>
-                                    ))}
-                                </div>
-                                
-                                <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '15px', marginBottom: '5px' }}>■ 최근 10년 세운 (과거 4년 ~ 미래 5년)</div>
-                                <div className="swipe-container" ref={el => attachSwipe(el)}>
-                                    {resData.timeline.sewun.map((sw, i) => {
-                                        const isCurrent = sw.year === new Date().getFullYear();
-                                        return (
-                                            <div className={`timeline-card ${isCurrent ? 'current-year' : ''}`} key={i}>
-                                                <div className="timeline-age" style={{ fontWeight: isCurrent ? '900' : 'normal', color: isCurrent ? 'var(--gold-main)' : '#ccc' }}>
-                                                    {sw.year}년 {isCurrent && <span style={{fontSize:'10px', display:'block'}}>(올해)</span>}
-                                                </div>
-                                                <div style={{ fontSize: '11px', color: 'var(--gold-main)', marginBottom: '2px' }}>{renderTooltipItem(sw.stem_tg, false)}</div>
-                                                <div className="timeline-ganzhi">{renderTooltipItem(sw.stem, true)}<br />{renderTooltipItem(sw.branch, true)}</div>
-                                                <div style={{ fontSize: '11px', color: 'var(--gold-main)', marginTop: '2px' }}>{renderTooltipItem(sw.branch_tg, false)}</div>
-                                            </div>
-                                        );
-                                    })}
                                 </div>
                             </div>
                         )}
@@ -889,18 +859,6 @@ export default function SajuCalculator() {
                                         </div>
                                     </div>
                                 )}
-                                <div className="panel">
-                                    <h3>🌱 통근력 (아성)</h3>
-                                    {(() => {
-                                        let power = resData.mechanics.tonggeun?.total_power || 0;
-                                        let rootText = "";
-                                        if (!resData.mechanics.tonggeun?.has_root || power < 10) rootText = "지지에 뿌리가 극히 미약하거나 없어 주관이 흔들리기 쉽습니다.";
-                                        else if (power < 30) rootText = "지지에 미약하게나마 뿌리를 내리고 있어 간신히 버티는 형국입니다.";
-                                        else if (power < 60) rootText = "뿌리가 제법 튼튼하여 어지간한 풍파에도 휩쓸리지 않습니다.";
-                                        else rootText = "뿌리가 매우 깊고 강력하여 태풍이 불어도 절대 흔들리지 않는 굳건함이 있습니다.";
-                                        return <div style={{ fontSize: '13px' }}>총 파워: <b>{power}</b><br />{rootText}</div>
-                                    })()}
-                                </div>
                                 {resData.elements_imbalance && (
                                     <div className="panel">
                                         <h3>⚖️ 오행 과다/고립 분석</h3>
