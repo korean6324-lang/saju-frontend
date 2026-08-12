@@ -4,23 +4,21 @@ import React, { useState, useEffect, useRef } from 'react';
 const BACKEND_URL = "https://saju-backend-ffum.onrender.com"; 
 
 export default function SajuCalculator() {
-    // 초기 뷰를 'home'(대문)으로 유지
     const [view, setView] = useState("home"); 
     const [loading, setLoading] = useState(false);
     const [resData, setResData] = useState(null);
     const [copyFormattedText, setCopyFormattedText] = useState("");
     
-    // 사이드바 메뉴 상태
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    
-    // 모달 및 툴팁 상태
     const [errorModal, setErrorModal] = useState({ show: false, msg: "" });
     const [dictModal, setDictModal] = useState({ show: false, keyword: "", results: null });
     const [tooltip, setTooltip] = useState({ show: false, meta: null, top: 0, left: 0 });
 
-    // 폼 상태
+    // 🚨 폼 상태에 글로벌 위치(location) 및 시간모름(unknown_time) 추가
     const [form, setForm] = useState({
-        calendar_type: 'solar', dt_input: '1946-12-07T04:30', gender: 'M',
+        calendar_type: 'solar', dt_input: '1946-12-07T12:00', gender: 'M',
+        location: '127.0|+9', // 기본값: 서울 (경도 127.0, UTC+9)
+        unknown_time: false,
         opt_daewun: false, daewun_num: '', 
         use_traditional: false, lunar_month: 11,
         use_partner: false, p_calendar_type: 'solar', p_dt_input: '1950-05-12T12:00', p_gender: 'F'
@@ -28,15 +26,23 @@ export default function SajuCalculator() {
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
+        
+        // 🚨 시간 모름 체크 시 시간 입력 포맷 동적 변경
+        if (name === 'unknown_time') {
+            setForm(prev => ({
+                ...prev,
+                unknown_time: checked,
+                dt_input: checked ? prev.dt_input.split('T')[0] : prev.dt_input.split('T')[0] + 'T12:00'
+            }));
+            return;
+        }
+        
         setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     };
 
     const hideTooltip = () => setTooltip(prev => ({ ...prev, show: false }));
 
-    // 화면(view)이 바뀔 때 무조건 툴팁을 강제로 끄는 방어 로직
-    useEffect(() => {
-        hideTooltip();
-    }, [view]);
+    useEffect(() => { hideTooltip(); }, [view]);
 
     useEffect(() => {
         let metaViewport = document.querySelector("meta[name=viewport]");
@@ -73,24 +79,27 @@ export default function SajuCalculator() {
         const rect = e.target.getBoundingClientRect();
         let top = rect.top - 120;
         let left = rect.left + (rect.width / 2) - 130;
-        
         if (top < 10) top = rect.bottom + 10;
         if (left < 10) left = 10;
         if (left + 260 > window.innerWidth - 10) left = window.innerWidth - 270;
-
         setTooltip({ show: true, meta, top, left });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        hideTooltip(); // 스캔 시작 시 툴팁 강제 종료
+        hideTooltip(); 
         setLoading(true);
         try {
+            // 🚨 location 값을 파싱하여 경도와 시차(UTC)를 백엔드로 전송
+            const [longitudeStr, timezoneStr] = form.location.split('|');
+            
             const payload = {
-                datetime_str: form.dt_input.replace('T', ' '),
+                datetime_str: form.unknown_time ? form.dt_input.split('T')[0] + ' 12:00' : form.dt_input.replace('T', ' '),
                 calendar_type: form.calendar_type,
                 gender: form.gender,
-                longitude: 127.0,
+                longitude: parseFloat(longitudeStr),
+                timezone: parseInt(timezoneStr),
+                unknown_time: form.unknown_time,
                 apply_true_solar: true, apply_yaja: true,
                 apply_traditional_lunar: form.use_traditional,
                 lunar_month: form.use_traditional ? parseInt(form.lunar_month) : null
@@ -125,8 +134,7 @@ export default function SajuCalculator() {
     };
 
     const generateCopyText = (res) => {
-        let txt = `======================================\n   [ MYEONGRI MASTER 분석 리포트 ]\n======================================\n\n명식 복사 기능은 전체 텍스트 구조 개편으로 인해 현재 점검 중입니다.`;
-        setCopyFormattedText(txt);
+        setCopyFormattedText("명식 복사 기능은 전체 텍스트 구조 개편으로 인해 현재 점검 중입니다.");
     };
 
     const handleCopy = () => {
@@ -141,7 +149,8 @@ export default function SajuCalculator() {
         const metaDict = resData.mechanics.metadata || {};
         const meta = metaDict[keyword];
         const display = text || keyword;
-        if (!meta) return <span key={Math.random()}>{display}</span>;
+        // 빈 데이터나 알 수 없음 처리
+        if (!meta || keyword === "-" || keyword === "알수없음") return <span key={Math.random()}>{display}</span>;
         
         const cssClass = isChar ? "hanja-tooltip char-tooltip" : "hanja-tooltip";
         return (
@@ -152,7 +161,7 @@ export default function SajuCalculator() {
     };
 
     const renderHanjaString = (str) => {
-        if (!str) return "";
+        if (!str || str === "-") return "-";
         return str.split('').map(char => renderTooltipItem(char, true));
     };
 
@@ -171,7 +180,7 @@ export default function SajuCalculator() {
         return Object.entries(dataObj).map(([key, list]) => ({
             name: key,
             position: Array.isArray(list) ? list.join(', ') : list,
-            desc: "⚠️ 백엔드(logic_dynamics.py) 파일이 아직 예전 버전입니다. 깃허브에 코드를 덮어쓰기 하시면 전문가용 심층 분석이 출력됩니다!"
+            desc: "⚠️ 백엔드(logic_dynamics.py) 파일이 아직 예전 버전입니다."
         })).filter(item => item.position && item.position.length > 0);
     };
 
@@ -191,54 +200,30 @@ export default function SajuCalculator() {
                 
                 .app-container { font-family: "'Noto Serif KR', serif"; background: var(--bg-color); min-height: 100vh; color: var(--text-main); width: 100%; max-width: 100vw; overflow-x: hidden; }
                 
-                /* 햄버거 메뉴 버튼 (우측 상단) */
-                .hamburger-btn {
-                    position: fixed; top: 20px; right: 20px; z-index: 1000;
-                    background: rgba(255,255,255,0.05); border: 1px solid #333; color: white;
-                    padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 20px;
-                    transition: 0.3s; backdrop-filter: blur(5px);
-                }
+                .hamburger-btn { position: fixed; top: 20px; right: 20px; z-index: 1000; background: rgba(255,255,255,0.05); border: 1px solid #333; color: white; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 20px; transition: 0.3s; backdrop-filter: blur(5px); }
                 .hamburger-btn:hover { background: rgba(212,175,55,0.2); color: var(--gold-main); border-color: var(--gold-main); }
 
-                /* 사이드바 메뉴 디자인 */
-                .sidebar-overlay {
-                    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-                    background: rgba(0,0,0,0.7); z-index: 3000;
-                    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-                    backdrop-filter: blur(3px);
-                }
+                .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); z-index: 3000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(3px); }
                 .sidebar-overlay.open { opacity: 1; pointer-events: auto; }
-                
-                .sidebar-menu {
-                    position: fixed; top: 0; right: 0; width: 300px; height: 100vh;
-                    background: var(--card-bg); z-index: 3001;
-                    transform: translateX(100%); transition: transform 0.3s ease-in-out;
-                    box-shadow: -10px 0 30px rgba(0,0,0,0.8);
-                    display: flex; flex-direction: column; text-align: left;
-                    border-left: 1px solid #333;
-                }
+                .sidebar-menu { position: fixed; top: 0; right: 0; width: 300px; height: 100vh; background: var(--card-bg); z-index: 3001; transform: translateX(100%); transition: transform 0.3s ease-in-out; box-shadow: -10px 0 30px rgba(0,0,0,0.8); display: flex; flex-direction: column; text-align: left; border-left: 1px solid #333; }
                 .sidebar-menu.open { transform: translateX(0); }
-                
                 .sidebar-header { padding: 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
                 .sidebar-header h3 { margin: 0; color: var(--gold-main); font-size: 1.1rem; font-weight: 900; letter-spacing: 1px; }
                 .sidebar-close-btn { background: none; border: none; font-size: 28px; color: #888; cursor: pointer; padding: 0; line-height: 1; transition: 0.2s; }
                 .sidebar-close-btn:hover { color: white; }
-                
                 .sidebar-content { flex: 1; overflow-y: auto; padding: 10px 0; }
                 .sidebar-item { padding: 18px 25px; border-bottom: 1px solid rgba(255,255,255,0.03); color: var(--text-main); display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; font-size: 15px; font-weight: 500; }
                 .sidebar-item:hover { background: rgba(212,175,55,0.05); color: var(--gold-main); padding-left: 30px; }
-                
                 .sidebar-footer { padding: 25px 20px; border-top: 1px solid #333; background: rgba(0,0,0,0.3); }
                 .sidebar-login { display: flex; align-items: center; gap: 10px; color: #aaa; cursor: pointer; font-size: 14px; margin-top: 15px; font-weight: bold; transition: 0.2s; }
                 .sidebar-login:hover { color: var(--gold-light); }
 
-                /* 대문(Home) 랜딩 페이지 전용 디자인 */
+                /* 대문(Home) 랜딩 페이지 */
                 .landing-section { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 60px 20px; background: radial-gradient(circle at center, #1a1e24 0%, var(--bg-color) 100%); text-align: center; }
                 .landing-hero { max-width: 900px; margin-bottom: 50px; animation: fadeIn 1s ease-out; }
                 .landing-title { font-size: 3.5rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 20px; color: #fff; line-height: 1.3; }
                 .landing-title span { color: var(--gold-main); text-shadow: 0 0 20px rgba(212,175,55,0.3); }
                 .landing-subtitle { font-size: 1.2rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 40px; font-weight: 300; }
-                
                 .btn-cta { background: linear-gradient(135deg, var(--gold-dark), var(--gold-main)); color: #000; border: none; border-radius: 50px; padding: 20px 40px; font-size: 1.2rem; font-weight: 900; cursor: pointer; box-shadow: 0 10px 30px rgba(212,175,55,0.3); transition: all 0.3s; animation: pulse 2s infinite; }
                 .btn-cta:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(212,175,55,0.5); animation: none; }
                 
@@ -256,37 +241,30 @@ export default function SajuCalculator() {
                 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(212,175,55,0.4); } 70% { box-shadow: 0 0 0 15px rgba(212,175,55,0); } 100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); } }
                 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-                /* 🚨 프로필 입력 화면 (잘림 방지 및 레이아웃 수정) */
-                .hero-section { 
-                    display: flex; 
-                    flex-direction: column; 
-                    align-items: center; 
-                    justify-content: flex-start; /* flex-start로 변경하여 무조건 아래로만 늘어나게 방어 */
-                    min-height: 100vh; 
-                    padding: 12vh 20px 80px 20px; /* 상단 여백을 충분히 주어 폼이 안전하게 스크롤되게 함 */
-                    background: var(--bg-color); 
-                    text-align: center; 
-                    position: relative; 
-                }
+                /* 프로필 입력 화면 */
+                .hero-section { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; padding: 12vh 20px 80px 20px; background: var(--bg-color); text-align: center; position: relative; }
                 .hero-title { font-size: 2.5rem; font-weight: 900; letter-spacing: 2px; margin-top: 0; margin-bottom: 20px; color: var(--gold-main); text-shadow: 0 4px 15px rgba(212,175,55,0.2); }
                 .hero-subtitle { font-size: 1rem; color: var(--text-muted); margin-bottom: 40px; font-weight: 300; line-height: 1.6; }
                 
-                .input-card { background: var(--card-bg); padding: 30px; border-radius: 12px; width: 100%; max-width: 700px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
+                .input-card { background: var(--card-bg); padding: 30px; border-radius: 12px; width: 100%; max-width: 750px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
                 .input-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, var(--gold-main), transparent); }
+                
+                /* 🚨 폼 그리드 조정 (글로벌 옵션 포함) */
                 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; text-align: left; }
-                .options-row { display: flex; gap: 15px; margin-top: 20px; font-size: 13px; }
+                .full-width { grid-column: 1 / -1; }
+                .options-row { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 20px; font-size: 13px; }
+                
                 label { font-size: 13px; font-weight: 700; color: var(--gold-light); margin-bottom: 5px; display: block; }
                 input, select { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid #333; color: white; border-radius: 6px; font-family: inherit; font-size: 14px; transition: all 0.3s; }
                 input:focus, select:focus { border-color: var(--gold-main); outline: none; }
                 .btn-primary { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--gold-dark), var(--gold-main)); color: #000; border: none; border-radius: 6px; font-size: 16px; font-weight: 900; cursor: pointer; margin-top: 25px; transition: transform 0.2s, box-shadow 0.2s; }
                 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212,175,55,0.4); }
                 
-                /* 좌측 사전 열기 버튼 */
                 .top-nav { position: absolute; top: 20px; left: 20px; z-index: 100; }
                 .btn-icon { background: rgba(255,255,255,0.1); color: white; border: 1px solid #333; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; transition: 0.3s; }
                 .btn-icon:hover { background: var(--gold-main); color: #000; border-color: var(--gold-main); }
                 
-                /* 대시보드 (분석 리포트) */
+                /* 대시보드 */
                 .dashboard { padding: 60px 20px 40px 20px; max-width: 1300px; margin: auto; width: 100%; box-sizing: border-box; }
                 .dash-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 30px; }
                 .dash-header h2 { margin: 0; color: var(--gold-main); font-weight: 900; }
@@ -349,7 +327,6 @@ export default function SajuCalculator() {
                     .landing-subtitle { font-size: 1rem; padding: 0 10px; }
                     .feature-card { padding: 20px; }
                     
-                    /* 모바일: 히어로 섹션 상하 여백 안전 장치 */
                     .hero-section { padding-top: 100px; padding-bottom: 60px; }
                     .hero-title { font-size: 1.8rem; margin-top: 0px; margin-bottom: 15px; }
                     .hero-subtitle { font-size: 0.9rem; word-break: keep-all; padding: 0 10px; margin-bottom: 30px; }
@@ -381,10 +358,8 @@ export default function SajuCalculator() {
                 }
             `}</style>
 
-            {/* 햄버거 버튼 */}
             <button className="hamburger-btn" onClick={() => setIsSidebarOpen(true)}>☰</button>
 
-            {/* 우측 사이드바 */}
             <div className={`sidebar-overlay ${isSidebarOpen ? 'open' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
             <div className={`sidebar-menu ${isSidebarOpen ? 'open' : ''}`}>
                 <div className="sidebar-header">
@@ -392,36 +367,19 @@ export default function SajuCalculator() {
                     <button className="sidebar-close-btn" onClick={() => setIsSidebarOpen(false)}>×</button>
                 </div>
                 <div className="sidebar-content">
-                    <div className="sidebar-item" onClick={() => { setView("home"); setIsSidebarOpen(false); window.scrollTo(0,0); }}>
-                        🏠 홈
-                    </div>
-                    <div className="sidebar-item" onClick={() => { setView("input"); setIsSidebarOpen(false); window.scrollTo(0,0); }}>
-                        ⚙️ 프로필 입력
-                    </div>
-                    <div className="sidebar-item" onClick={() => { setDictModal({ show: true, keyword: "", results: null }); setIsSidebarOpen(false); }}>
-                        📖 마스터 백과사전
-                    </div>
-                    <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>
-                        🗂️ 저장한 명식
-                    </div>
-                    <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>
-                        ❓ 자주 묻는 질문
-                    </div>
-                    <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>
-                        🎧 고객센터
-                    </div>
+                    <div className="sidebar-item" onClick={() => { setView("home"); setIsSidebarOpen(false); window.scrollTo(0,0); }}>🏠 홈</div>
+                    <div className="sidebar-item" onClick={() => { setView("input"); setIsSidebarOpen(false); window.scrollTo(0,0); }}>⚙️ 프로필 입력</div>
+                    <div className="sidebar-item" onClick={() => { setDictModal({ show: true, keyword: "", results: null }); setIsSidebarOpen(false); }}>📖 마스터 백과사전</div>
+                    <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>🗂️ 저장한 명식</div>
+                    <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>❓ 자주 묻는 질문</div>
+                    <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>🎧 고객센터</div>
                 </div>
                 <div className="sidebar-footer">
-                    <button className="btn-primary" style={{ marginTop: 0, padding: '12px' }} onClick={() => alert('앱 출시 준비 중입니다.')}>
-                        앱 다운로드
-                    </button>
-                    <div className="sidebar-login" onClick={() => alert('로그인 기능 준비 중입니다.')}>
-                        <span>🚪</span> 로그인
-                    </div>
+                    <button className="btn-primary" style={{ marginTop: 0, padding: '12px' }} onClick={() => alert('앱 출시 준비 중입니다.')}>앱 다운로드</button>
+                    <div className="sidebar-login" onClick={() => alert('로그인 기능 준비 중입니다.')}><span>🚪</span> 로그인</div>
                 </div>
             </div>
 
-            {/* 전역 툴팁 / 모달 */}
             {tooltip.show && tooltip.meta && (
                 <div style={{ position: 'fixed', zIndex: 9999, width: '260px', maxWidth: '90vw', backgroundColor: '#222', color: '#fff', textAlign: 'left', borderRadius: '8px', padding: '15px', fontSize: '13px', lineHeight: '1.5', border: '1px solid #444', boxShadow: '0 10px 25px rgba(0,0,0,0.8)', pointerEvents: 'none', fontWeight: 300, top: tooltip.top + 'px', left: tooltip.left + 'px' }}>
                     <strong style={{ color: 'var(--gold-main)' }}>{tooltip.meta.term} {tooltip.meta.hanja ? `(${tooltip.meta.hanja})` : ''}</strong><br /><br />{tooltip.meta.meaning}
@@ -460,16 +418,11 @@ export default function SajuCalculator() {
             {view === "home" && (
                 <div className="landing-section">
                     <div className="top-nav"><button className="btn-icon" onClick={() => setDictModal(prev => ({ ...prev, show: true }))}>📖 사전 열기</button></div>
-                    
                     <div className="landing-hero">
                         <h1 className="landing-title">당신의 운명,<br/><span>데이터와 알고리즘</span>으로 해독하다</h1>
                         <p className="landing-subtitle">대한민국 상위 1% 대가들의 심층 간명 비법을<br/>10개의 다이내믹 엔진으로 완벽하게 구현한 초정밀 예측 시스템</p>
-                        
-                        <button className="btn-cta" onClick={() => { setView("input"); window.scrollTo(0,0); }}>
-                            내 운명 스캔 시작하기
-                        </button>
+                        <button className="btn-cta" onClick={() => { setView("input"); window.scrollTo(0,0); }}>내 운명 스캔 시작하기</button>
                     </div>
-
                     <div className="bento-features">
                         <div className="feature-card">
                             <div className="feature-icon">🔮</div>
@@ -487,10 +440,7 @@ export default function SajuCalculator() {
                             <p>나의 기질에 맞는 최적의 직무, 취약한 건강 장기와 업상대체법. 그리고 일상에 적용할 수 있는 오행 밸런스 지표를 제시합니다.</p>
                         </div>
                     </div>
-
-                    <div className="system-status">
-                        <span className="status-dot"></span> 10-Core Master Engine 정상 가동 중
-                    </div>
+                    <div className="system-status"><span className="status-dot"></span> 10-Core Master Engine 정상 가동 중</div>
                 </div>
             )}
 
@@ -507,19 +457,51 @@ export default function SajuCalculator() {
                                 <label>본인 생년월일시</label>
                                 <div style={{ display: 'flex', gap: '10px' }}>
                                     <select name="calendar_type" value={form.calendar_type} onChange={handleInputChange} style={{ width: '35%' }}><option value="solar">양력</option><option value="lunar">음력(평달)</option><option value="lunar_leap">음력(윤달)</option></select>
-                                    <input type="datetime-local" name="dt_input" value={form.dt_input} onChange={handleInputChange} required style={{ width: '65%' }} />
+                                    <input 
+                                        type={form.unknown_time ? "date" : "datetime-local"} 
+                                        name="dt_input" 
+                                        value={form.dt_input} 
+                                        onChange={handleInputChange} 
+                                        required 
+                                        style={{ width: '65%' }} 
+                                    />
                                 </div>
                             </div>
                             <div>
                                 <label>본인 성별</label>
                                 <select name="gender" value={form.gender} onChange={handleInputChange}><option value="M">남성 (Male)</option><option value="F">여성 (Female)</option></select>
                             </div>
+
+                            {/* 🚨 글로벌 위치 (경도 & 시차) 선택 기능 추가 */}
+                            <div className="full-width">
+                                <label>태어난 지역 (글로벌 표준시 및 진태양시 정밀 보정)</label>
+                                <select name="location" value={form.location} onChange={handleInputChange}>
+                                    <option value="127.0|+9">🇰🇷 대한민국 (서울/표준: UTC+9, 경도 127.0°)</option>
+                                    <option value="129.0|+9">🇰🇷 대한민국 (부산/동부: UTC+9, 경도 129.0°)</option>
+                                    <option value="139.7|+9">🇯🇵 일본 (도쿄: UTC+9, 경도 139.7°)</option>
+                                    <option value="135.5|+9">🇯🇵 일본 (오사카: UTC+9, 경도 135.5°)</option>
+                                    <option value="116.4|+8">🇨🇳 중국 (베이징: UTC+8, 경도 116.4°)</option>
+                                    <option value="121.5|+8">🇨🇳 중국 (상하이: UTC+8, 경도 121.5°)</option>
+                                    <option value="114.0|+8">🇭🇰 홍콩 (UTC+8, 경도 114.0°)</option>
+                                    <option value="121.5|+8">🇹🇼 대만 (타이베이: UTC+8, 경도 121.5°)</option>
+                                </select>
+                            </div>
                         </div>
 
+                        {/* 🚨 시간 모름 체크박스 추가 */}
                         <div className="options-row">
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}><input type="checkbox" name="opt_daewun" checked={form.opt_daewun} onChange={handleInputChange} style={{ width: 'auto' }} /> 대운수 수동지정</label>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}><input type="checkbox" name="use_traditional" checked={form.use_traditional} onChange={handleInputChange} style={{ width: 'auto' }} /> 고법 둔월법</label>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', color: 'var(--accent-red)' }}><input type="checkbox" name="use_partner" checked={form.use_partner} onChange={handleInputChange} style={{ width: 'auto' }} /> 💘 파트너 궁합</label>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', color: 'var(--gold-main)' }}>
+                                <input type="checkbox" name="unknown_time" checked={form.unknown_time} onChange={handleInputChange} style={{ width: 'auto' }} /> 🕒 시간 모름
+                            </label>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
+                                <input type="checkbox" name="opt_daewun" checked={form.opt_daewun} onChange={handleInputChange} style={{ width: 'auto' }} /> 대운수 수동지정
+                            </label>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
+                                <input type="checkbox" name="use_traditional" checked={form.use_traditional} onChange={handleInputChange} style={{ width: 'auto' }} /> 고법 둔월법
+                            </label>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', color: 'var(--accent-red)' }}>
+                                <input type="checkbox" name="use_partner" checked={form.use_partner} onChange={handleInputChange} style={{ width: 'auto' }} /> 💘 파트너 궁합
+                            </label>
                         </div>
 
                         {form.opt_daewun && (
@@ -552,7 +534,6 @@ export default function SajuCalculator() {
                         <div>
                             <span style={{ fontSize: '12px', color: '#777', marginRight: '15px' }}>진태양시 보정: <span style={{ color: '#fff' }}>{resData.corrected_time}</span></span>
                             <button className="btn-icon" onClick={handleCopy} style={{ marginRight: '8px' }}>📋 복사</button>
-                            {/* 다시하기 버튼 클릭 시 input 화면으로 이동 */}
                             <button className="btn-icon" onClick={() => { hideTooltip(); setView("input"); window.scrollTo(0,0); }} style={{ background: '#333' }}>⟲ 다시하기</button>
                         </div>
                     </div>
@@ -571,7 +552,8 @@ export default function SajuCalculator() {
                                         const hidden = resData.mechanics.hidden_stems[p];
                                         const isGm = resData.mechanics.gongmang.includes(bazi.branch);
                                         const safeStem = (arr, isBold) => {
-                                            if (!arr || !arr[0] || arr[0].trim() === '' || arr[0] === 'null' || arr[0] === 'None') return '-';
+                                            // 🚨 시간 모름 등으로 인한 빈 값(-) 안전 처리
+                                            if (!arr || !arr[0] || arr[0].trim() === '' || arr[0] === 'null' || arr[0] === 'None' || arr[0] === '-') return '-';
                                             const el = renderTooltipItem(arr[0], true);
                                             return isBold ? <b>{el}</b> : el;
                                         };
@@ -598,7 +580,6 @@ export default function SajuCalculator() {
                     </div>
 
                     <div className="dashboard-layout">
-                        
                         {resData.classical?.reading && (
                             <div className="panel">
                                 <h3>📜 전문가용 심층 고법 간명지</h3>
