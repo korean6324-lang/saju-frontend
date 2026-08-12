@@ -30,6 +30,13 @@ export default function SajuCalculator() {
         setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     };
 
+    const hideTooltip = () => setTooltip(prev => ({ ...prev, show: false }));
+
+    // 🚨 [버그 픽스] 화면(view)이 바뀔 때 무조건 툴팁을 강제로 끄는 방어 로직
+    useEffect(() => {
+        hideTooltip();
+    }, [view]);
+
     useEffect(() => {
         let metaViewport = document.querySelector("meta[name=viewport]");
         if (!metaViewport) {
@@ -72,10 +79,10 @@ export default function SajuCalculator() {
 
         setTooltip({ show: true, meta, top, left });
     };
-    const hideTooltip = () => setTooltip(prev => ({ ...prev, show: false }));
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        hideTooltip(); // 🚨 스캔 시작 시에도 툴팁 강제 종료
         setLoading(true);
         try {
             const payload = {
@@ -183,7 +190,6 @@ export default function SajuCalculator() {
                 
                 .app-container { font-family: "'Noto Serif KR', serif"; background: var(--bg-color); min-height: 100vh; color: var(--text-main); width: 100%; max-width: 100vw; overflow-x: hidden; }
                 
-                /* 🚨 햄버거 메뉴 버튼 (우측 상단 고정으로 이동) */
                 .hamburger-btn {
                     position: fixed; top: 20px; right: 20px; z-index: 1000;
                     background: rgba(255,255,255,0.05); border: 1px solid #333; color: white;
@@ -192,7 +198,6 @@ export default function SajuCalculator() {
                 }
                 .hamburger-btn:hover { background: rgba(212,175,55,0.2); color: var(--gold-main); border-color: var(--gold-main); }
 
-                /* 우측 슬라이드 사이드바 메뉴 디자인 */
                 .sidebar-overlay {
                     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
                     background: rgba(0,0,0,0.7); z-index: 3000;
@@ -224,10 +229,8 @@ export default function SajuCalculator() {
                 .sidebar-login { display: flex; align-items: center; gap: 10px; color: #aaa; cursor: pointer; font-size: 14px; margin-top: 15px; font-weight: bold; transition: 0.2s; }
                 .sidebar-login:hover { color: var(--gold-light); }
 
-                /* 기존 레이아웃 */
                 .hero-section { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; background: radial-gradient(circle at center, #1a1e24 0%, var(--bg-color) 100%); text-align: center; position: relative; }
                 
-                /* 🚨 타이틀 디자인 조정 (위로 올리고 줄간격 확보) */
                 .hero-title { font-size: 3rem; font-weight: 900; letter-spacing: 2px; margin-top: -60px; margin-bottom: 25px; color: var(--gold-main); text-shadow: 0 4px 15px rgba(212,175,55,0.2); }
                 .hero-subtitle { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 50px; font-weight: 300; line-height: 1.6; }
                 
@@ -241,7 +244,6 @@ export default function SajuCalculator() {
                 .btn-primary { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--gold-dark), var(--gold-main)); color: #000; border: none; border-radius: 6px; font-size: 16px; font-weight: 900; cursor: pointer; margin-top: 25px; transition: transform 0.2s, box-shadow 0.2s; }
                 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212,175,55,0.4); }
                 
-                /* 🚨 좌측 상단으로 이동한 사전 열기 버튼 */
                 .top-nav { position: absolute; top: 20px; left: 20px; z-index: 100; }
                 .btn-icon { background: rgba(255,255,255,0.1); color: white; border: 1px solid #333; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; transition: 0.3s; }
                 .btn-icon:hover { background: var(--gold-main); color: #000; border-color: var(--gold-main); }
@@ -302,7 +304,6 @@ export default function SajuCalculator() {
                     .top-nav { left: 15px; top: 15px; }
                     .sidebar-menu { width: 85vw; max-width: 320px; }
                     
-                    /* 모바일 타이틀 조정 */
                     .hero-title { font-size: 1.8rem; margin-top: -40px; margin-bottom: 20px; }
                     .hero-subtitle { font-size: 0.9rem; word-break: keep-all; padding: 0 10px; margin-bottom: 40px; }
                     
@@ -333,10 +334,10 @@ export default function SajuCalculator() {
                 }
             `}</style>
 
-            {/* 🚨 햄버거 버튼 (우측 상단) */}
+            {/* 햄버거 버튼 */}
             <button className="hamburger-btn" onClick={() => setIsSidebarOpen(true)}>☰</button>
 
-            {/* 우측 사이드바(Drawer) 영역 */}
+            {/* 우측 사이드바 */}
             <div className={`sidebar-overlay ${isSidebarOpen ? 'open' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
             <div className={`sidebar-menu ${isSidebarOpen ? 'open' : ''}`}>
                 <div className="sidebar-header">
@@ -409,9 +410,7 @@ export default function SajuCalculator() {
 
             {view === "hero" && (
                 <div className="hero-section">
-                    {/* 🚨 사전열기 버튼은 좌측 상단으로 이동 */}
                     <div className="top-nav"><button className="btn-icon" onClick={() => setDictModal(prev => ({ ...prev, show: true }))}>📖 사전 열기</button></div>
-                    
                     <h1 className="hero-title">MYEONGRI MASTER</h1>
                     <div className="hero-subtitle">대한민국 1% 명리 마스터를 위한 초정밀 예측 시스템</div>
                     <form className="input-card" onSubmit={handleSubmit}>
@@ -463,7 +462,8 @@ export default function SajuCalculator() {
                         <h2>분석 리포트</h2>
                         <div>
                             <span style={{ fontSize: '12px', color: '#777', marginRight: '15px' }}>진태양시 보정: <span style={{ color: '#fff' }}>{resData.corrected_time}</span></span>
-                            <button className="btn-icon" onClick={handleCopy} style={{ marginRight: '8px' }}>📋 복사</button><button className="btn-icon" onClick={() => { setView("hero"); window.scrollTo(0,0); }} style={{ background: '#333' }}>⟲ 다시하기</button>
+                            <button className="btn-icon" onClick={handleCopy} style={{ marginRight: '8px' }}>📋 복사</button>
+                            <button className="btn-icon" onClick={() => { hideTooltip(); setView("hero"); window.scrollTo(0,0); }} style={{ background: '#333' }}>⟲ 다시하기</button>
                         </div>
                     </div>
 
