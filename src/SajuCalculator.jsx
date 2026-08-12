@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 // 🔴 파이썬 백엔드 주소 (Render)
 const BACKEND_URL = "https://saju-backend-ffum.onrender.com"; 
 
-// 🚨 [수정 완료] 다국어 객체 철거 후 한국어 단일 텍스트로 경량화
+// 🚨 [단일화 완료] 한국어 전용 텍스트
 const t = {
     btnDict: "📖 사전 열기", btnHome: "🏠 홈", btnProfile: "⚙️ 프로필 입력", btnSave: "🗂️ 저장한 명식", btnFaq: "❓ 자주 묻는 질문", btnCs: "🎧 고객센터", btnApp: "앱 다운로드", btnLogin: "로그인",
     landingTitle1: "당신의 운명,", landingTitle2: "데이터와 알고리즘", landingTitle3: "으로 해독하다",
@@ -79,7 +79,6 @@ export default function SajuCalculator() {
         setDictModal(prev => ({ ...prev, keyword }));
         if (!keyword) { setDictModal(prev => ({ ...prev, results: null })); return; }
         try {
-            // 🚨 [수정 완료] 언어 파라미터 삭제
             const response = await fetch(`${BACKEND_URL}/api/dictionary?q=${encodeURIComponent(keyword)}`);
             const results = await response.json();
             setDictModal(prev => ({ ...prev, results }));
@@ -90,7 +89,6 @@ export default function SajuCalculator() {
         setIsSidebarOpen(false); 
         setFaqModal({ show: true, data: null });
         try {
-            // 🚨 [수정 완료] 언어 파라미터 삭제
             const response = await fetch(`${BACKEND_URL}/api/faq`);
             const data = await response.json();
             setFaqModal({ show: true, data: data });
@@ -162,6 +160,7 @@ export default function SajuCalculator() {
 
     const handleCopy = () => { alert("복사 기능은 구조 개편 중입니다."); };
 
+    // 🚨 [수정 완료] 사전 연동 툴팁 렌더러
     const renderTooltipItem = (keyword, isChar = true, text = null) => {
         if (!resData) return text || keyword;
         const metaDict = resData.mechanics?.metadata || {};
@@ -191,16 +190,9 @@ export default function SajuCalculator() {
         el.onmousemove = (e) => { if (!isDown) return; e.preventDefault(); const walk = (e.pageX - el.offsetLeft - startX) * 2; el.scrollLeft = scrollLeft - walk; };
     };
 
-    const normalizeDynamics = (dataObj) => {
-        if (!dataObj) return [];
-        if (Array.isArray(dataObj)) return dataObj; 
-        return Object.entries(dataObj).map(([key, list]) => ({
-            name: key, position: Array.isArray(list) ? list.join(', ') : list, desc: ""
-        })).filter(item => item.position && item.position.length > 0);
-    };
-
-    const specialStarsArray = resData ? normalizeDynamics(resData.dynamics?.special_stars) : [];
-    const disastersArray = resData ? normalizeDynamics(resData.dynamics?.disasters) : [];
+    // 🚨 [수정 완료] 불필요한 배열 파싱 찌꺼기(normalizeDynamics) 완전 삭제 및 데이터 직선화
+    const specialStarsArray = resData?.dynamics?.special_stars || [];
+    const disastersArray = resData?.dynamics?.disasters || [];
 
     const renderLocationOptions = () => (
         <>
@@ -227,7 +219,6 @@ export default function SajuCalculator() {
                 html, body, #root, #__next { margin: 0 !important; padding: 0 !important; background-color: var(--bg-color) !important; width: 100%; max-width: 100vw; min-height: 100vh; overflow-x: hidden; }
                 
                 * { box-sizing: border-box; }
-                /* 🚨 한국어 전용이므로 모든 언어 분기 CSS 제거 */
                 div, p, span, h1, h2, h3, h4 { word-break: keep-all; overflow-wrap: break-word; } 
                 
                 ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -291,7 +282,7 @@ export default function SajuCalculator() {
                 label { font-size: 13px; font-weight: 700; color: var(--gold-light); margin-bottom: 5px; display: block; }
                 input, select { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid #333; color: white; border-radius: 6px; font-family: inherit; font-size: 14px; transition: all 0.3s; }
                 input:focus, select:focus { border-color: var(--gold-main); outline: none; }
-                .btn-primary { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--gold-dark), var(--gold-main)); color: #000; border: none; border-radius: 6px; font-size: 16px; font-weight: 900; cursor: pointer; margin-top: 25px; transition: transform 0.2s, box-shadow 0.2s; }
+                .btn-primary { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--gold-dark), var(--gold-main)); color: #000; border: none; border-radius: 6px; font-size: 16px; font-weight: 900; cursor: margin-top: 25px; transition: transform 0.2s, box-shadow 0.2s; }
                 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212,175,55,0.4); }
                 
                 .top-nav { position: absolute; top: 20px; left: 20px; z-index: 100; }
@@ -714,8 +705,10 @@ export default function SajuCalculator() {
                                         <h3>⚖️ 격국과 용신</h3>
                                         <div className="highlight-box">
                                             <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>나의 그릇</div>
-                                            {/* 🚨 [수정 완료] name_clean 을 사용하고, 원본 name(한자 포함)을 렌더링에 그대로 사용합니다 */}
-                                            <div style={{ fontSize: '18px', color: 'var(--gold-main)', fontWeight: 'bold', marginBottom: '5px' }}>{renderTooltipItem(resData.yongshin.geokguk?.name_clean || '-', false, resData.yongshin.geokguk?.name)}</div>
+                                            {/* 🚨 [수정 완료] 한자가 분실되지 않도록 괄호를 동적으로 조합하여 렌더링 */}
+                                            <div style={{ fontSize: '18px', color: 'var(--gold-main)', fontWeight: 'bold', marginBottom: '5px' }}>
+                                                {renderTooltipItem(resData.yongshin.geokguk?.name_clean || '-', false, resData.yongshin.geokguk?.name_clean + (resData.yongshin.geokguk?.hanja_clean ? `(${resData.yongshin.geokguk?.hanja_clean})` : ''))}
+                                            </div>
                                             <div style={{ fontSize: '13px' }}>{resData.yongshin.geokguk?.desc || '-'}</div>
                                         </div>
                                         <div className="highlight-box" style={{ borderLeftColor: 'var(--accent-blue)' }}>
@@ -731,7 +724,7 @@ export default function SajuCalculator() {
                                                 <span className="badge badge-bad">기신</span> {resData.yongshin.yongshin?.gishin || '-'}
                                             </div>
                                         </div>
-                                        {/* 🚨 [수정 완료] 백엔드의 boolean 판별 값만 사용하여 깔끔하게 조건 렌더링합니다 */}
+                                        {/* 🚨 [수정 완료] 통근력 방어 코드 찌꺼기 완전 제거 */}
                                         {resData.mechanics?.tonggeun !== undefined && (
                                             <div className="highlight-box" style={{ borderLeftColor: '#e67e22', marginBottom: 0, marginTop: '15px' }}>
                                                 <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.t_tonggeun_title}</div>
@@ -759,12 +752,13 @@ export default function SajuCalculator() {
                                             </div>
                                             <div style={{ marginTop: '15px' }}>
                                                 {resData.practical.health?.map((h, i) => {
-                                                    const bc = h.status.includes('양호') ? 'var(--accent-green)' : 'var(--accent-red)';
+                                                    // 백엔드가 준 status_code를 그대로 사용하여 색상을 그립니다
+                                                    const bc = h.type === "양호" ? 'var(--accent-green)' : (h.type === "고립(無)" ? "#aaa" : "var(--accent-red)");
                                                     return (
                                                         <div className="highlight-box" style={{ marginBottom: '10px', padding: '10px', borderLeftColor: bc }} key={i}>
-                                                            <div style={{ color: bc, fontWeight: 'bold', fontSize: '13px' }}>[{h.element}] {h.status}</div>
+                                                            <div style={{ color: bc, fontWeight: 'bold', fontSize: '13px' }}>[{h.element}] {h.original_status}</div>
                                                             <div style={{ fontSize: '12px', margin: '3px 0' }}>장기: {h.organ} / 증상: {h.symptom}</div>
-                                                            <div style={{ fontSize: '11px', color: '#888' }}>{h.advice}</div>
+                                                            <div style={{ fontSize: '11px', color: '#888' }}>{h.desc}</div>
                                                         </div>
                                                     );
                                                 })}
@@ -849,15 +843,28 @@ export default function SajuCalculator() {
                                 <div className="gunghap-grid">
                                     <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--accent-blue)' }}>
                                         <div style={{ fontSize: '12px', color: '#aaa' }}>나의 영혼 기운</div>
-                                        <div style={{ fontSize: '14px' }}>{resData.gunghap.my_samwon?.name || '-'} / <b style={{ color: 'var(--accent-blue)' }}>{resData.gunghap.my_star?.name || '-'}</b></div>
+                                        {/* 🚨 [수정 완료] 삼원갑자/구궁팔괘 툴팁 연동 및 한자 조합 */}
+                                        <div style={{ fontSize: '14px' }}>
+                                            {renderTooltipItem(resData.gunghap.my_samwon?.name, false, resData.gunghap.my_samwon?.name + (resData.gunghap.my_samwon?.hanja ? `(${resData.gunghap.my_samwon?.hanja})` : ''))} / 
+                                            <b style={{ color: 'var(--accent-blue)', marginLeft: '5px' }}>
+                                                {renderTooltipItem(resData.gunghap.my_star?.name, false, resData.gunghap.my_star?.name + (resData.gunghap.my_star?.hanja ? `(${resData.gunghap.my_star?.hanja})` : ''))}
+                                            </b>
+                                        </div>
                                     </div>
                                     <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--accent-red)' }}>
                                         <div style={{ fontSize: '12px', color: '#aaa' }}>상대방 영혼 기운</div>
-                                        <div style={{ fontSize: '14px' }}>{resData.gunghap.partner_samwon?.name || '-'} / <b style={{ color: 'var(--accent-red)' }}>{resData.gunghap.partner_star?.name || '-'}</b></div>
+                                        <div style={{ fontSize: '14px' }}>
+                                            {renderTooltipItem(resData.gunghap.partner_samwon?.name, false, resData.gunghap.partner_samwon?.name + (resData.gunghap.partner_samwon?.hanja ? `(${resData.gunghap.partner_samwon?.hanja})` : ''))} / 
+                                            <b style={{ color: 'var(--accent-red)', marginLeft: '5px' }}>
+                                                {renderTooltipItem(resData.gunghap.partner_star?.name, false, resData.gunghap.partner_star?.name + (resData.gunghap.partner_star?.hanja ? `(${resData.gunghap.partner_star?.hanja})` : ''))}
+                                            </b>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="highlight-box" style={{ borderLeftColor: 'var(--gold-main)' }}>
-                                    <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--gold-main)', marginBottom: '5px' }}>✨ 구궁(九宮) 겉궁합: {resData.gunghap.gugung?.status || '-'} ({resData.gunghap.gugung?.score || 0}점)</div>
+                                    <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--gold-main)', marginBottom: '5px' }}>
+                                        ✨ 구궁(九宮) 겉궁합: {renderTooltipItem(resData.gunghap.gugung?.status, false, resData.gunghap.gugung?.status + (resData.gunghap.gugung?.hanja ? `(${resData.gunghap.gugung?.hanja})` : ''))} ({resData.gunghap.gugung?.score || 0}점)
+                                    </div>
                                     <div style={{ fontSize: '13px', marginBottom: '10px', whiteSpace: 'pre-wrap' }}>{resData.gunghap.gugung?.desc || '-'}</div>
                                     <div style={{ background: 'rgba(0,0,0,0.5)', padding: '10px', borderRadius: '4px', fontSize: '12px' }}>
                                         <b style={{ color: 'var(--gold-light)' }}>📜 고서 비결:</b> {resData.gunghap.gugung?.classical || '-'}<br /><br />
@@ -865,7 +872,9 @@ export default function SajuCalculator() {
                                     </div>
                                 </div>
                                 <div className="highlight-box" style={{ borderLeftColor: '#9b59b6', margin: 0 }}>
-                                    <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#9b59b6', marginBottom: '5px' }}>🔥 일지(日支) 속궁합: {resData.gunghap.inner?.relation || '-'} - {resData.gunghap.inner?.status || '-'}</div>
+                                    <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#9b59b6', marginBottom: '5px' }}>
+                                        🔥 일지(日支) 속궁합: {renderTooltipItem(resData.gunghap.inner?.relation, false, resData.gunghap.inner?.relation + (resData.gunghap.inner?.hanja ? `(${resData.gunghap.inner?.hanja})` : ''))} - {resData.gunghap.inner?.status || '-'}
+                                    </div>
                                     <div style={{ fontSize: '13px' }}>{resData.gunghap.inner?.desc || '-'}</div>
                                 </div>
                             </div>
@@ -941,8 +950,10 @@ export default function SajuCalculator() {
                                             {specialStarsArray.map((star, idx) => (
                                                 <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--gold-main)', padding: '15px' }} key={idx}>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                                                        {/* 🚨 [수정 완료] 엔진에서 쪼갠 name_clean을 이용해 툴팁 호출, 원본 name은 그대로 표시 */}
-                                                        <span style={{ color: 'var(--gold-light)', fontWeight: 'bold', fontSize: '15px' }}>{renderTooltipItem(star.name_clean, false, star.name)}</span>
+                                                        {/* 🚨 [수정 완료] 한자 분실 복구 및 툴팁 완벽 연결 */}
+                                                        <span style={{ color: 'var(--gold-light)', fontWeight: 'bold', fontSize: '15px' }}>
+                                                            {renderTooltipItem(star.name_clean, false, star.name_clean + (star.hanja_clean ? `(${star.hanja_clean})` : ''))}
+                                                        </span>
                                                         <span className="badge" style={{ margin: 0, border: '1px solid var(--gold-dark)', color: 'var(--gold-main)', background: 'transparent' }}>{renderHanjaString(star.position)}</span>
                                                     </div>
                                                     <div style={{ fontSize: '13px', color: '#ccc', wordBreak: 'keep-all', lineHeight: '1.6' }}>
@@ -965,8 +976,10 @@ export default function SajuCalculator() {
                                             {disastersArray.map((dis, idx) => (
                                                 <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--accent-red)', padding: '15px' }} key={idx}>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                                                        {/* 🚨 [수정 완료] 엔진에서 쪼갠 name_clean을 이용해 툴팁 호출, 원본 name은 그대로 표시 */}
-                                                        <span style={{ color: 'var(--accent-red)', fontWeight: 'bold', fontSize: '15px' }}>{renderTooltipItem(dis.name_clean, false, dis.name)}</span>
+                                                        {/* 🚨 [수정 완료] 한자 분실 복구 및 툴팁 완벽 연결 */}
+                                                        <span style={{ color: 'var(--accent-red)', fontWeight: 'bold', fontSize: '15px' }}>
+                                                            {renderTooltipItem(dis.name_clean, false, dis.name_clean + (dis.hanja_clean ? `(${dis.hanja_clean})` : ''))}
+                                                        </span>
                                                         <span className="badge badge-bad" style={{ margin: 0 }}>{renderHanjaString(dis.position)}</span>
                                                     </div>
                                                     <div style={{ fontSize: '13px', color: '#ccc', wordBreak: 'keep-all', lineHeight: '1.6' }}>
