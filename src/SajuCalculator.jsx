@@ -3,11 +3,11 @@ import React, { useState, useEffect, useRef } from 'react';
 // 🔴 파이썬 백엔드 주소 (Render)
 const BACKEND_URL = "https://saju-backend-ffum.onrender.com"; 
 
-// 🚨 프론트엔드 UI 다국어 언어팩
+// 🚨 프론트엔드 UI 다국어 언어팩 (줄바꿈 \n 제거 후 안정화)
 const uiTexts = {
     ko: {
         btnDict: "📖 사전 열기", btnHome: "🏠 홈", btnProfile: "⚙️ 프로필 입력", btnSave: "🗂️ 저장한 명식", btnFaq: "❓ 자주 묻는 질문", btnCs: "🎧 고객센터", btnApp: "앱 다운로드", btnLogin: "로그인",
-        landingTitle1: "당신의 운명,\n", landingTitle2: "데이터와 알고리즘", landingTitle3: "으로 해독하다",
+        landingTitle1: "당신의 운명,", landingTitle2: "데이터와 알고리즘", landingTitle3: "으로 해독하다",
         landingDesc: "대한민국 상위 1% 대가들의 심층 간명 비법을\n10개의 다이내믹 엔진으로 완벽하게 구현한 초정밀 예측 시스템",
         btnStart: "내 운명 스캔 시작하기",
         feature1Title: "초정밀 사주 명리", feature1Desc: "단순한 키워드 나열이 아닙니다. 격국, 용신, 조후, 12성 당사주까지. 고서의 비결을 현대적 팩트폭행으로 치환한 심층 간명지를 제공합니다.",
@@ -27,8 +27,7 @@ const uiTexts = {
     },
     ja: {
         btnDict: "📖 辞典を開く", btnHome: "🏠 ホーム", btnProfile: "⚙️ 入力フォーム", btnSave: "🗂️ 保存した命式", btnFaq: "❓ よくある質問", btnCs: "🎧 サポート", btnApp: "アプリ", btnLogin: "ログイン",
-        landingTitle1: "あなたの運命を、\n", landingTitle2: "データとアルゴリズム", 
-        landingTitle3: "で解読", /* 🚨 'する' 생략: 일본어 체언멈춤(명사로 끝맺기) 적용 및 줄바꿈 버그 원천 차단 */
+        landingTitle1: "あなたの運命を、", landingTitle2: "データとアルゴリズム", landingTitle3: "で解読",
         landingDesc: "上位1%の大家の深層鑑定秘法を\n10のダイナミックエンジンで完璧に具現化した超精密予測システム",
         btnStart: "運命のスキャンを開始する",
         feature1Title: "超精密 四柱推命", feature1Desc: "単純なキーワードの羅列ではありません。格局、用神、調候から十二星まで。古書の秘訣を現代的かつ直説的に変換した深層鑑定書を提供します。",
@@ -48,7 +47,7 @@ const uiTexts = {
     },
     'zh-CN': {
         btnDict: "📖 打开字典", btnHome: "🏠 首页", btnProfile: "⚙️ 填写资料", btnSave: "🗂️ 已存命盘", btnFaq: "❓ 常见问题", btnCs: "🎧 客服中心", btnApp: "下载 APP", btnLogin: "登录",
-        landingTitle1: "您的命运，\n", landingTitle2: "通过数据与算法", landingTitle3: "来解读",
+        landingTitle1: "您的命运，", landingTitle2: "通过数据与算法", landingTitle3: "来解读",
         landingDesc: "将前1%命理大家的深层论命秘法\n通过10个动态引擎完美实现的超精密预测系统",
         btnStart: "开始扫描我的命运",
         feature1Title: "超精密 四柱八字", feature1Desc: "绝非简单的关键词堆砌。从格局、用神、调候到十二星。将古书秘诀转化为现代的直白解析，提供深层论命报告。",
@@ -68,7 +67,7 @@ const uiTexts = {
     },
     'zh-TW': {
         btnDict: "📖 打開字典", btnHome: "🏠 首頁", btnProfile: "⚙️ 填寫資料", btnSave: "🗂️ 已存命盤", btnFaq: "❓ 常見問題", btnCs: "🎧 客服中心", btnApp: "下載 APP", btnLogin: "登入",
-        landingTitle1: "您的命運，\n", landingTitle2: "透過數據與演算法", landingTitle3: "來解讀",
+        landingTitle1: "您的命運，", landingTitle2: "透過數據與演算法", landingTitle3: "來解讀",
         landingDesc: "將前1%命理大家的深層論命秘法\n透過10個動態引擎完美實現的超精密預測系統",
         btnStart: "開始掃描我的命運",
         feature1Title: "超精密 四柱八字", feature1Desc: "絕非簡單的關鍵詞堆砌。從格局、用神、調候到十二星。將古書秘訣轉化為現代的直白解析，提供深層論命報告。",
@@ -258,14 +257,16 @@ export default function SajuCalculator() {
     );
 
     return (
-        <div className="app-container">
+        /* 🚨 언어 코드(lang)를 CSS 최상단에 주입하여 언어별 분기 처리 */
+        <div className="app-container" lang={lang}>
             <style>{`
                 :root { --bg-color: #0d0f12; --card-bg: #16181d; --text-main: #f1f2f6; --text-muted: #95a5a6; --gold-light: #f1c40f; --gold-main: #d4af37; --gold-dark: #b5952f; --accent-red: #e74c3c; --accent-blue: #3498db; --accent-green: #2ecc71; }
                 html, body, #root, #__next { margin: 0 !important; padding: 0 !important; background-color: var(--bg-color) !important; width: 100%; max-width: 100vw; min-height: 100vh; overflow-x: hidden; }
+                * { box-sizing: border-box; }
                 
-                /* 🚨 [CSS 긴급 수정] h1, h2 태그에도 단어 단위 줄바꿈 금지 속성 강제 추가 (일본어/중국어 깨짐 방어) */
-                * { box-sizing: border-box; overflow-wrap: break-word !important; word-wrap: break-word !important; }
-                div, p, span, h1, h2, h3, h4 { word-break: keep-all; } 
+                /* 🚨 [무결점 CSS 방어] 한국어는 단어 보존, 일본어/중국어는 자연스러운 줄바꿈 허용 */
+                .app-container:lang(ko) { word-break: keep-all; overflow-wrap: break-word; }
+                .app-container:not(:lang(ko)) { word-break: normal; overflow-wrap: anywhere; line-break: strict; }
                 
                 ::-webkit-scrollbar { width: 6px; height: 6px; }
                 ::-webkit-scrollbar-track { background: var(--bg-color); }
@@ -273,17 +274,9 @@ export default function SajuCalculator() {
                 
                 .app-container { font-family: "'Noto Serif KR', serif"; background: var(--bg-color); min-height: 100vh; color: var(--text-main); width: 100%; max-width: 100vw; overflow-x: hidden; }
                 
-                .lang-switcher {
-                    position: fixed; top: 20px; right: 70px; z-index: 1000;
-                    display: flex; align-items: center; background: rgba(255,255,255,0.05);
-                    border: 1px solid #333; border-radius: 6px; padding: 6px 10px;
-                    backdrop-filter: blur(5px);
-                }
+                .lang-switcher { position: fixed; top: 20px; right: 70px; z-index: 1000; display: flex; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid #333; border-radius: 6px; padding: 6px 10px; backdrop-filter: blur(5px); }
                 .lang-switcher span { margin-right: 5px; font-size: 16px; }
-                .lang-switcher select {
-                    background: transparent; color: white; border: none; font-size: 13px; font-weight: bold;
-                    outline: none; cursor: pointer; appearance: none;
-                }
+                .lang-switcher select { background: transparent; color: white; border: none; font-size: 13px; font-weight: bold; outline: none; cursor: pointer; appearance: none; }
                 .lang-switcher select option { background: #16181d; color: white; }
                 
                 .hamburger-btn { position: fixed; top: 20px; right: 20px; z-index: 1000; background: rgba(255,255,255,0.05); border: 1px solid #333; color: white; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 20px; transition: 0.3s; backdrop-filter: blur(5px); }
@@ -304,15 +297,12 @@ export default function SajuCalculator() {
                 .sidebar-login { display: flex; align-items: center; gap: 10px; color: #aaa; cursor: pointer; font-size: 14px; margin-top: 15px; font-weight: bold; transition: 0.2s; }
                 .sidebar-login:hover { color: var(--gold-light); }
 
-                /* 대문(Home) 랜딩 페이지 */
-                .landing-section { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 60px 20px; background: radial-gradient(circle at center, #1a1e24 0%, var(--bg-color) 100%); text-align: center; }
+                /* 🚨 대문 랜딩 페이지 (천장 잘림 방지 15vh 여백 + flex-start 구조 유지) */
+                .landing-section { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; padding: 15vh 20px 80px 20px; background: radial-gradient(circle at center, #1a1e24 0%, var(--bg-color) 100%); text-align: center; }
                 .landing-hero { max-width: 900px; margin-bottom: 50px; animation: fadeIn 1s ease-out; }
-                
-                /* 🚨 타이틀 CSS 방어선 추가 (white-space: pre-wrap 로 \n 강제 유지) */
-                .landing-title { font-size: 3.5rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 20px; color: #fff; line-height: 1.3; white-space: pre-wrap; }
+                .landing-title { font-size: 3.5rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 20px; color: #fff; line-height: 1.3; }
                 .landing-title span { color: var(--gold-main); text-shadow: 0 0 20px rgba(212,175,55,0.3); }
                 .landing-subtitle { font-size: 1.2rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 40px; font-weight: 300; white-space: pre-wrap; }
-                
                 .btn-cta { background: linear-gradient(135deg, var(--gold-dark), var(--gold-main)); color: #000; border: none; border-radius: 50px; padding: 20px 40px; font-size: 1.2rem; font-weight: 900; cursor: pointer; box-shadow: 0 10px 30px rgba(212,175,55,0.3); transition: all 0.3s; animation: pulse 2s infinite; }
                 .btn-cta:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(212,175,55,0.5); animation: none; }
                 
@@ -518,7 +508,11 @@ export default function SajuCalculator() {
                 <div className="landing-section">
                     <div className="top-nav"><button className="btn-icon" onClick={() => setDictModal(prev => ({ ...prev, show: true }))}>{t.btnDict}</button></div>
                     <div className="landing-hero">
-                        <h1 className="landing-title">{t.landingTitle1}<span>{t.landingTitle2}</span>{t.landingTitle3}</h1>
+                        {/* 🚨 [무결점 레이아웃] 명시적 줄바꿈 태그(<br/>) 적용으로 브라우저 오작동 100% 방지 */}
+                        <h1 className="landing-title">
+                            {t.landingTitle1}<br/>
+                            <span>{t.landingTitle2}</span>{t.landingTitle3}
+                        </h1>
                         <p className="landing-subtitle">{t.landingDesc}</p>
                         <button className="btn-cta" onClick={() => { setView("input"); window.scrollTo(0,0); }}>{t.btnStart}</button>
                     </div>
@@ -663,6 +657,10 @@ export default function SajuCalculator() {
                             <button className="btn-icon" onClick={() => { hideTooltip(); setView("input"); window.scrollTo(0,0); }} style={{ background: '#333' }}>{t.btnRetry}</button>
                         </div>
                     </div>
+
+                    {resData.applied_traditional && (
+                        <div style={{ background: 'rgba(231,76,60,0.1)', borderLeft: '3px solid var(--accent-red)', padding: '15px', borderRadius: '6px', marginBottom: '20px', fontSize: '13px' }}>⚠️ <b>고법(古法) 명리 적용:</b> 천문학적 절기를 무시하고 입력하신 음력 달로 월주가 덮어씌워졌습니다.</div>
+                    )}
 
                     <div className="bazi-table-container">
                         <table className="bazi-table">
