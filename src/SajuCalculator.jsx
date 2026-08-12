@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 const BACKEND_URL = "https://saju-backend-ffum.onrender.com"; 
 
 export default function SajuCalculator() {
-    // 🚨 초기 뷰를 'home'(대문)으로 변경
+    // 초기 뷰를 'home'(대문)으로 유지
     const [view, setView] = useState("home"); 
     const [loading, setLoading] = useState(false);
     const [resData, setResData] = useState(null);
@@ -232,7 +232,7 @@ export default function SajuCalculator() {
                 .sidebar-login { display: flex; align-items: center; gap: 10px; color: #aaa; cursor: pointer; font-size: 14px; margin-top: 15px; font-weight: bold; transition: 0.2s; }
                 .sidebar-login:hover { color: var(--gold-light); }
 
-                /* 🚨 대문(Home) 랜딩 페이지 전용 디자인 */
+                /* 대문(Home) 랜딩 페이지 전용 디자인 */
                 .landing-section { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 60px 20px; background: radial-gradient(circle at center, #1a1e24 0%, var(--bg-color) 100%); text-align: center; }
                 .landing-hero { max-width: 900px; margin-bottom: 50px; animation: fadeIn 1s ease-out; }
                 .landing-title { font-size: 3.5rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 20px; color: #fff; line-height: 1.3; }
@@ -256,9 +256,19 @@ export default function SajuCalculator() {
                 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(212,175,55,0.4); } 70% { box-shadow: 0 0 0 15px rgba(212,175,55,0); } 100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); } }
                 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-                /* 프로필 입력 화면 (hero-section) */
-                .hero-section { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; background: var(--bg-color); text-align: center; position: relative; }
-                .hero-title { font-size: 2.5rem; font-weight: 900; letter-spacing: 2px; margin-top: -30px; margin-bottom: 20px; color: var(--gold-main); text-shadow: 0 4px 15px rgba(212,175,55,0.2); }
+                /* 🚨 프로필 입력 화면 (잘림 방지 및 레이아웃 수정) */
+                .hero-section { 
+                    display: flex; 
+                    flex-direction: column; 
+                    align-items: center; 
+                    justify-content: flex-start; /* flex-start로 변경하여 무조건 아래로만 늘어나게 방어 */
+                    min-height: 100vh; 
+                    padding: 12vh 20px 80px 20px; /* 상단 여백을 충분히 주어 폼이 안전하게 스크롤되게 함 */
+                    background: var(--bg-color); 
+                    text-align: center; 
+                    position: relative; 
+                }
+                .hero-title { font-size: 2.5rem; font-weight: 900; letter-spacing: 2px; margin-top: 0; margin-bottom: 20px; color: var(--gold-main); text-shadow: 0 4px 15px rgba(212,175,55,0.2); }
                 .hero-subtitle { font-size: 1rem; color: var(--text-muted); margin-bottom: 40px; font-weight: 300; line-height: 1.6; }
                 
                 .input-card { background: var(--card-bg); padding: 30px; border-radius: 12px; width: 100%; max-width: 700px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
@@ -339,6 +349,8 @@ export default function SajuCalculator() {
                     .landing-subtitle { font-size: 1rem; padding: 0 10px; }
                     .feature-card { padding: 20px; }
                     
+                    /* 모바일: 히어로 섹션 상하 여백 안전 장치 */
+                    .hero-section { padding-top: 100px; padding-bottom: 60px; }
                     .hero-title { font-size: 1.8rem; margin-top: 0px; margin-bottom: 15px; }
                     .hero-subtitle { font-size: 0.9rem; word-break: keep-all; padding: 0 10px; margin-bottom: 30px; }
                     
