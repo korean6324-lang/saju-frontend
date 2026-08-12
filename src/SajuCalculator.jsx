@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 // 🔴 파이썬 백엔드 주소 (Render)
 const BACKEND_URL = "https://saju-backend-ffum.onrender.com"; 
 
-// 🚨 프론트엔드 UI 다국어 언어팩 (사전 검색 안내 문구 추가 완료)
+// 🚨 프론트엔드 UI 다국어 언어팩 (일본어 타이틀 완벽 수정 및 복구)
 const uiTexts = {
     ko: {
         btnDict: "📖 사전 열기", btnHome: "🏠 홈", btnProfile: "⚙️ 프로필 입력", btnSave: "🗂️ 저장한 명식", btnFaq: "❓ 자주 묻는 질문", btnCs: "🎧 고객센터", btnApp: "앱 다운로드", btnLogin: "로그인",
@@ -28,7 +28,8 @@ const uiTexts = {
     },
     ja: {
         btnDict: "📖 辞典を開く", btnHome: "🏠 ホーム", btnProfile: "⚙️ 入力フォーム", btnSave: "🗂️ 保存した命式", btnFaq: "❓ よくある質問", btnCs: "🎧 サポート", btnApp: "アプリ", btnLogin: "ログイン",
-        landingTitle1: "あなたの運命を、", landingTitle2: "データとアルゴリズム", landingTitle3: "で解読する",
+        landingTitle1: "あなたの運命を、", landingTitle2: "データとアルゴリズム", 
+        landingTitle3: "で解読", /* 🚨 명사형 종결로 복구 완료 (줄바꿈 원천 차단) */
         landingDesc: "上位1%の大家の深層鑑定秘法を\n10のダイナミックエンジンで完璧に具現化した超精密予測システム",
         btnStart: "運命のスキャンを開始する",
         feature1Title: "超精密 四柱推命", feature1Desc: "単純なキーワードの羅列ではありません。格局、用神、調候から十二星まで。古書の秘訣を現代的かつ直説的に変換した深層鑑定書を提供します。",
@@ -263,12 +264,17 @@ export default function SajuCalculator() {
             <style>{`
                 :root { --bg-color: #0d0f12; --card-bg: #16181d; --text-main: #f1f2f6; --text-muted: #95a5a6; --gold-light: #f1c40f; --gold-main: #d4af37; --gold-dark: #b5952f; --accent-red: #e74c3c; --accent-blue: #3498db; --accent-green: #2ecc71; }
                 html, body, #root, #__next { margin: 0 !important; padding: 0 !important; background-color: var(--bg-color) !important; width: 100%; max-width: 100vw; min-height: 100vh; overflow-x: hidden; }
-                * { box-sizing: border-box; }
                 
-                /* 🚨 [CSS 3중 방어] агрессив한 overflow-wrap 제거, 안전한 기본 줄바꿈 복구 */
+                /* 🚨 [무결점 CSS 방어] 일본어/중국어는 무조건 글자 단위로 줄바꿈 되도록 !important 강제 쐐기 박기 */
+                * { box-sizing: border-box; }
                 div, p, span, h1, h2, h3, h4 { word-break: keep-all; overflow-wrap: break-word; } 
-                .app-container:lang(ko) { word-break: keep-all; overflow-wrap: break-word; }
-                .app-container:not(:lang(ko)) { word-break: normal; overflow-wrap: break-word; line-break: strict; }
+                .app-container:not(:lang(ko)) *, 
+                .app-container:not(:lang(ko)) h1, 
+                .app-container:not(:lang(ko)) p, 
+                .app-container:not(:lang(ko)) div { 
+                    word-break: normal !important; 
+                    overflow-wrap: break-word !important; 
+                }
                 
                 ::-webkit-scrollbar { width: 6px; height: 6px; }
                 ::-webkit-scrollbar-track { background: var(--bg-color); }
@@ -301,8 +307,6 @@ export default function SajuCalculator() {
 
                 .landing-section { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; padding: 15vh 20px 80px 20px; background: radial-gradient(circle at center, #1a1e24 0%, var(--bg-color) 100%); text-align: center; }
                 .landing-hero { max-width: 900px; margin-bottom: 50px; animation: fadeIn 1s ease-out; }
-                
-                /* 🚨 타이틀 CSS 방어: span 전체를 칠하지 않도록 클래스 분리 */
                 .landing-title { font-size: 3.5rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 20px; color: #fff; line-height: 1.3; white-space: pre-wrap; }
                 .landing-title span.highlight { color: var(--gold-main); text-shadow: 0 0 20px rgba(212,175,55,0.3); }
                 .landing-subtitle { font-size: 1.2rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 40px; font-weight: 300; white-space: pre-wrap; }
@@ -383,6 +387,7 @@ export default function SajuCalculator() {
                 .hanja-tooltip { display: inline-block; cursor: pointer; color: var(--gold-main); border-bottom: 1px dashed rgba(212,175,55,0.5); }
                 .hanja-tooltip.char-tooltip { color: #fff; border-bottom: none; }
                 
+                /* 사전 모달창 고정 (Jitter 완벽 해결) */
                 .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 4000; backdrop-filter: blur(5px); }
                 .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); width: 90%; max-width: 600px; height: 80vh; border-radius: 12px; padding: 25px; display: flex; flex-direction: column; border: 1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: left; }
                 .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
@@ -410,7 +415,7 @@ export default function SajuCalculator() {
                     
                     .hero-section { padding-top: 100px; padding-bottom: 60px; }
                     .hero-title { font-size: 1.8rem; margin-top: 0px; margin-bottom: 15px; }
-                    .hero-subtitle { font-size: 0.9rem; word-break: keep-all; padding: 0 10px; margin-bottom: 30px; }
+                    .hero-subtitle { font-size: 0.9rem; padding: 0 10px; margin-bottom: 30px; }
                     
                     .input-card { padding: 20px 15px; border-radius: 0; border-left: none; border-right: none; }
                     .form-grid { grid-template-columns: 1fr; gap: 15px; } 
@@ -512,11 +517,10 @@ export default function SajuCalculator() {
                 <div className="landing-section">
                     <div className="top-nav"><button className="btn-icon" onClick={() => setDictModal(prev => ({ ...prev, show: true }))}>{t.btnDict}</button></div>
                     <div className="landing-hero">
-                        {/* 🚨 [무결점 레이아웃] 'で解読する'에 white-space: nowrap 적용으로 절대 찢어지지 않음 */}
                         <h1 className="landing-title">
                             {t.landingTitle1}<br/>
                             <span className="highlight">{t.landingTitle2}</span>
-                            <span style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>{t.landingTitle3}</span>
+                            {t.landingTitle3}
                         </h1>
                         <p className="landing-subtitle">{t.landingDesc}</p>
                         <button className="btn-cta" onClick={() => { setView("input"); window.scrollTo(0,0); }}>{t.btnStart}</button>
@@ -774,7 +778,7 @@ export default function SajuCalculator() {
                                                                 <div style={{ fontSize: '12px', color: '#ccc' }}>{ev.desc}</div>
                                                             </div>
                                                         )
-                                                    }) : <div style={{ fontSize: '12px', color: '#777' }}>올해는 큰 충/합이 없는 평탄한 시기입니다.</div>}
+                                                    }) : <div style={{ fontSize: '12px', color: '#777' }}>올해는 큰 충/합이 없는 평탄한 시기닙니다.</div>}
                                                 </>
                                             )
                                         })()}
