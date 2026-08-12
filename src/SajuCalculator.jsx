@@ -9,6 +9,9 @@ export default function SajuCalculator() {
     const [resData, setResData] = useState(null);
     const [copyFormattedText, setCopyFormattedText] = useState("");
     
+    // 🚨 [신규] 사이드바 메뉴 상태
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    
     // 모달 및 툴팁 상태
     const [errorModal, setErrorModal] = useState({ show: false, msg: "" });
     const [dictModal, setDictModal] = useState({ show: false, keyword: "", results: null });
@@ -160,7 +163,7 @@ export default function SajuCalculator() {
         return Object.entries(dataObj).map(([key, list]) => ({
             name: key,
             position: Array.isArray(list) ? list.join(', ') : list,
-            desc: "⚠️ 백엔드(logic_dynamics.py) 파일이 아직 예전 버전입니다."
+            desc: "⚠️ 백엔드(logic_dynamics.py) 파일이 아직 예전 버전입니다. 깃허브에 코드를 덮어쓰기 하시면 전문가용 심층 분석이 출력됩니다!"
         })).filter(item => item.position && item.position.length > 0);
     };
 
@@ -180,7 +183,48 @@ export default function SajuCalculator() {
                 
                 .app-container { font-family: "'Noto Serif KR', serif"; background: var(--bg-color); min-height: 100vh; color: var(--text-main); width: 100%; max-width: 100vw; overflow-x: hidden; }
                 
-                /* 메인 화면 */
+                /* 🚨 햄버거 메뉴 버튼 (좌측 상단 고정) */
+                .hamburger-btn {
+                    position: fixed; top: 20px; left: 20px; z-index: 1000;
+                    background: rgba(255,255,255,0.05); border: 1px solid #333; color: white;
+                    padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 20px;
+                    transition: 0.3s; backdrop-filter: blur(5px);
+                }
+                .hamburger-btn:hover { background: rgba(212,175,55,0.2); color: var(--gold-main); border-color: var(--gold-main); }
+
+                /* 🚨 우측 슬라이드 사이드바 메뉴 디자인 */
+                .sidebar-overlay {
+                    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                    background: rgba(0,0,0,0.7); z-index: 3000;
+                    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+                    backdrop-filter: blur(3px);
+                }
+                .sidebar-overlay.open { opacity: 1; pointer-events: auto; }
+                
+                .sidebar-menu {
+                    position: fixed; top: 0; right: 0; width: 300px; height: 100vh;
+                    background: var(--card-bg); z-index: 3001;
+                    transform: translateX(100%); transition: transform 0.3s ease-in-out;
+                    box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+                    display: flex; flex-direction: column; text-align: left;
+                    border-left: 1px solid #333;
+                }
+                .sidebar-menu.open { transform: translateX(0); }
+                
+                .sidebar-header { padding: 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+                .sidebar-header h3 { margin: 0; color: var(--gold-main); font-size: 1.1rem; font-weight: 900; letter-spacing: 1px; }
+                .sidebar-close-btn { background: none; border: none; font-size: 28px; color: #888; cursor: pointer; padding: 0; line-height: 1; transition: 0.2s; }
+                .sidebar-close-btn:hover { color: white; }
+                
+                .sidebar-content { flex: 1; overflow-y: auto; padding: 10px 0; }
+                .sidebar-item { padding: 18px 25px; border-bottom: 1px solid rgba(255,255,255,0.03); color: var(--text-main); display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; font-size: 15px; font-weight: 500; }
+                .sidebar-item:hover { background: rgba(212,175,55,0.05); color: var(--gold-main); padding-left: 30px; }
+                
+                .sidebar-footer { padding: 25px 20px; border-top: 1px solid #333; background: rgba(0,0,0,0.3); }
+                .sidebar-login { display: flex; align-items: center; gap: 10px; color: #aaa; cursor: pointer; font-size: 14px; margin-top: 15px; font-weight: bold; transition: 0.2s; }
+                .sidebar-login:hover { color: var(--gold-light); }
+
+                /* 기존 레이아웃 */
                 .hero-section { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; background: radial-gradient(circle at center, #1a1e24 0%, var(--bg-color) 100%); text-align: center; position: relative; }
                 .hero-title { font-size: 3rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 10px; color: var(--gold-main); text-shadow: 0 4px 15px rgba(212,175,55,0.2); }
                 .hero-subtitle { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 40px; font-weight: 300; }
@@ -193,14 +237,13 @@ export default function SajuCalculator() {
                 input:focus, select:focus { border-color: var(--gold-main); outline: none; }
                 .btn-primary { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--gold-dark), var(--gold-main)); color: #000; border: none; border-radius: 6px; font-size: 16px; font-weight: 900; cursor: pointer; margin-top: 25px; transition: transform 0.2s, box-shadow 0.2s; }
                 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212,175,55,0.4); }
-                .top-nav { position: absolute; top: 20px; right: 20px; z-index: 100; }
+                
+                .dashboard { padding: 60px 20px 40px 20px; max-width: 1300px; margin: auto; width: 100%; box-sizing: border-box; } /* 상단 햄버거 메뉴를 피하기 위해 padding-top 증가 */
+                .dash-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 30px; }
+                .dash-header h2 { margin: 0; color: var(--gold-main); font-weight: 900; padding-left: 50px; } /* 햄버거 버튼과 겹치지 않게 여백 추가 */
+                
                 .btn-icon { background: rgba(255,255,255,0.1); color: white; border: 1px solid #333; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; transition: 0.3s; }
                 .btn-icon:hover { background: var(--gold-main); color: #000; border-color: var(--gold-main); }
-                
-                /* 대시보드 공통 */
-                .dashboard { padding: 40px 20px; max-width: 1300px; margin: auto; width: 100%; box-sizing: border-box; }
-                .dash-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 30px; }
-                .dash-header h2 { margin: 0; color: var(--gold-main); font-weight: 900; }
                 
                 .bazi-table-container { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid #222; margin-bottom: 30px; overflow-x: auto; width: 100%; }
                 .bazi-table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: center; }
@@ -211,9 +254,7 @@ export default function SajuCalculator() {
                 .ten-god { font-size: 13px; color: var(--gold-main); margin-bottom: 5px; font-weight: 700; letter-spacing: 1px; }
                 .hidden-stems { font-size: 13px; color: #eee; margin-top: 15px; text-align: center !important; background: rgba(0,0,0,0.4); padding: 12px 5px; border-radius: 8px; font-weight: 500; letter-spacing: 2px; }
                 
-                /* 🚨 밀도 100% 벤토 박스 레이아웃 (Bento Box) */
                 .dashboard-layout { display: flex; flex-direction: column; gap: 20px; width: 100%; }
-                
                 .bento-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
                 .bento-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
                 .bento-col { display: flex; flex-direction: column; gap: 20px; }
@@ -232,14 +273,13 @@ export default function SajuCalculator() {
                 .timeline-card { flex: 0 0 100px; background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 8px; text-align: center !important; padding: 15px 10px; transition: 0.3s; user-select: none; }
                 .timeline-card.current-year { border: 2px solid var(--gold-main) !important; background: rgba(212,175,55,0.2) !important; box-shadow: 0 0 15px rgba(212,175,55,0.5); transform: scale(1.05); }
 
-                /* 뱃지 및 모달 */
                 .badge { display: inline-block; padding: 4px 8px; background: rgba(255,255,255,0.05); border: 1px solid #444; border-radius: 4px; font-size: 12px; margin: 3px; font-weight: 700; color: #ccc; }
                 .badge-good { border-color: var(--accent-green); color: var(--accent-green); background: rgba(46,204,113,0.1); }
                 .badge-bad { border-color: var(--accent-red); color: var(--accent-red); background: rgba(231,76,60,0.1); }
                 .hanja-tooltip { display: inline-block; cursor: pointer; color: var(--gold-main); border-bottom: 1px dashed rgba(212,175,55,0.5); }
                 .hanja-tooltip.char-tooltip { color: #fff; border-bottom: none; }
                 
-                .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 2000; backdrop-filter: blur(5px); }
+                .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 4000; backdrop-filter: blur(5px); }
                 .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); width: 90%; max-width: 600px; max-height: 80vh; border-radius: 12px; padding: 25px; display: flex; flex-direction: column; border: 1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: left; }
                 .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
                 .modal-header h3 { margin: 0; color: var(--gold-main); }
@@ -248,29 +288,31 @@ export default function SajuCalculator() {
                 .dict-results { overflow-y: auto; padding-right: 10px; margin-top: 15px; }
                 .dict-item { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 4px solid var(--gold-main); margin-bottom: 15px; }
 
-                /* 📱📱 🚨 모바일 및 테블릿 벤토 반응형 제어 🚨 📱📱 */
+                /* 📱📱 🚨 모바일 및 테블릿 반응형 제어 🚨 📱📱 */
                 @media (max-width: 1024px) {
-                    /* 테블릿: 3단을 2단으로 접음 */
                     .bento-row-3 { grid-template-columns: 1fr 1fr; }
                 }
                 @media (max-width: 768px) {
-                    /* 모바일: 전부 1열로 예쁘게 쌓음 */
+                    .hamburger-btn { top: 15px; left: 15px; font-size: 18px; padding: 6px 10px; }
+                    .sidebar-menu { width: 85vw; max-width: 320px; }
+                    
                     .hero-title { font-size: 1.8rem; }
                     .hero-subtitle { font-size: 0.9rem; word-break: keep-all; padding: 0 10px; }
                     .input-card { padding: 20px 15px; border-radius: 0; border-left: none; border-right: none; }
                     .form-grid { grid-template-columns: 1fr; gap: 15px; } 
                     .options-row { flex-direction: column; align-items: flex-start; gap: 10px; } 
                     
-                    .dashboard { padding: 15px 10px; overflow-x: hidden; }
+                    .dashboard { padding: 60px 10px 20px 10px; overflow-x: hidden; }
                     .dash-header { flex-direction: column; gap: 10px; align-items: flex-start; }
+                    .dash-header h2 { padding-left: 0; }
                     .dash-header div { width: 100%; display: flex; justify-content: space-between; }
+                    
                     .bazi-table-container { padding: 15px 5px; border-radius: 8px; }
                     .bazi-table th { font-size: 11px; padding-bottom: 8px; }
                     .bazi-table td { padding: 10px 2px; }
                     .stem, .branch { font-size: 26px; }
                     .hidden-stems { font-size: 10px; padding: 8px 2px; letter-spacing: 0; word-break: break-all; }
                     
-                    /* 벤토 박스를 수직 1단으로 병합 */
                     .bento-row-2, .bento-row-3 { grid-template-columns: 1fr; gap: 15px; }
                     .panel { padding: 15px; border-radius: 8px; word-break: break-word; }
                     
@@ -282,6 +324,46 @@ export default function SajuCalculator() {
                     .elements-flex > div { flex: 1 1 30%; min-width: 50px; padding: 8px !important; }
                 }
             `}</style>
+
+            {/* 🚨 햄버거 버튼 */}
+            <button className="hamburger-btn" onClick={() => setIsSidebarOpen(true)}>☰</button>
+
+            {/* 🚨 우측 사이드바(Drawer) 영역 */}
+            <div className={`sidebar-overlay ${isSidebarOpen ? 'open' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
+            <div className={`sidebar-menu ${isSidebarOpen ? 'open' : ''}`}>
+                <div className="sidebar-header">
+                    <h3>MYEONGRI</h3>
+                    <button className="sidebar-close-btn" onClick={() => setIsSidebarOpen(false)}>×</button>
+                </div>
+                <div className="sidebar-content">
+                    <div className="sidebar-item" onClick={() => { setView("hero"); setIsSidebarOpen(false); window.scrollTo(0,0); }}>
+                        🏠 홈
+                    </div>
+                    <div className="sidebar-item" onClick={() => { setDictModal({ show: true, keyword: "", results: null }); setIsSidebarOpen(false); }}>
+                        📖 마스터 백과사전
+                    </div>
+                    <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>
+                        🗂️ 저장한 명식
+                    </div>
+                    <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>
+                        ⚙️ 프로필 입력
+                    </div>
+                    <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>
+                        ❓ 자주 묻는 질문
+                    </div>
+                    <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>
+                        🎧 고객센터
+                    </div>
+                </div>
+                <div className="sidebar-footer">
+                    <button className="btn-primary" style={{ marginTop: 0, padding: '12px' }} onClick={() => alert('앱 출시 준비 중입니다.')}>
+                        앱 다운로드
+                    </button>
+                    <div className="sidebar-login" onClick={() => alert('로그인 기능 준비 중입니다.')}>
+                        <span>🚪</span> 로그인
+                    </div>
+                </div>
+            </div>
 
             {tooltip.show && tooltip.meta && (
                 <div style={{ position: 'fixed', zIndex: 9999, width: '260px', maxWidth: '90vw', backgroundColor: '#222', color: '#fff', textAlign: 'left', borderRadius: '8px', padding: '15px', fontSize: '13px', lineHeight: '1.5', border: '1px solid #444', boxShadow: '0 10px 25px rgba(0,0,0,0.8)', pointerEvents: 'none', fontWeight: 300, top: tooltip.top + 'px', left: tooltip.left + 'px' }}>
@@ -308,7 +390,7 @@ export default function SajuCalculator() {
             )}
 
             {errorModal.show && (
-                <div className="modal-overlay" style={{ zIndex: 3000 }}>
+                <div className="modal-overlay" style={{ zIndex: 4000 }}>
                     <div className="modal-content" style={{ borderLeft: '4px solid var(--accent-red)' }}>
                         <div className="modal-header"><h3 style={{ color: 'var(--accent-red)' }}>⚠️ 시스템 오류 안내</h3><button className="close-btn" onClick={() => setErrorModal({ show: false, msg: "" })}>×</button></div>
                         <div style={{ marginBottom: '15px' }}><textarea readOnly value={errorModal.msg} style={{ width: '100%', height: '150px', background: '#000', color: 'var(--accent-red)', padding: '10px', border: '1px solid #333', borderRadius: '6px', fontFamily: 'monospace', resize: 'none' }}></textarea></div>
@@ -319,7 +401,6 @@ export default function SajuCalculator() {
 
             {view === "hero" && (
                 <div className="hero-section">
-                    <div className="top-nav"><button className="btn-icon" onClick={() => setDictModal(prev => ({ ...prev, show: true }))}>📖 사전 열기</button></div>
                     <h1 className="hero-title">MYEONGRI MASTER</h1>
                     <div className="hero-subtitle">대한민국 1% 명리 마스터를 위한 초정밀 예측 시스템</div>
                     <form className="input-card" onSubmit={handleSubmit}>
@@ -379,7 +460,6 @@ export default function SajuCalculator() {
                         <div style={{ background: 'rgba(231,76,60,0.1)', borderLeft: '3px solid var(--accent-red)', padding: '15px', borderRadius: '6px', marginBottom: '20px', fontSize: '13px' }}>⚠️ <b>고법(古法) 명리 적용:</b> 천문학적 절기를 무시하고 입력하신 음력 달로 월주가 덮어씌워졌습니다.</div>
                     )}
 
-                    {/* 원국 4기둥 */}
                     <div className="bazi-table-container">
                         <table className="bazi-table">
                             <thead><tr><th>연주 (Year)</th><th>월주 (Month)</th><th>일주 (Day)</th><th>시주 (Hour)</th></tr></thead>
@@ -416,10 +496,8 @@ export default function SajuCalculator() {
                         </table>
                     </div>
 
-                    {/* 🚨 궁극의 밀도: 벤토 박스 레이아웃 시작 */}
                     <div className="dashboard-layout">
                         
-                        {/* [상단 그룹]: 심층 간명지 (가로 꽉 채움) */}
                         {resData.classical?.reading && (
                             <div className="panel">
                                 <h3>📜 전문가용 심층 고법 간명지</h3>
@@ -454,9 +532,7 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* [중단 1 그룹]: 2단 분할 (격국과 용신 / 운세) */}
                         <div className="bento-row-2">
-                            {/* 좌측: 격국과 용신 */}
                             <div className="bento-col">
                                 {resData.yongshin && (
                                     <div className="panel" style={{ height: '100%' }}>
@@ -483,7 +559,6 @@ export default function SajuCalculator() {
                                 )}
                             </div>
                             
-                            {/* 우측: 올해 및 이달의 운세 */}
                             <div className="bento-col">
                                 {resData.unse?.year && (
                                     <div className="panel">
@@ -540,7 +615,6 @@ export default function SajuCalculator() {
                             </div>
                         </div>
 
-                        {/* [중단 2 그룹]: 실용통변 (가로 꽉 채움) */}
                         {resData.practical && (
                             <div className="panel">
                                 <h3>💼 현대 실용 통변 (직업 & 헬스케어)</h3>
@@ -566,7 +640,6 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 납음오행 (가로 꽉 채움) */}
                         {resData.napeum_reading && (
                             <div className="panel">
                                 <h3>🎵 납음오행(納音五行)의 숨은 파동</h3>
@@ -582,7 +655,6 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 궁합 분석 (가로 꽉 채움) */}
                         {resData.gunghap && (
                             <div className="panel">
                                 <h3>💞 삼원갑자 및 심층 궁합 분석</h3>
@@ -611,7 +683,6 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 인생 타임라인 (가로 꽉 채움) */}
                         {resData.timeline && (
                             <div className="panel">
                                 <h3>⏳ 인생 타임라인 (스와이프 하여 확인)</h3>
@@ -646,9 +717,7 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 🚨 [하단 그룹]: 3단 분할 벤토 (가장 골칫거리였던 빈 공간 완벽 해결) */}
                         <div className="bento-row-3">
-                            {/* 좌측 기둥: 기초 역학 지표 모음 */}
                             <div className="bento-col">
                                 {resData.mechanics?.elements_dist && (
                                     <div className="panel">
@@ -696,7 +765,6 @@ export default function SajuCalculator() {
                                 )}
                             </div>
 
-                            {/* 중앙 기둥: 심층 신살 */}
                             <div className="bento-col">
                                 {specialStarsArray.length > 0 && (
                                     <div className="panel" style={{ height: '100%' }}>
@@ -720,7 +788,6 @@ export default function SajuCalculator() {
                                 )}
                             </div>
 
-                            {/* 우측 기둥: 흉액 진단 */}
                             <div className="bento-col">
                                 {disastersArray.length > 0 && (
                                     <div className="panel" style={{ height: '100%' }}>
