@@ -132,7 +132,7 @@ export default function SajuCalculator() {
     // ----------------------------------------------------
     const generateCopyText = (res) => {
         const bazi = res.bazi;
-        let txt = `======================================\n   [ BAZI MASTER ENGINE 분석 리포트 ]\n======================================\n\n`;
+        let txt = `======================================\n   [ MYEONGRI MASTER 분석 리포트 ]\n======================================\n\n`;
         txt += `▶ 진태양시 보정: ${res.corrected_time}\n\n`;
         
         txt += `[1. 사주 원국 (四柱 原局)]\n`;
@@ -466,7 +466,7 @@ export default function SajuCalculator() {
                     <div className="top-nav">
                         <button className="btn-icon" onClick={() => setDictModal(prev => ({ ...prev, show: true }))}>📖 사전 열기</button>
                     </div>
-                    <h1 className="hero-title">BAZI MASTER ENGINE</h1>
+                    <h1 className="hero-title">MYEONGRI MASTER </h1>
                     <div className="hero-subtitle">대한민국 1% 명리 마스터를 위한 초정밀 예측 시스템</div>
                     
                     <form className="input-card" onSubmit={handleSubmit}>
