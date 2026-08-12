@@ -24,7 +24,10 @@ const uiTexts = {
         txtGongmang: "공망", txtHidden: "지장간", txtNapeum: "[납음]",
         locSeoul: "🇰🇷 대한민국 (서울/표준: UTC+9, 127.0°)", locBusan: "🇰🇷 대한민국 (부산/동부: UTC+9, 129.0°)", locTokyo: "🇯🇵 일본 (도쿄: UTC+9, 139.7°)", locOsaka: "🇯🇵 일본 (오사카: UTC+9, 135.5°)", locBeijing: "🇨🇳 중국 (베이징: UTC+8, 116.4°)", locShanghai: "🇨🇳 중국 (상하이: UTC+8, 121.5°)", locHongKong: "🇭🇰 홍콩 (UTC+8, 114.0°)", locTaipei: "🇹🇼 대만 (타이베이: UTC+8, 121.5°)", locHanoi: "🇻🇳 베트남 (하노이: UTC+7, 105.8°)", locSydney: "🇦🇺 호주 (시드니: UTC+11, 151.2°E)", locLA: "🇺🇸 미국 (LA/서부: UTC-8, 118.2°W)", locNY: "🇺🇸 미국 (뉴욕/동부: UTC-5, 74.0°W)", locLondon: "🇬🇧 영국 (런던: UTC+0, 0.1°W)",
         dictPlaceholder: "궁금한 용어나 한자를 입력하세요", dictEmpty: "검색어를 입력하시면 전문 해설이 나타납니다.", dictNoResult: "검색 결과가 없습니다.",
-        faqTitle: "❓ 자주 묻는 질문"
+        faqTitle: "❓ 자주 묻는 질문",
+        t_tonggeun_title: "통근력 (나의 뿌리)", t_tonggeun_yes_badge: "통근(通根)", t_tonggeun_no_badge: "무근(無根)",
+        t_tonggeun_yes_desc: "지지에 튼튼한 뿌리를 내리고 있어, 어떤 풍파에도 흔들리지 않는 굳건한 주체성과 자립심을 지니고 있습니다.",
+        t_tonggeun_no_desc: "지지에 뿌리가 미약하여 환경 변화에 민감하며, 주변 상황에 휩쓸리기 쉬운 기질이 있습니다."
     },
     ja: {
         btnDict: "📖 辞典を開く", btnHome: "🏠 ホーム", btnProfile: "⚙️ 入力フォーム", btnSave: "🗂️ 保存した命式", btnFaq: "❓ よくある質問", btnCs: "🎧 サポート", btnApp: "アプリ", btnLogin: "ログイン",
@@ -46,7 +49,10 @@ const uiTexts = {
         txtGongmang: "空亡", txtHidden: "蔵干", txtNapeum: "[納音]",
         locSeoul: "🇰🇷 韓国 (ソウル: UTC+9, 127.0°)", locBusan: "🇰🇷 韓国 (釜山: UTC+9, 129.0°)", locTokyo: "🇯🇵 日本 (東京: UTC+9, 139.7°)", locOsaka: "🇯🇵 日本 (大阪: UTC+9, 135.5°)", locBeijing: "🇨🇳 中国 (北京: UTC+8, 116.4°)", locShanghai: "🇨🇳 中国 (上海: UTC+8, 121.5°)", locHongKong: "🇭🇰 香港 (UTC+8, 114.0°)", locTaipei: "🇹🇼 台湾 (台北: UTC+8, 121.5°)", locHanoi: "🇻🇳 ベトナム (ハノイ: UTC+7, 105.8°)", locSydney: "🇦🇺 豪州 (シドニー: UTC+11, 151.2°E)", locLA: "🇺🇸 米国 (LA: UTC-8, 118.2°W)", locNY: "🇺🇸 米国 (NY: UTC-5, 74.0°W)", locLondon: "🇬🇧 英国 (ロンドン: UTC+0, 0.1°W)",
         dictPlaceholder: "気になる用語や漢字を入力してください", dictEmpty: "検索語を入力すると専門的な解説が表示されます。", dictNoResult: "検索結果がありません。",
-        faqTitle: "❓ よくある質問"
+        faqTitle: "❓ よくある質問",
+        t_tonggeun_title: "通根力 (日干の根)", t_tonggeun_yes_badge: "通根", t_tonggeun_no_badge: "無根",
+        t_tonggeun_yes_desc: "地支に丈夫な根を下ろしており、どんな風波にも揺るがない確固たる主体性と自立心を持っています。",
+        t_tonggeun_no_desc: "地支に根が弱く環境の変化に敏感で、周囲の状況に流されやすい気質があります。"
     },
     'zh-CN': {
         btnDict: "📖 打开字典", btnHome: "🏠 首页", btnProfile: "⚙️ 填写资料", btnSave: "🗂️ 已存命盘", btnFaq: "❓ 常见问题", btnCs: "🎧 客服中心", btnApp: "下载 APP", btnLogin: "登录",
@@ -68,7 +74,10 @@ const uiTexts = {
         txtGongmang: "空亡", txtHidden: "地支藏干", txtNapeum: "[纳音]",
         locSeoul: "🇰🇷 韩国 (首尔: UTC+9, 127.0°)", locBusan: "🇰🇷 韩国 (釜山: UTC+9, 129.0°)", locTokyo: "🇯🇵 日本 (东京: UTC+9, 139.7°)", locOsaka: "🇯🇵 日本 (大阪: UTC+9, 135.5°)", locBeijing: "🇨🇳 中国 (北京: UTC+8, 116.4°)", locShanghai: "🇨🇳 中国 (上海: UTC+8, 121.5°)", locHongKong: "🇭🇰 香港 (UTC+8, 114.0°)", locTaipei: "🇹🇼 台湾 (台北: UTC+8, 121.5°)", locHanoi: "🇻🇳 越南 (河内: UTC+7, 105.8°)", locSydney: "🇦🇺 澳洲 (悉尼: UTC+11, 151.2°E)", locLA: "🇺🇸 美国 (洛杉矶: UTC-8, 118.2°W)", locNY: "🇺🇸 美国 (纽约: UTC-5, 74.0°W)", locLondon: "🇬🇧 英国 (伦敦: UTC+0, 0.1°W)",
         dictPlaceholder: "请输入想了解的术语或汉字", dictEmpty: "输入搜索词即可查看专业解析。", dictNoResult: "没有搜索结果。",
-        faqTitle: "❓ 常见问题"
+        faqTitle: "❓ 常见问题",
+        t_tonggeun_title: "通根力 (日干之根)", t_tonggeun_yes_badge: "通根", t_tonggeun_no_badge: "无根",
+        t_tonggeun_yes_desc: "在地支拥有坚实的根基，无论经历何种风波都具备不可动摇的坚定主体性与自立心。",
+        t_tonggeun_no_desc: "地支根基微弱，对环境变化敏感，容易受周围情况影响。"
     },
     'zh-TW': {
         btnDict: "📖 打開字典", btnHome: "🏠 首頁", btnProfile: "⚙️ 填寫資料", btnSave: "🗂️ 已存命盤", btnFaq: "❓ 常見問題", btnCs: "🎧 客服中心", btnApp: "下載 APP", btnLogin: "登入",
@@ -90,7 +99,10 @@ const uiTexts = {
         txtGongmang: "空亡", txtHidden: "地支藏干", txtNapeum: "[納音]",
         locSeoul: "🇰🇷 韓國 (首爾: UTC+9, 127.0°)", locBusan: "🇰🇷 韓國 (釜山: UTC+9, 129.0°)", locTokyo: "🇯🇵 日本 (東京: UTC+9, 139.7°)", locOsaka: "🇯🇵 日本 (大阪: UTC+9, 135.5°)", locBeijing: "🇨🇳 中國 (北京: UTC+8, 116.4°)", locShanghai: "🇨🇳 中國 (上海: UTC+8, 121.5°)", locHongKong: "🇭🇰 香港 (UTC+8, 114.0°)", locTaipei: "🇹🇼 台灣 (台北: UTC+8, 121.5°)", locHanoi: "🇻🇳 越南 (河內: UTC+7, 105.8°)", locSydney: "🇦🇺 澳洲 (悉尼: UTC+11, 151.2°E)", locLA: "🇺🇸 美國 (洛杉磯: UTC-8, 118.2°W)", locNY: "🇺🇸 美國 (紐約: UTC-5, 74.0°W)", locLondon: "🇬🇧 英國 (倫敦: UTC+0, 0.1°W)",
         dictPlaceholder: "請輸入想了解的術語或漢字", dictEmpty: "輸入搜尋詞即可查看專業解析。", dictNoResult: "沒有搜尋結果。",
-        faqTitle: "❓ 常見問題"
+        faqTitle: "❓ 常見問題",
+        t_tonggeun_title: "通根力 (日干之根)", t_tonggeun_yes_badge: "通根", t_tonggeun_no_badge: "無根",
+        t_tonggeun_yes_desc: "在地支擁有堅實的根基，無論經歷何種風波都具備不可動搖的堅定主體性與自立心。",
+        t_tonggeun_no_desc: "地支根基微弱，對環境變化敏感，容易受周圍情況影響。"
     }
 };
 
@@ -257,7 +269,6 @@ export default function SajuCalculator() {
         el.onmousemove = (e) => { if (!isDown) return; e.preventDefault(); const walk = (e.pageX - el.offsetLeft - startX) * 2; el.scrollLeft = scrollLeft - walk; };
     };
 
-    // 🚨 신살 및 흉액 파싱 함수
     const normalizeDynamics = (dataObj) => {
         if (!dataObj) return [];
         if (Array.isArray(dataObj)) return dataObj; 
@@ -409,7 +420,6 @@ export default function SajuCalculator() {
                 .hanja-tooltip { display: inline-block; cursor: pointer; color: var(--gold-main); border-bottom: 1px dashed rgba(212,175,55,0.5); }
                 .hanja-tooltip.char-tooltip { color: #fff; border-bottom: none; }
                 
-                /* 고정된 높이의 안전한 모달창 */
                 .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 4000; backdrop-filter: blur(5px); }
                 .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); width: 90%; max-width: 600px; height: 80vh; border-radius: 12px; padding: 25px; display: flex; flex-direction: column; border: 1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: left; }
                 .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
@@ -419,11 +429,9 @@ export default function SajuCalculator() {
                 .dict-results { flex: 1; overflow-y: auto; padding-right: 10px; margin-top: 15px; }
                 .dict-item { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 4px solid var(--gold-main); margin-bottom: 15px; }
                 
-                /* 🚨 [디테일 강화] FAQ 텍스트 UI 최적화 */
                 .faq-q { color: var(--gold-main); font-weight: 900; font-size: 1.05rem; margin-bottom: 12px; line-height: 1.5; border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 8px;}
                 .faq-a { color: #eee; font-size: 0.95rem; line-height: 1.7; white-space: pre-wrap; padding-left: 10px; border-left: 2px solid #555;}
 
-                /* 📱📱 모바일 및 테블릿 반응형 제어 📱📱 */
                 @media (max-width: 1024px) {
                     .bento-row-3 { grid-template-columns: 1fr 1fr; }
                     .bento-features { grid-template-columns: 1fr; }
@@ -563,7 +571,6 @@ export default function SajuCalculator() {
                 </div>
             )}
 
-            {/* ===================== VIEW 1: 대문(Home) 랜딩 페이지 ===================== */}
             {view === "home" && (
                 <div className="landing-section">
                     <div className="top-nav"><button className="btn-icon" onClick={() => setDictModal(prev => ({ ...prev, show: true }))}>{t.btnDict}</button></div>
@@ -597,7 +604,6 @@ export default function SajuCalculator() {
                 </div>
             )}
 
-            {/* ===================== VIEW 2: 프로필 입력폼 ===================== */}
             {view === "input" && (
                 <div className="hero-section">
                     <div className="top-nav"><button className="btn-icon" onClick={() => setDictModal(prev => ({ ...prev, show: true }))}>{t.btnDict}</button></div>
@@ -706,7 +712,6 @@ export default function SajuCalculator() {
                 </div>
             )}
 
-            {/* ===================== VIEW 3: 대시보드 리포트 ===================== */}
             {view === "dashboard" && resData && (
                 <div className="dashboard">
                     <div className="dash-header">
@@ -761,7 +766,8 @@ export default function SajuCalculator() {
                     </div>
 
                     <div className="dashboard-layout">
-                        {/* 🚨 [복구 1] 납음오행 심층 해설 완벽 복구 */}
+                        
+                        {/* 🚨 [복구 영역] 납음오행 심층 해설 */}
                         {resData.napeum_reading && resData.napeum_reading.length > 0 && (
                             <div className="panel">
                                 <h3>🎵 납음오행(納音五行) 심층 해설</h3>
@@ -820,6 +826,18 @@ export default function SajuCalculator() {
                                                 <span className="badge badge-bad">기신</span> {resData.yongshin.yongshin?.gishin || '-'}
                                             </div>
                                         </div>
+                                        {/* 🚨 [복구 및 다국어 업데이트 완료] 통근력 (나의 뿌리) */}
+                                        {resData.mechanics?.tonggeun !== undefined && (
+                                            <div className="highlight-box" style={{ borderLeftColor: '#e67e22', marginBottom: 0, marginTop: '15px' }}>
+                                                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.t_tonggeun_title}</div>
+                                                <div style={{ fontSize: '13px', lineHeight: '1.6', marginTop: '5px', color: '#ccc' }}>
+                                                    {resData.mechanics.tonggeun === true || resData.mechanics.tonggeun?.is_rooted === true || resData.mechanics.tonggeun?.status?.includes('통근') 
+                                                        ? <><span className="badge badge-good">{t.t_tonggeun_yes_badge}</span> {t.t_tonggeun_yes_desc}</>
+                                                        : <><span className="badge badge-bad">{t.t_tonggeun_no_badge}</span> {t.t_tonggeun_no_desc}</>
+                                                    }
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -852,7 +870,7 @@ export default function SajuCalculator() {
                             </div>
                         </div>
 
-                        {/* 🚨 [복구 2] 올해, 이달, 오늘의 운세를 3단 그리드로 깔끔하게 복원 완료 */}
+                        {/* 🚨 [복구 영역] 올해/이달/오늘 운세 3단 그리드 완벽 복원 */}
                         <div className="bento-row-3">
                             <div className="bento-col">
                                 {resData.unse?.year && (
@@ -949,7 +967,7 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 🚨 [복구 3] 사라졌던 대운 및 세운 타임라인(스와이프 레이아웃) 완벽 복구 */}
+                        {/* 🚨 [복구 영역] 대운 및 세운 스와이프 타임라인 완벽 복원 */}
                         {resData.timeline && (
                             <div className="panel">
                                 <h3 style={{ marginBottom: '15px' }}>⏳ 대운(大運) 흐름 (10년 주기)</h3>
