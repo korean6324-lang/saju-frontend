@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 // 🔴 파이썬 백엔드 주소 (Render)
 const BACKEND_URL = "https://saju-backend-ffum.onrender.com"; 
 
-// 🚨 [신규] 프론트엔드 UI 다국어 언어팩 (한국어, 일본어, 중국어 간체, 중국어 번체)
+// 🚨 프론트엔드 UI 다국어 언어팩
 const uiTexts = {
     ko: {
         btnDict: "📖 사전 열기", btnHome: "🏠 홈", btnProfile: "⚙️ 프로필 입력", btnSave: "🗂️ 저장한 명식", btnFaq: "❓ 자주 묻는 질문", btnCs: "🎧 고객센터", btnApp: "앱 다운로드", btnLogin: "로그인",
@@ -27,7 +27,8 @@ const uiTexts = {
     },
     ja: {
         btnDict: "📖 辞典を開く", btnHome: "🏠 ホーム", btnProfile: "⚙️ 入力フォーム", btnSave: "🗂️ 保存した命式", btnFaq: "❓ よくある質問", btnCs: "🎧 サポート", btnApp: "アプリ", btnLogin: "ログイン",
-        landingTitle1: "あなたの運命を、\n", landingTitle2: "データとアルゴリズム", landingTitle3: "で解読する",
+        landingTitle1: "あなたの運命を、\n", landingTitle2: "データとアルゴリズム", 
+        landingTitle3: "で解読", /* 🚨 'する' 생략: 일본어 체언멈춤(명사로 끝맺기) 적용 및 줄바꿈 버그 원천 차단 */
         landingDesc: "上位1%の大家の深層鑑定秘法を\n10のダイナミックエンジンで完璧に具現化した超精密予測システム",
         btnStart: "運命のスキャンを開始する",
         feature1Title: "超精密 四柱推命", feature1Desc: "単純なキーワードの羅列ではありません。格局、用神、調候から十二星まで。古書の秘訣を現代的かつ直説的に変換した深層鑑定書を提供します。",
@@ -92,9 +93,8 @@ export default function SajuCalculator() {
     const [loading, setLoading] = useState(false);
     const [resData, setResData] = useState(null);
     
-    // 🚨 [신규] 글로벌 언어 상태 (기본값: 한국어)
     const [lang, setLang] = useState("ko");
-    const t = uiTexts[lang]; // 현재 언어 텍스트 객체
+    const t = uiTexts[lang]; 
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [errorModal, setErrorModal] = useState({ show: false, msg: "" });
@@ -169,7 +169,7 @@ export default function SajuCalculator() {
                 unknown_time: form.unknown_time,
                 apply_true_solar: true, apply_yaja: true,
                 apply_traditional_lunar: form.use_traditional, lunar_month: form.use_traditional ? parseInt(form.lunar_month) : null,
-                language: lang // 🚨 [신규] 선택된 언어 코드를 백엔드로 전송
+                language: lang 
             };
             
             if (form.opt_daewun && form.daewun_num !== '') payload.daewun_num = parseInt(form.daewun_num);
@@ -239,17 +239,6 @@ export default function SajuCalculator() {
         el.onmousemove = (e) => { if (!isDown) return; e.preventDefault(); const walk = (e.pageX - el.offsetLeft - startX) * 2; el.scrollLeft = scrollLeft - walk; };
     };
 
-    const normalizeDynamics = (dataObj) => {
-        if (!dataObj) return [];
-        if (Array.isArray(dataObj)) return dataObj; 
-        return Object.entries(dataObj).map(([key, list]) => ({
-            name: key, position: Array.isArray(list) ? list.join(', ') : list, desc: "백엔드 업데이트 필요"
-        })).filter(item => item.position && item.position.length > 0);
-    };
-
-    const specialStarsArray = resData ? normalizeDynamics(resData.dynamics?.special_stars) : [];
-    const disastersArray = resData ? normalizeDynamics(resData.dynamics?.disasters) : [];
-
     const renderLocationOptions = () => (
         <>
             <option value="127.0|+9">{t.locSeoul}</option>
@@ -271,18 +260,19 @@ export default function SajuCalculator() {
     return (
         <div className="app-container">
             <style>{`
-                /* 기존 벤토 박스 레이아웃 완벽 보존 */
                 :root { --bg-color: #0d0f12; --card-bg: #16181d; --text-main: #f1f2f6; --text-muted: #95a5a6; --gold-light: #f1c40f; --gold-main: #d4af37; --gold-dark: #b5952f; --accent-red: #e74c3c; --accent-blue: #3498db; --accent-green: #2ecc71; }
                 html, body, #root, #__next { margin: 0 !important; padding: 0 !important; background-color: var(--bg-color) !important; width: 100%; max-width: 100vw; min-height: 100vh; overflow-x: hidden; }
+                
+                /* 🚨 [CSS 긴급 수정] h1, h2 태그에도 단어 단위 줄바꿈 금지 속성 강제 추가 (일본어/중국어 깨짐 방어) */
                 * { box-sizing: border-box; overflow-wrap: break-word !important; word-wrap: break-word !important; }
-                div, p, span, h3, h4 { word-break: keep-all; }
+                div, p, span, h1, h2, h3, h4 { word-break: keep-all; } 
+                
                 ::-webkit-scrollbar { width: 6px; height: 6px; }
                 ::-webkit-scrollbar-track { background: var(--bg-color); }
                 ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
                 
                 .app-container { font-family: "'Noto Serif KR', serif"; background: var(--bg-color); min-height: 100vh; color: var(--text-main); width: 100%; max-width: 100vw; overflow-x: hidden; }
                 
-                /* 🚨 [신규] 글로벌 언어 스위치 버튼 */
                 .lang-switcher {
                     position: fixed; top: 20px; right: 70px; z-index: 1000;
                     display: flex; align-items: center; background: rgba(255,255,255,0.05);
@@ -314,12 +304,15 @@ export default function SajuCalculator() {
                 .sidebar-login { display: flex; align-items: center; gap: 10px; color: #aaa; cursor: pointer; font-size: 14px; margin-top: 15px; font-weight: bold; transition: 0.2s; }
                 .sidebar-login:hover { color: var(--gold-light); }
 
-                /* 대문 랜딩 페이지 */
+                /* 대문(Home) 랜딩 페이지 */
                 .landing-section { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 60px 20px; background: radial-gradient(circle at center, #1a1e24 0%, var(--bg-color) 100%); text-align: center; }
                 .landing-hero { max-width: 900px; margin-bottom: 50px; animation: fadeIn 1s ease-out; }
-                .landing-title { font-size: 3.5rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 20px; color: #fff; line-height: 1.3; }
+                
+                /* 🚨 타이틀 CSS 방어선 추가 (white-space: pre-wrap 로 \n 강제 유지) */
+                .landing-title { font-size: 3.5rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 20px; color: #fff; line-height: 1.3; white-space: pre-wrap; }
                 .landing-title span { color: var(--gold-main); text-shadow: 0 0 20px rgba(212,175,55,0.3); }
                 .landing-subtitle { font-size: 1.2rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 40px; font-weight: 300; white-space: pre-wrap; }
+                
                 .btn-cta { background: linear-gradient(135deg, var(--gold-dark), var(--gold-main)); color: #000; border: none; border-radius: 50px; padding: 20px 40px; font-size: 1.2rem; font-weight: 900; cursor: pointer; box-shadow: 0 10px 30px rgba(212,175,55,0.3); transition: all 0.3s; animation: pulse 2s infinite; }
                 .btn-cta:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(212,175,55,0.5); animation: none; }
                 
@@ -454,7 +447,6 @@ export default function SajuCalculator() {
                 }
             `}</style>
 
-            {/* 🚨 언어 선택 스위처 (우측 상단 햄버거 메뉴 옆) */}
             <div className="lang-switcher">
                 <span>🌐</span>
                 <select value={lang} onChange={(e) => setLang(e.target.value)}>
