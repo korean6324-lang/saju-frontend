@@ -9,7 +9,7 @@ export default function SajuCalculator() {
     const [resData, setResData] = useState(null);
     const [copyFormattedText, setCopyFormattedText] = useState("");
     
-    // 🚨 [신규] 사이드바 메뉴 상태
+    // 사이드바 메뉴 상태
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     
     // 모달 및 툴팁 상태
@@ -183,16 +183,16 @@ export default function SajuCalculator() {
                 
                 .app-container { font-family: "'Noto Serif KR', serif"; background: var(--bg-color); min-height: 100vh; color: var(--text-main); width: 100%; max-width: 100vw; overflow-x: hidden; }
                 
-                /* 🚨 햄버거 메뉴 버튼 (좌측 상단 고정) */
+                /* 🚨 햄버거 메뉴 버튼 (우측 상단 고정으로 이동) */
                 .hamburger-btn {
-                    position: fixed; top: 20px; left: 20px; z-index: 1000;
+                    position: fixed; top: 20px; right: 20px; z-index: 1000;
                     background: rgba(255,255,255,0.05); border: 1px solid #333; color: white;
                     padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 20px;
                     transition: 0.3s; backdrop-filter: blur(5px);
                 }
                 .hamburger-btn:hover { background: rgba(212,175,55,0.2); color: var(--gold-main); border-color: var(--gold-main); }
 
-                /* 🚨 우측 슬라이드 사이드바 메뉴 디자인 */
+                /* 우측 슬라이드 사이드바 메뉴 디자인 */
                 .sidebar-overlay {
                     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
                     background: rgba(0,0,0,0.7); z-index: 3000;
@@ -226,8 +226,11 @@ export default function SajuCalculator() {
 
                 /* 기존 레이아웃 */
                 .hero-section { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; background: radial-gradient(circle at center, #1a1e24 0%, var(--bg-color) 100%); text-align: center; position: relative; }
-                .hero-title { font-size: 3rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 10px; color: var(--gold-main); text-shadow: 0 4px 15px rgba(212,175,55,0.2); }
-                .hero-subtitle { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 40px; font-weight: 300; }
+                
+                /* 🚨 타이틀 디자인 조정 (위로 올리고 줄간격 확보) */
+                .hero-title { font-size: 3rem; font-weight: 900; letter-spacing: 2px; margin-top: -60px; margin-bottom: 25px; color: var(--gold-main); text-shadow: 0 4px 15px rgba(212,175,55,0.2); }
+                .hero-subtitle { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 50px; font-weight: 300; line-height: 1.6; }
+                
                 .input-card { background: var(--card-bg); padding: 30px; border-radius: 12px; width: 100%; max-width: 700px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
                 .input-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, var(--gold-main), transparent); }
                 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; text-align: left; }
@@ -238,12 +241,14 @@ export default function SajuCalculator() {
                 .btn-primary { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--gold-dark), var(--gold-main)); color: #000; border: none; border-radius: 6px; font-size: 16px; font-weight: 900; cursor: pointer; margin-top: 25px; transition: transform 0.2s, box-shadow 0.2s; }
                 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212,175,55,0.4); }
                 
-                .dashboard { padding: 60px 20px 40px 20px; max-width: 1300px; margin: auto; width: 100%; box-sizing: border-box; } /* 상단 햄버거 메뉴를 피하기 위해 padding-top 증가 */
-                .dash-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 30px; }
-                .dash-header h2 { margin: 0; color: var(--gold-main); font-weight: 900; padding-left: 50px; } /* 햄버거 버튼과 겹치지 않게 여백 추가 */
-                
+                /* 🚨 좌측 상단으로 이동한 사전 열기 버튼 */
+                .top-nav { position: absolute; top: 20px; left: 20px; z-index: 100; }
                 .btn-icon { background: rgba(255,255,255,0.1); color: white; border: 1px solid #333; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; transition: 0.3s; }
                 .btn-icon:hover { background: var(--gold-main); color: #000; border-color: var(--gold-main); }
+                
+                .dashboard { padding: 60px 20px 40px 20px; max-width: 1300px; margin: auto; width: 100%; box-sizing: border-box; }
+                .dash-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 30px; }
+                .dash-header h2 { margin: 0; color: var(--gold-main); font-weight: 900; }
                 
                 .bazi-table-container { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid #222; margin-bottom: 30px; overflow-x: auto; width: 100%; }
                 .bazi-table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: center; }
@@ -288,16 +293,19 @@ export default function SajuCalculator() {
                 .dict-results { overflow-y: auto; padding-right: 10px; margin-top: 15px; }
                 .dict-item { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 4px solid var(--gold-main); margin-bottom: 15px; }
 
-                /* 📱📱 🚨 모바일 및 테블릿 반응형 제어 🚨 📱📱 */
+                /* 📱📱 모바일 및 테블릿 반응형 제어 📱📱 */
                 @media (max-width: 1024px) {
                     .bento-row-3 { grid-template-columns: 1fr 1fr; }
                 }
                 @media (max-width: 768px) {
-                    .hamburger-btn { top: 15px; left: 15px; font-size: 18px; padding: 6px 10px; }
+                    .hamburger-btn { top: 15px; right: 15px; font-size: 18px; padding: 6px 10px; }
+                    .top-nav { left: 15px; top: 15px; }
                     .sidebar-menu { width: 85vw; max-width: 320px; }
                     
-                    .hero-title { font-size: 1.8rem; }
-                    .hero-subtitle { font-size: 0.9rem; word-break: keep-all; padding: 0 10px; }
+                    /* 모바일 타이틀 조정 */
+                    .hero-title { font-size: 1.8rem; margin-top: -40px; margin-bottom: 20px; }
+                    .hero-subtitle { font-size: 0.9rem; word-break: keep-all; padding: 0 10px; margin-bottom: 40px; }
+                    
                     .input-card { padding: 20px 15px; border-radius: 0; border-left: none; border-right: none; }
                     .form-grid { grid-template-columns: 1fr; gap: 15px; } 
                     .options-row { flex-direction: column; align-items: flex-start; gap: 10px; } 
@@ -325,10 +333,10 @@ export default function SajuCalculator() {
                 }
             `}</style>
 
-            {/* 🚨 햄버거 버튼 */}
+            {/* 🚨 햄버거 버튼 (우측 상단) */}
             <button className="hamburger-btn" onClick={() => setIsSidebarOpen(true)}>☰</button>
 
-            {/* 🚨 우측 사이드바(Drawer) 영역 */}
+            {/* 우측 사이드바(Drawer) 영역 */}
             <div className={`sidebar-overlay ${isSidebarOpen ? 'open' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
             <div className={`sidebar-menu ${isSidebarOpen ? 'open' : ''}`}>
                 <div className="sidebar-header">
@@ -401,6 +409,9 @@ export default function SajuCalculator() {
 
             {view === "hero" && (
                 <div className="hero-section">
+                    {/* 🚨 사전열기 버튼은 좌측 상단으로 이동 */}
+                    <div className="top-nav"><button className="btn-icon" onClick={() => setDictModal(prev => ({ ...prev, show: true }))}>📖 사전 열기</button></div>
+                    
                     <h1 className="hero-title">MYEONGRI MASTER</h1>
                     <div className="hero-subtitle">대한민국 1% 명리 마스터를 위한 초정밀 예측 시스템</div>
                     <form className="input-card" onSubmit={handleSubmit}>
