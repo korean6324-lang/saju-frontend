@@ -14,27 +14,39 @@ export default function SajuCalculator() {
     const [dictModal, setDictModal] = useState({ show: false, keyword: "", results: null });
     const [tooltip, setTooltip] = useState({ show: false, meta: null, top: 0, left: 0 });
 
-    // 🚨 폼 상태에 파트너 위치(p_location) 추가
+    // 🚨 파트너용 체크리스트 상태 추가
     const [form, setForm] = useState({
         calendar_type: 'solar', dt_input: '1946-12-07T12:00', gender: 'M',
         location: '127.0|+9', 
         unknown_time: false,
         opt_daewun: false, daewun_num: '', 
         use_traditional: false, lunar_month: 11,
-        use_partner: false, p_calendar_type: 'solar', p_dt_input: '1950-05-12T12:00', p_gender: 'F',
-        p_location: '127.0|+9' // 파트너 기본 위치 (서울)
+        use_partner: false, 
+        p_calendar_type: 'solar', p_dt_input: '1950-05-12T12:00', p_gender: 'F',
+        p_location: '127.0|+9',
+        p_unknown_time: false, 
+        p_opt_daewun: false, p_daewun_num: '', 
+        p_use_traditional: false, p_lunar_month: 11
     });
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
+        
         if (name === 'unknown_time') {
             setForm(prev => ({
-                ...prev,
-                unknown_time: checked,
+                ...prev, unknown_time: checked,
                 dt_input: checked ? prev.dt_input.split('T')[0] : prev.dt_input.split('T')[0] + 'T12:00'
-            }));
-            return;
+            })); return;
         }
+        
+        // 🚨 파트너 시간 모름 처리
+        if (name === 'p_unknown_time') {
+            setForm(prev => ({
+                ...prev, p_unknown_time: checked,
+                p_dt_input: checked ? prev.p_dt_input.split('T')[0] : prev.p_dt_input.split('T')[0] + 'T12:00'
+            })); return;
+        }
+        
         setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     };
 
@@ -104,14 +116,18 @@ export default function SajuCalculator() {
             
             if (form.opt_daewun && form.daewun_num !== '') payload.daewun_num = parseInt(form.daewun_num);
             
-            // 🚨 파트너의 경도 및 타임존 추출 후 payload에 포함
+            // 🚨 파트너 상세 페이로드 데이터 추가
             if (form.use_partner) {
                 const [pLonStr, pTzStr] = form.p_location.split('|');
-                payload.partner_datetime_str = form.p_dt_input.replace('T', ' ');
+                payload.partner_datetime_str = form.p_unknown_time ? form.p_dt_input.split('T')[0] + ' 12:00' : form.p_dt_input.replace('T', ' ');
                 payload.partner_calendar_type = form.p_calendar_type;
                 payload.partner_gender = form.p_gender;
                 payload.partner_longitude = parseFloat(pLonStr);
                 payload.partner_timezone = parseInt(pTzStr);
+                payload.partner_unknown_time = form.p_unknown_time;
+                payload.partner_apply_traditional_lunar = form.p_use_traditional;
+                payload.partner_lunar_month = form.p_use_traditional ? parseInt(form.p_lunar_month) : null;
+                if (form.p_opt_daewun && form.p_daewun_num !== '') payload.partner_daewun_num = parseInt(form.p_daewun_num);
             }
 
             const response = await fetch(`${BACKEND_URL}/api/bazi`, {
@@ -182,14 +198,14 @@ export default function SajuCalculator() {
         return Object.entries(dataObj).map(([key, list]) => ({
             name: key,
             position: Array.isArray(list) ? list.join(', ') : list,
-            desc: "⚠️ 백엔드(logic_dynamics.py) 파일이 아직 예전 버전입니다."
+            desc: "⚠️ 백엔드(logic_dynamics.py) 파일이 아직 예전 버전입니다. 깃허브에 코드를 덮어쓰기 하시면 전문가용 심층 분석이 출력됩니다!"
         })).filter(item => item.position && item.position.length > 0);
     };
 
     const specialStarsArray = resData ? normalizeDynamics(resData.dynamics?.special_stars) : [];
     const disastersArray = resData ? normalizeDynamics(resData.dynamics?.disasters) : [];
 
-    // 공통 글로벌 지역 옵션 렌더링 함수
+    // 공통 글로벌 지역 옵션
     const renderLocationOptions = () => (
         <>
             <option value="127.0|+9">🇰🇷 대한민국 (서울/표준: UTC+9, 경도 127.0°)</option>
@@ -523,19 +539,58 @@ export default function SajuCalculator() {
                             <div style={{ marginTop: '15px', background: 'rgba(0,0,0,0.2)', padding: '15px', borderRadius: '6px' }}><label>고법(古法) 음력 월 강제 지정</label><input type="number" name="lunar_month" value={form.lunar_month} onChange={handleInputChange} min="1" max="12" /></div>
                         )}
 
+                        {/* 🚨 파트너 입력 구역 */}
                         {form.use_partner && (
-                            <div style={{ marginTop: '15px', background: 'rgba(231,76,60,0.05)', border: '1px solid rgba(231,76,60,0.2)', padding: '15px', borderRadius: '6px' }}>
-                                <label style={{ color: 'var(--accent-red)' }}>상대방 (궁합용)</label>
+                            <div style={{ marginTop: '25px', background: 'rgba(231,76,60,0.05)', border: '1px solid rgba(231,76,60,0.2)', padding: '20px', borderRadius: '8px' }}>
+                                <label style={{ color: 'var(--accent-red)', fontSize: '15px', marginBottom: '15px' }}>💘 상대방 (궁합용)</label>
+                                
                                 <div className="form-grid" style={{ marginBottom: '15px' }}>
-                                    <div style={{ display: 'flex', gap: '10px' }}><select name="p_calendar_type" value={form.p_calendar_type} onChange={handleInputChange} style={{ width: '35%' }}><option value="solar">양력</option><option value="lunar">음력(평달)</option><option value="lunar_leap">음력(윤달)</option></select><input type="datetime-local" name="p_dt_input" value={form.p_dt_input} onChange={handleInputChange} style={{ width: '65%' }} /></div>
+                                    <div style={{ display: 'flex', gap: '10px' }}>
+                                        <select name="p_calendar_type" value={form.p_calendar_type} onChange={handleInputChange} style={{ width: '35%' }}><option value="solar">양력</option><option value="lunar">음력(평달)</option><option value="lunar_leap">음력(윤달)</option></select>
+                                        <input 
+                                            type={form.p_unknown_time ? "date" : "datetime-local"} 
+                                            name="p_dt_input" 
+                                            value={form.p_dt_input} 
+                                            onChange={handleInputChange} 
+                                            style={{ width: '65%' }} 
+                                        />
+                                    </div>
                                     <select name="p_gender" value={form.p_gender} onChange={handleInputChange}><option value="F">여성 (Female)</option><option value="M">남성 (Male)</option></select>
                                 </div>
-                                <div className="full-width">
+                                
+                                <div className="full-width" style={{ marginBottom: '15px' }}>
                                     <label style={{ color: 'var(--accent-red)' }}>상대방 태어난 지역</label>
                                     <select name="p_location" value={form.p_location} onChange={handleInputChange}>
                                         {renderLocationOptions()}
                                     </select>
                                 </div>
+
+                                {/* 🚨 파트너 전용 체크리스트 */}
+                                <div className="options-row" style={{ marginTop: '10px', paddingTop: '15px', borderTop: '1px dashed rgba(231,76,60,0.3)' }}>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', color: 'var(--gold-main)' }}>
+                                        <input type="checkbox" name="p_unknown_time" checked={form.p_unknown_time} onChange={handleInputChange} style={{ width: 'auto' }} /> 🕒 시간 모름
+                                    </label>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
+                                        <input type="checkbox" name="p_opt_daewun" checked={form.p_opt_daewun} onChange={handleInputChange} style={{ width: 'auto' }} /> 대운수 수동지정
+                                    </label>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
+                                        <input type="checkbox" name="p_use_traditional" checked={form.p_use_traditional} onChange={handleInputChange} style={{ width: 'auto' }} /> 고법 둔월법
+                                    </label>
+                                </div>
+
+                                {/* 파트너 전용 조건부 입력칸 */}
+                                {form.p_opt_daewun && (
+                                    <div style={{ marginTop: '15px', background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '6px' }}>
+                                        <label>상대방 대운수 지정 (미입력시 자동)</label>
+                                        <input type="number" name="p_daewun_num" value={form.p_daewun_num} onChange={handleInputChange} min="0" max="10" placeholder="0~10 입력" />
+                                    </div>
+                                )}
+                                {form.p_use_traditional && (
+                                    <div style={{ marginTop: '15px', background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '6px' }}>
+                                        <label>상대방 고법(古法) 음력 월 강제 지정</label>
+                                        <input type="number" name="p_lunar_month" value={form.p_lunar_month} onChange={handleInputChange} min="1" max="12" />
+                                    </div>
+                                )}
                             </div>
                         )}
                         <button type="submit" className="btn-primary" disabled={loading} style={{ opacity: loading ? 0.7 : 1 }}>{loading ? "연산 중 (Processing...)" : "운명 스캔 시작 (SCAN)"}</button>
