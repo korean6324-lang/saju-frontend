@@ -30,7 +30,7 @@ export default function SajuCalculator() {
     };
 
     // ----------------------------------------------------
-    // 🚨 [필수] 모바일 잘림 방지 뷰포트 강제 주입 로직
+    // 🚨 모바일 뷰포트 강제 주입 (화면 고정)
     // ----------------------------------------------------
     useEffect(() => {
         let metaViewport = document.querySelector("meta[name=viewport]");
@@ -39,7 +39,6 @@ export default function SajuCalculator() {
             metaViewport.name = "viewport";
             document.head.appendChild(metaViewport);
         }
-        // 화면 고정 및 잘림을 방지하는 모바일 최적화 비율 강제 설정
         metaViewport.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
         
         const handleScroll = () => hideTooltip();
@@ -214,9 +213,6 @@ export default function SajuCalculator() {
             .catch(err => alert("복사 실패: " + err));
     };
 
-    // ----------------------------------------------------
-    // 5. JSX 렌더링 헬퍼 함수
-    // ----------------------------------------------------
     const renderTooltipItem = (keyword, isChar = true, text = null) => {
         if (!resData) return text || keyword;
         const metaDict = resData.mechanics.metadata || {};
@@ -252,20 +248,31 @@ export default function SajuCalculator() {
             <style>{`
                 :root { --bg-color: #0d0f12; --card-bg: #16181d; --text-main: #f1f2f6; --text-muted: #95a5a6; --gold-light: #f1c40f; --gold-main: #d4af37; --gold-dark: #b5952f; --accent-red: #e74c3c; --accent-blue: #3498db; --accent-green: #2ecc71; }
                 
-                /* PC & 기본 환경 공통 초기화 */
+                /* 🚨 1. 하얀 여백 완벽 제거 및 가로 스크롤 방지 */
                 html, body, #root, #__next { 
                     margin: 0 !important; 
                     padding: 0 !important; 
                     background-color: var(--bg-color) !important; 
                     width: 100%; 
-                    height: 100%;
+                    max-width: 100vw; 
+                    min-height: 100vh; 
+                    overflow-x: hidden; 
                 }
-                * { box-sizing: border-box; }
+                
+                /* 🚨 2. 긴 텍스트 잘림 및 박스 넘침 100% 방지 (핵심 코드) */
+                * { 
+                    box-sizing: border-box; 
+                    overflow-wrap: break-word !important; 
+                    word-wrap: break-word !important; 
+                }
+                div, p, span, h3, h4 {
+                    word-break: keep-all; /* 한글은 단어 단위로 유지하되 */
+                }
+
                 ::-webkit-scrollbar { width: 6px; height: 6px; }
                 ::-webkit-scrollbar-track { background: var(--bg-color); }
                 ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
-                /* 레이아웃 방어막 (가로 스크롤 완전 차단) */
                 .app-container {
                     font-family: "'Noto Serif KR', serif";
                     background: var(--bg-color);
@@ -305,7 +312,7 @@ export default function SajuCalculator() {
                 .bazi-table-container { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid #222; margin-bottom: 30px; overflow-x: auto; width: 100%; }
                 .bazi-table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: center; }
                 .bazi-table th { color: var(--text-muted); font-size: 13px; padding-bottom: 15px; border-bottom: 1px solid #333; font-weight: 400; }
-                .bazi-table td { padding: 15px 10px; border-right: 1px solid #222; }
+                .bazi-table td { padding: 15px 10px; border-right: 1px solid #222; min-width: 0; }
                 .bazi-table td:last-child { border-right: none; }
                 .stem, .branch { font-size: 38px; font-weight: 900; color: #fff; line-height: 1.2; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
                 .ten-god { font-size: 13px; color: var(--gold-main); margin-bottom: 5px; font-weight: 700; letter-spacing: 1px; }
@@ -313,11 +320,13 @@ export default function SajuCalculator() {
                 
                 /* 그리드 및 패널 레이아웃 */
                 .panel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; align-items: start; width: 100%; }
-                .panel { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid #222; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; text-align: left !important; width: 100%; box-sizing: border-box; }
+                
+                /* 🚨 3. min-width: 0; 을 통해 자식 요소가 그리드를 뚫고 나가는 현상 방지 */
+                .panel { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid #222; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; text-align: left !important; width: 100%; min-width: 0; box-sizing: border-box; }
                 .panel-full { grid-column: 1 / -1; }
                 .panel h3 { margin-top: 0; color: var(--gold-main); font-size: 1.1rem; margin-bottom: 20px; display: flex; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; text-align: left !important; }
                 
-                .highlight-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 3px solid var(--gold-main); margin-bottom: 15px; text-align: left !important; }
+                .highlight-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 3px solid var(--gold-main); margin-bottom: 15px; text-align: left !important; min-width: 0; }
                 
                 /* 내부 그리드 제어 */
                 .napeum-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
@@ -325,7 +334,7 @@ export default function SajuCalculator() {
                 .practical-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
                 
                 /* 세운 및 타임라인 스와이프 */
-                .swipe-container { display: flex; gap: 15px; overflow-x: auto; padding: 10px 5px 25px 5px; cursor: grab; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+                .swipe-container { display: flex; gap: 15px; overflow-x: auto; padding: 10px 5px 25px 5px; cursor: grab; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; min-width: 0; }
                 .swipe-container::-webkit-scrollbar { display: none; }
                 .timeline-card { flex: 0 0 100px; background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 8px; text-align: center !important; padding: 15px 10px; transition: 0.3s; user-select: none; }
                 .timeline-card:hover { background: rgba(212,175,55,0.1); border-color: var(--gold-dark); transform: translateY(-3px); }
@@ -354,28 +363,30 @@ export default function SajuCalculator() {
                     .hero-subtitle { font-size: 0.9rem; word-break: keep-all; padding: 0 10px; }
                     .input-card { padding: 20px 15px; border-radius: 0; border-left: none; border-right: none; }
                     
-                    /* 폼 입력창 및 체크박스 1줄 정렬 */
+                    /* 폼 입력창 1줄 정렬 */
                     .form-grid { grid-template-columns: 1fr; gap: 15px; } 
                     .options-row { flex-direction: column; align-items: flex-start; gap: 10px; } 
                     
-                    /* 패널 여백 축소 */
-                    .dashboard { padding: 15px 10px; }
+                    .dashboard { padding: 15px 10px; overflow-x: hidden; }
                     .dash-header { flex-direction: column; gap: 10px; align-items: flex-start; }
                     .dash-header div { width: 100%; display: flex; justify-content: space-between; }
                     
-                    /* 사주 기둥 축소 및 가로 꽉 채움 */
+                    /* 사주 기둥 축소 및 가로 스크롤 허용 */
                     .bazi-table-container { padding: 15px 5px; border-radius: 8px; }
                     .bazi-table th { font-size: 11px; padding-bottom: 8px; }
                     .bazi-table td { padding: 10px 2px; }
                     .stem, .branch { font-size: 26px; }
-                    .hidden-stems { font-size: 10px; padding: 8px 2px; letter-spacing: 0; }
+                    .hidden-stems { font-size: 10px; padding: 8px 2px; letter-spacing: 0; word-break: break-all; }
                     
-                    /* 🚨 모든 다중 그리드를 1줄로 예쁘게 쌓기 */
-                    .panel { padding: 15px; border-radius: 8px; }
-                    .panel-grid { grid-template-columns: 1fr; gap: 15px; }
+                    /* 모든 다중 그리드를 1줄로 예쁘게 쌓기 및 넘침 방지 */
+                    .panel { padding: 15px; border-radius: 8px; word-break: break-word; }
+                    .panel-grid { grid-template-columns: 1fr; gap: 15px; width: 100%; }
                     .napeum-grid { grid-template-columns: 1fr !important; }
                     .gunghap-grid { grid-template-columns: 1fr !important; }
                     .practical-grid { grid-template-columns: 1fr !important; }
+                    
+                    /* 긴 텍스트 강제 줄바꿈 (모바일 필수) */
+                    .highlight-box { padding: 12px; font-size: 0.95em; word-break: break-word; }
                     
                     /* 세운 타임라인 터치 최적화 */
                     .swipe-container { gap: 10px; padding: 5px 0 15px 0; }
