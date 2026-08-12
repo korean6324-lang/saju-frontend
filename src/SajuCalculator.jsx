@@ -1,118 +1,39 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // 🔴 파이썬 백엔드 주소 (Render)
 const BACKEND_URL = "https://saju-backend-ffum.onrender.com"; 
 
-const uiTexts = {
-    ko: {
-        btnDict: "📖 사전 열기", btnHome: "🏠 홈", btnProfile: "⚙️ 프로필 입력", btnSave: "🗂️ 저장한 명식", btnFaq: "❓ 자주 묻는 질문", btnCs: "🎧 고객센터", btnApp: "앱 다운로드", btnLogin: "로그인",
-        landingTitle1: "당신의 운명,", landingTitle2: "데이터와 알고리즘", landingTitle3: "으로 해독하다",
-        landingDesc: "대한민국 상위 1% 대가들의 심층 간명 비법을\n10개의 다이내믹 엔진으로 완벽하게 구현한 초정밀 예측 시스템",
-        btnStart: "내 운명 스캔 시작하기",
-        feature1Title: "초정밀 사주 명리", feature1Desc: "단순한 키워드 나열이 아닙니다. 격국, 용신, 조후, 12성 당사주까지. 고서의 비결을 현대적 팩트폭행으로 치환한 심층 간명지를 제공합니다.",
-        feature2Title: "영혼을 꿰뚫는 심층 궁합", feature2Desc: "구궁(九宮) 겉궁합과 일지(日支) 속궁합의 완벽한 크로스체크. 삼원갑자를 기반으로 인연의 깊이와 파국의 타이밍까지 적나라하게 분석합니다.",
-        feature3Title: "현대 실용 통변 & 풍수", feature3Desc: "나의 기질에 맞는 최적의 직무, 취약한 건강 장기와 업상대체법. 그리고 일상에 적용할 수 있는 오행 밸런스 지표를 제시합니다.",
-        systemStatus: "10-Core Master Engine 정상 가동 중",
-        inputTitle: "프로필 입력", inputDesc: "정확한 연산을 위해 운명을 스캔할 정보를 입력해 주세요.",
-        lblBirth: "본인 생년월일시", lblGender: "본인 성별", lblLocation: "태어난 지역 (글로벌 표준시 및 진태양시 정밀 보정)",
-        optSolar: "양력", optLunar: "음력(평달)", optLunarLeap: "음력(윤달)", optMale: "남성 (Male)", optFemale: "여성 (Female)",
-        chkUnknownTime: "🕒 시간 모름", chkDaewun: "대운수 수동지정", chkGoBeob: "고법 둔월법", chkPartner: "💘 파트너 궁합",
-        lblPartner: "💘 상대방 (궁합용)", lblPartnerLoc: "상대방 태어난 지역",
-        btnScan: "운명 스캔 시작 (SCAN)", btnScanning: "연산 중 (Processing...)",
-        repTitle: "분석 리포트", repTime: "진태양시 보정", btnCopy: "📋 복사", btnRetry: "⟲ 다시하기",
-        colYear: "연주 (Year)", colMonth: "월주 (Month)", colDay: "일주 (Day)", colHour: "시주 (Hour)",
-        txtGongmang: "공망", txtHidden: "지장간", txtNapeum: "[납음]",
-        locSeoul: "🇰🇷 대한민국 (서울/표준: UTC+9, 127.0°)", locBusan: "🇰🇷 대한민국 (부산/동부: UTC+9, 129.0°)", locTokyo: "🇯🇵 일본 (도쿄: UTC+9, 139.7°)", locOsaka: "🇯🇵 일본 (오사카: UTC+9, 135.5°)", locBeijing: "🇨🇳 중국 (베이징: UTC+8, 116.4°)", locShanghai: "🇨🇳 중국 (상하이: UTC+8, 121.5°)", locHongKong: "🇭🇰 홍콩 (UTC+8, 114.0°)", locTaipei: "🇹🇼 대만 (타이베이: UTC+8, 121.5°)", locHanoi: "🇻🇳 베트남 (하노이: UTC+7, 105.8°)", locSydney: "🇦🇺 호주 (시드니: UTC+11, 151.2°E)", locLA: "🇺🇸 미국 (LA/서부: UTC-8, 118.2°W)", locNY: "🇺🇸 미국 (뉴욕/동부: UTC-5, 74.0°W)", locLondon: "🇬🇧 영국 (런던: UTC+0, 0.1°W)",
-        dictPlaceholder: "궁금한 용어나 한자를 입력하세요", dictEmpty: "검색어를 입력하시면 전문 해설이 나타납니다.", dictNoResult: "검색 결과가 없습니다.",
-        faqTitle: "❓ 자주 묻는 질문",
-        t_tonggeun_title: "통근력 (나의 뿌리)", t_tonggeun_yes_badge: "통근(通根)", t_tonggeun_no_badge: "무근(無根)",
-        t_tonggeun_yes_desc: "지지에 튼튼한 뿌리를 내리고 있어, 어떤 풍파에도 흔들리지 않는 굳건한 주체성과 자립심을 지니고 있습니다.",
-        t_tonggeun_no_desc: "지지에 뿌리가 미약하여 환경 변화에 민감하며, 주변 상황에 휩쓸리기 쉬운 기질이 있습니다."
-    },
-    ja: {
-        btnDict: "📖 辞典を開く", btnHome: "🏠 ホーム", btnProfile: "⚙️ 入力フォーム", btnSave: "🗂️ 保存した命式", btnFaq: "❓ よくある質問", btnCs: "🎧 サポート", btnApp: "アプリ", btnLogin: "ログイン",
-        landingTitle1: "あなたの運命を、", landingTitle2: "データとアルゴリズム", landingTitle3: "で解読",
-        landingDesc: "上位1%の大家の深層鑑定秘法を\n10のダイナミックエンジンで完璧に具現化した超精密予測システム",
-        btnStart: "運命のスキャンを開始する",
-        feature1Title: "超精密 四柱推命", feature1Desc: "単純なキーワードの羅列ではありません。格局、用神、調候から十二星まで。古書の秘訣を現代的かつ直説的に変換した深層鑑定書を提供します。",
-        feature2Title: "魂を見抜く深層相性", feature2Desc: "九宮の表相性と日支の裏相性を完璧にクロスチェック。三元甲子に基づき、縁の深さと破局のタイミングまで赤裸々に分析します。",
-        feature3Title: "現代実用通変＆風水", feature3Desc: "あなたの気質に合った最適な職務、脆弱な健康臓器と業障代替法。そして日常に応用できる五行バランス指標を提示します。",
-        systemStatus: "10-Core Master Engine 正常稼働中",
-        inputTitle: "プロフィール入力", inputDesc: "正確な演算のため、運命をスキャンする情報を入力してください。",
-        lblBirth: "本人の生年月日と時間", lblGender: "本人の性別", lblLocation: "生まれた地域 (グローバル標準時・真太陽時補正)",
-        optSolar: "陽暦", optLunar: "陰暦(平月)", optLunarLeap: "陰暦(閏月)", optMale: "男性 (Male)", optFemale: "女性 (Female)",
-        chkUnknownTime: "🕒 時間不明", chkDaewun: "大運数 手動指定", chkGoBeob: "古法 遁月法", chkPartner: "💘 パートナー相性",
-        lblPartner: "💘 相手 (相性用)", lblPartnerLoc: "相手の生まれた地域",
-        btnScan: "運命スキャン開始 (SCAN)", btnScanning: "演算中 (Processing...)",
-        repTitle: "分析レポート", repTime: "真太陽時補正", btnCopy: "📋 コピー", btnRetry: "⟲ やり直す",
-        colYear: "年柱 (Year)", colMonth: "月柱 (Month)", colDay: "日柱 (Day)", colHour: "時柱 (Hour)",
-        txtGongmang: "空亡", txtHidden: "蔵干", txtNapeum: "[納音]",
-        locSeoul: "🇰🇷 韓国 (ソウル: UTC+9, 127.0°)", locBusan: "🇰🇷 韓国 (釜山: UTC+9, 129.0°)", locTokyo: "🇯🇵 日本 (東京: UTC+9, 139.7°)", locOsaka: "🇯🇵 日本 (大阪: UTC+9, 135.5°)", locBeijing: "🇨🇳 中国 (北京: UTC+8, 116.4°)", locShanghai: "🇨🇳 中国 (上海: UTC+8, 121.5°)", locHongKong: "🇭🇰 香港 (UTC+8, 114.0°)", locTaipei: "🇹🇼 台湾 (台北: UTC+8, 121.5°)", locHanoi: "🇻🇳 ベトナム (ハノイ: UTC+7, 105.8°)", locSydney: "🇦🇺 豪州 (シドニー: UTC+11, 151.2°E)", locLA: "🇺🇸 米国 (LA: UTC-8, 118.2°W)", locNY: "🇺🇸 米国 (NY: UTC-5, 74.0°W)", locLondon: "🇬🇧 英国 (ロンドン: UTC+0, 0.1°W)",
-        dictPlaceholder: "気になる用語や漢字を入力してください", dictEmpty: "検索語を入力すると専門的な解説が表示されます。", dictNoResult: "検索結果がありません。",
-        faqTitle: "❓ よくある質問",
-        t_tonggeun_title: "通根力 (日干の根)", t_tonggeun_yes_badge: "通根", t_tonggeun_no_badge: "無根",
-        t_tonggeun_yes_desc: "地支に丈夫な根を下ろしており、どんな風波にも揺るがない確固たる主体性と自立心を持っています。",
-        t_tonggeun_no_desc: "地支に根が弱く環境の変化に敏感で、周囲の状況に流されやすい気質があります。"
-    },
-    'zh-CN': {
-        btnDict: "📖 打开字典", btnHome: "🏠 首页", btnProfile: "⚙️ 填写资料", btnSave: "🗂️ 已存命盘", btnFaq: "❓ 常见问题", btnCs: "🎧 客服中心", btnApp: "下载 APP", btnLogin: "登录",
-        landingTitle1: "您的命运，", landingTitle2: "通过数据与算法", landingTitle3: "来解读",
-        landingDesc: "将前1%命理大家的深层论命秘法\n通过10个动态引擎完美实现的超精密预测系统",
-        btnStart: "开始扫描我的命运",
-        feature1Title: "超精密 四柱八字", feature1Desc: "绝非简单的关键词堆砌。从格局、用神、调候到十二星。将古书秘诀转化为现代的直白解析，提供深层论命报告。",
-        feature2Title: "洞穿灵魂的深层合婚", feature2Desc: "九宫外合与日支内合的完美交叉比对。基于三元甲子，赤裸裸地分析缘分的深浅与破局的时机。",
-        feature3Title: "现代实用通变与风水", feature3Desc: "契合您气质的最佳职务、脆弱的健康脏器与化解之法。并提供可应用于日常的五行平衡指标。",
-        systemStatus: "10-Core Master Engine 正常运行中",
-        inputTitle: "填写资料", inputDesc: "为了精准运算，请输入用于扫描命运的信息。",
-        lblBirth: "本人生辰八字", lblGender: "本人性别", lblLocation: "出生地区 (全球标准时与真太阳时校正)",
-        optSolar: "公历", optLunar: "农历(平月)", optLunarLeap: "农历(闰月)", optMale: "男性 (Male)", optFemale: "女性 (Female)",
-        chkUnknownTime: "🕒 未知时间", chkDaewun: "大运数手动指定", chkGoBeob: "古法 遁月法", chkPartner: "💘 伴侣合婚",
-        lblPartner: "💘 对方 (合婚用)", lblPartnerLoc: "对方出生地区",
-        btnScan: "开始命运扫描 (SCAN)", btnScanning: "运算中 (Processing...)",
-        repTitle: "分析报告", repTime: "真太阳时校正", btnCopy: "📋 复制", btnRetry: "⟲ 重试",
-        colYear: "年柱 (Year)", colMonth: "月柱 (Month)", colDay: "日柱 (Day)", colHour: "时柱 (Hour)",
-        txtGongmang: "空亡", txtHidden: "地支藏干", txtNapeum: "[纳音]",
-        locSeoul: "🇰🇷 韩国 (首尔: UTC+9, 127.0°)", locBusan: "🇰🇷 韩国 (釜山: UTC+9, 129.0°)", locTokyo: "🇯🇵 日本 (东京: UTC+9, 139.7°)", locOsaka: "🇯🇵 日本 (大阪: UTC+9, 135.5°)", locBeijing: "🇨🇳 中国 (北京: UTC+8, 116.4°)", locShanghai: "🇨🇳 中国 (上海: UTC+8, 121.5°)", locHongKong: "🇭🇰 香港 (UTC+8, 114.0°)", locTaipei: "🇹🇼 台湾 (台北: UTC+8, 121.5°)", locHanoi: "🇻🇳 越南 (河内: UTC+7, 105.8°)", locSydney: "🇦🇺 澳洲 (悉尼: UTC+11, 151.2°E)", locLA: "🇺🇸 美国 (洛杉矶: UTC-8, 118.2°W)", locNY: "🇺🇸 美国 (纽约: UTC-5, 74.0°W)", locLondon: "🇬🇧 英国 (伦敦: UTC+0, 0.1°W)",
-        dictPlaceholder: "请输入想了解的术语或汉字", dictEmpty: "输入搜索词即可查看专业解析。", dictNoResult: "没有搜索结果。",
-        faqTitle: "❓ 常见问题",
-        t_tonggeun_title: "通根力 (日干之根)", t_tonggeun_yes_badge: "通根", t_tonggeun_no_badge: "无根",
-        t_tonggeun_yes_desc: "在地支拥有坚实的根基，无论经历何种风波都具备不可动摇的坚定主体性与自立心。",
-        t_tonggeun_no_desc: "地支根基微弱，对环境变化敏感，容易受周围情况影响。"
-    },
-    'zh-TW': {
-        btnDict: "📖 打開字典", btnHome: "🏠 首頁", btnProfile: "⚙️ 填寫資料", btnSave: "🗂️ 已存命盤", btnFaq: "❓ 常見問題", btnCs: "🎧 客服中心", btnApp: "下載 APP", btnLogin: "登入",
-        landingTitle1: "您的命運，", landingTitle2: "透過數據與演算法", landingTitle3: "來解讀",
-        landingDesc: "將前1%命理大家的深層論命秘法\n透過10個動態引擎完美實現的超精密預測系統",
-        btnStart: "開始掃描我的命運",
-        feature1Title: "超精密 四柱八字", feature1Desc: "絕非簡單的關鍵詞堆砌。從格局、用神、調候到十二星。將古書秘訣轉化為現代的直白解析，提供深層論命報告。",
-        feature2Title: "洞穿靈魂的深層合婚", feature2Desc: "九宮外合與日支內合的完美交叉比對。基於三元甲子，赤裸裸地分析緣分的深淺與破局的時機。",
-        feature3Title: "現代實用通變與風水", feature3Desc: "契合您氣質的最佳職務、脆弱的健康臟器與化解之法。並提供可應用於日常的五行平衡指標。",
-        systemStatus: "10-Core Master Engine 正常運作中",
-        inputTitle: "填寫資料", inputDesc: "為了精準運算，請輸入用於掃描命運的資訊。",
-        lblBirth: "本人生辰八字", lblGender: "本人性別", lblLocation: "出生地區 (全球標準時與真太陽時校正)",
-        optSolar: "公曆", optLunar: "農曆(平月)", optLunarLeap: "農曆(閏月)", optMale: "男性 (Male)", optFemale: "女性 (Female)",
-        chkUnknownTime: "🕒 未知時間", chkDaewun: "大運數手動指定", chkGoBeob: "古法 遁月法", chkPartner: "💘 伴侶合婚",
-        lblPartner: "💘 對方 (合婚用)", lblPartnerLoc: "對方出生地區",
-        btnScan: "開始命運掃描 (SCAN)", btnScanning: "運算中 (Processing...)",
-        repTitle: "分析報告", repTime: "真太陽時校正", btnCopy: "📋 複製", btnRetry: "⟲ 重試",
-        colYear: "年柱 (Year)", colMonth: "月柱 (Month)", colDay: "日柱 (Day)", colHour: "時柱 (Hour)",
-        txtGongmang: "空亡", txtHidden: "地支藏干", txtNapeum: "[納音]",
-        locSeoul: "🇰🇷 韓國 (首爾: UTC+9, 127.0°)", locBusan: "🇰🇷 韓國 (釜山: UTC+9, 129.0°)", locTokyo: "🇯🇵 日本 (東京: UTC+9, 139.7°)", locOsaka: "🇯🇵 日本 (大阪: UTC+9, 135.5°)", locBeijing: "🇨🇳 中國 (北京: UTC+8, 116.4°)", locShanghai: "🇨🇳 中國 (上海: UTC+8, 121.5°)", locHongKong: "🇭🇰 香港 (UTC+8, 114.0°)", locTaipei: "🇹🇼 台灣 (台北: UTC+8, 121.5°)", locHanoi: "🇻🇳 越南 (河內: UTC+7, 105.8°)", locSydney: "🇦🇺 澳洲 (悉尼: UTC+11, 151.2°E)", locLA: "🇺🇸 美國 (洛杉磯: UTC-8, 118.2°W)", locNY: "🇺🇸 美國 (紐約: UTC-5, 74.0°W)", locLondon: "🇬🇧 英國 (倫敦: UTC+0, 0.1°W)",
-        dictPlaceholder: "請輸入想了解的術語或漢字", dictEmpty: "輸入搜尋詞即可查看專業解析。", dictNoResult: "沒有搜尋結果。",
-        faqTitle: "❓ 常見問題",
-        t_tonggeun_title: "通根力 (日干之根)", t_tonggeun_yes_badge: "通根", t_tonggeun_no_badge: "無根",
-        t_tonggeun_yes_desc: "在地支擁有堅實的根基，無論經歷何種風波都具備不可動搖的堅定主體性與自立心。",
-        t_tonggeun_no_desc: "地支根基微弱，對環境變化敏感，容易受周圍情況影響。"
-    }
+// 🚨 [수정 완료] 다국어 객체 철거 후 한국어 단일 텍스트로 경량화
+const t = {
+    btnDict: "📖 사전 열기", btnHome: "🏠 홈", btnProfile: "⚙️ 프로필 입력", btnSave: "🗂️ 저장한 명식", btnFaq: "❓ 자주 묻는 질문", btnCs: "🎧 고객센터", btnApp: "앱 다운로드", btnLogin: "로그인",
+    landingTitle1: "당신의 운명,", landingTitle2: "데이터와 알고리즘", landingTitle3: "으로 해독하다",
+    landingDesc: "대한민국 상위 1% 대가들의 심층 간명 비법을\n10개의 다이내믹 엔진으로 완벽하게 구현한 초정밀 예측 시스템",
+    btnStart: "내 운명 스캔 시작하기",
+    feature1Title: "초정밀 사주 명리", feature1Desc: "단순한 키워드 나열이 아닙니다. 격국, 용신, 조후, 12성 당사주까지. 고서의 비결을 현대적 팩트폭행으로 치환한 심층 간명지를 제공합니다.",
+    feature2Title: "영혼을 꿰뚫는 심층 궁합", feature2Desc: "구궁(九宮) 겉궁합과 일지(日支) 속궁합의 완벽한 크로스체크. 삼원갑자를 기반으로 인연의 깊이와 파국의 타이밍까지 적나라하게 분석합니다.",
+    feature3Title: "현대 실용 통변 & 풍수", feature3Desc: "나의 기질에 맞는 최적의 직무, 취약한 건강 장기와 업상대체법. 그리고 일상에 적용할 수 있는 오행 밸런스 지표를 제시합니다.",
+    systemStatus: "10-Core Master Engine 정상 가동 중",
+    inputTitle: "프로필 입력", inputDesc: "정확한 연산을 위해 운명을 스캔할 정보를 입력해 주세요.",
+    lblBirth: "본인 생년월일시", lblGender: "본인 성별", lblLocation: "태어난 지역 (글로벌 표준시 및 진태양시 정밀 보정)",
+    optSolar: "양력", optLunar: "음력(평달)", optLunarLeap: "음력(윤달)", optMale: "남성 (Male)", optFemale: "여성 (Female)",
+    chkUnknownTime: "🕒 시간 모름", chkDaewun: "대운수 수동지정", chkGoBeob: "고법 둔월법", chkPartner: "💘 파트너 궁합",
+    lblPartner: "💘 상대방 (궁합용)", lblPartnerLoc: "상대방 태어난 지역",
+    btnScan: "운명 스캔 시작 (SCAN)", btnScanning: "연산 중 (Processing...)",
+    repTitle: "분석 리포트", repTime: "진태양시 보정", btnCopy: "📋 복사", btnRetry: "⟲ 다시하기",
+    colYear: "연주 (Year)", colMonth: "월주 (Month)", colDay: "일주 (Day)", colHour: "시주 (Hour)",
+    txtGongmang: "공망", txtHidden: "지장간", txtNapeum: "[납음]",
+    locSeoul: "🇰🇷 대한민국 (서울/표준: UTC+9, 127.0°)", locBusan: "🇰🇷 대한민국 (부산/동부: UTC+9, 129.0°)", locTokyo: "🇯🇵 일본 (도쿄: UTC+9, 139.7°)", locOsaka: "🇯🇵 일본 (오사카: UTC+9, 135.5°)", locBeijing: "🇨🇳 중국 (베이징: UTC+8, 116.4°)", locShanghai: "🇨🇳 중국 (상하이: UTC+8, 121.5°)", locHongKong: "🇭🇰 홍콩 (UTC+8, 114.0°)", locTaipei: "🇹🇼 대만 (타이베이: UTC+8, 121.5°)", locHanoi: "🇻🇳 베트남 (하노이: UTC+7, 105.8°)", locSydney: "🇦🇺 호주 (시드니: UTC+11, 151.2°E)", locLA: "🇺🇸 미국 (LA/서부: UTC-8, 118.2°W)", locNY: "🇺🇸 미국 (뉴욕/동부: UTC-5, 74.0°W)", locLondon: "🇬🇧 영국 (런던: UTC+0, 0.1°W)",
+    dictPlaceholder: "궁금한 용어나 한자를 입력하세요", dictEmpty: "검색어를 입력하시면 전문 해설이 나타납니다.", dictNoResult: "검색 결과가 없습니다.",
+    faqTitle: "❓ 자주 묻는 질문",
+    t_tonggeun_title: "통근력 (나의 뿌리)", t_tonggeun_yes_badge: "통근(通根)", t_tonggeun_no_badge: "무근(無根)",
+    t_tonggeun_yes_desc: "지지에 튼튼한 뿌리를 내리고 있어, 어떤 풍파에도 흔들리지 않는 굳건한 주체성과 자립심을 지니고 있습니다.",
+    t_tonggeun_no_desc: "지지에 뿌리가 미약하여 환경 변화에 민감하며, 주변 상황에 휩쓸리기 쉬운 기질이 있습니다."
 };
 
 export default function SajuCalculator() {
     const [view, setView] = useState("home"); 
     const [loading, setLoading] = useState(false);
     const [resData, setResData] = useState(null);
-    
-    const [lang, setLang] = useState("ko");
-    const t = uiTexts[lang]; 
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [errorModal, setErrorModal] = useState({ show: false, msg: "" });
@@ -158,7 +79,8 @@ export default function SajuCalculator() {
         setDictModal(prev => ({ ...prev, keyword }));
         if (!keyword) { setDictModal(prev => ({ ...prev, results: null })); return; }
         try {
-            const response = await fetch(`${BACKEND_URL}/api/dictionary?q=${encodeURIComponent(keyword)}&lang=${lang}`);
+            // 🚨 [수정 완료] 언어 파라미터 삭제
+            const response = await fetch(`${BACKEND_URL}/api/dictionary?q=${encodeURIComponent(keyword)}`);
             const results = await response.json();
             setDictModal(prev => ({ ...prev, results }));
         } catch (err) { console.error(err); }
@@ -168,7 +90,8 @@ export default function SajuCalculator() {
         setIsSidebarOpen(false); 
         setFaqModal({ show: true, data: null });
         try {
-            const response = await fetch(`${BACKEND_URL}/api/faq?lang=${lang}`);
+            // 🚨 [수정 완료] 언어 파라미터 삭제
+            const response = await fetch(`${BACKEND_URL}/api/faq`);
             const data = await response.json();
             setFaqModal({ show: true, data: data });
         } catch (err) {
@@ -200,8 +123,7 @@ export default function SajuCalculator() {
                 longitude: parseFloat(longitudeStr), timezone: parseInt(timezoneStr),
                 unknown_time: form.unknown_time,
                 apply_true_solar: true, apply_yaja: true,
-                apply_traditional_lunar: form.use_traditional, lunar_month: form.use_traditional ? parseInt(form.lunar_month) : null,
-                language: lang 
+                apply_traditional_lunar: form.use_traditional, lunar_month: form.use_traditional ? parseInt(form.lunar_month) : null
             };
             
             if (form.opt_daewun && form.daewun_num !== '') payload.daewun_num = parseInt(form.daewun_num);
@@ -299,26 +221,20 @@ export default function SajuCalculator() {
     );
 
     return (
-        <div className="app-container" lang={lang}>
+        <div className="app-container">
             <style>{`
                 :root { --bg-color: #0d0f12; --card-bg: #16181d; --text-main: #f1f2f6; --text-muted: #95a5a6; --gold-light: #f1c40f; --gold-main: #d4af37; --gold-dark: #b5952f; --accent-red: #e74c3c; --accent-blue: #3498db; --accent-green: #2ecc71; }
                 html, body, #root, #__next { margin: 0 !important; padding: 0 !important; background-color: var(--bg-color) !important; width: 100%; max-width: 100vw; min-height: 100vh; overflow-x: hidden; }
                 
                 * { box-sizing: border-box; }
+                /* 🚨 한국어 전용이므로 모든 언어 분기 CSS 제거 */
                 div, p, span, h1, h2, h3, h4 { word-break: keep-all; overflow-wrap: break-word; } 
-                .app-container:lang(ko) { word-break: keep-all; overflow-wrap: break-word; }
-                .app-container:not(:lang(ko)) { word-break: normal !important; overflow-wrap: break-word !important; line-break: strict; }
                 
                 ::-webkit-scrollbar { width: 6px; height: 6px; }
                 ::-webkit-scrollbar-track { background: var(--bg-color); }
                 ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
                 
                 .app-container { font-family: "'Noto Serif KR', serif"; background: var(--bg-color); min-height: 100vh; color: var(--text-main); width: 100%; max-width: 100vw; overflow-x: hidden; }
-                
-                .lang-switcher { position: fixed; top: 20px; right: 70px; z-index: 1000; display: flex; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid #333; border-radius: 6px; padding: 6px 10px; backdrop-filter: blur(5px); }
-                .lang-switcher span { margin-right: 5px; font-size: 16px; }
-                .lang-switcher select { background: transparent; color: white; border: none; font-size: 13px; font-weight: bold; outline: none; cursor: pointer; appearance: none; }
-                .lang-switcher select option { background: #16181d; color: white; }
                 
                 .hamburger-btn { position: fixed; top: 20px; right: 20px; z-index: 1000; background: rgba(255,255,255,0.05); border: 1px solid #333; color: white; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 20px; transition: 0.3s; backdrop-filter: blur(5px); }
                 .hamburger-btn:hover { background: rgba(212,175,55,0.2); color: var(--gold-main); border-color: var(--gold-main); }
@@ -438,7 +354,6 @@ export default function SajuCalculator() {
                     .landing-title { font-size: 2.5rem; }
                 }
                 @media (max-width: 768px) {
-                    .lang-switcher { right: 60px; top: 15px; padding: 4px 8px; }
                     .hamburger-btn { top: 15px; right: 15px; font-size: 18px; padding: 6px 10px; }
                     .top-nav { left: 15px; top: 15px; }
                     .sidebar-menu { width: 85vw; max-width: 320px; }
@@ -477,16 +392,6 @@ export default function SajuCalculator() {
                     .elements-flex > div { flex: 1 1 30%; min-width: 50px; padding: 8px !important; }
                 }
             `}</style>
-
-            <div className="lang-switcher">
-                <span>🌐</span>
-                <select value={lang} onChange={(e) => setLang(e.target.value)}>
-                    <option value="ko">한국어</option>
-                    <option value="ja">日本語</option>
-                    <option value="zh-CN">简体中文</option>
-                    <option value="zh-TW">繁體中文</option>
-                </select>
-            </div>
 
             <button className="hamburger-btn" onClick={() => setIsSidebarOpen(true)}>☰</button>
 
@@ -767,7 +672,6 @@ export default function SajuCalculator() {
 
                     <div className="dashboard-layout">
                         
-                        {/* 🚨 [복구 영역] 납음오행 심층 해설 */}
                         {resData.napeum_reading && resData.napeum_reading.length > 0 && (
                             <div className="panel">
                                 <h3>🎵 납음오행(納音五行) 심층 해설</h3>
@@ -810,7 +714,8 @@ export default function SajuCalculator() {
                                         <h3>⚖️ 격국과 용신</h3>
                                         <div className="highlight-box">
                                             <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>나의 그릇</div>
-                                            <div style={{ fontSize: '18px', color: 'var(--gold-main)', fontWeight: 'bold', marginBottom: '5px' }}>{renderTooltipItem(resData.yongshin.geokguk?.name?.split('(')[0] || '-', false, resData.yongshin.geokguk?.name)}</div>
+                                            {/* 🚨 [수정 완료] name_clean 을 사용하고, 원본 name(한자 포함)을 렌더링에 그대로 사용합니다 */}
+                                            <div style={{ fontSize: '18px', color: 'var(--gold-main)', fontWeight: 'bold', marginBottom: '5px' }}>{renderTooltipItem(resData.yongshin.geokguk?.name_clean || '-', false, resData.yongshin.geokguk?.name)}</div>
                                             <div style={{ fontSize: '13px' }}>{resData.yongshin.geokguk?.desc || '-'}</div>
                                         </div>
                                         <div className="highlight-box" style={{ borderLeftColor: 'var(--accent-blue)' }}>
@@ -826,12 +731,12 @@ export default function SajuCalculator() {
                                                 <span className="badge badge-bad">기신</span> {resData.yongshin.yongshin?.gishin || '-'}
                                             </div>
                                         </div>
-                                        {/* 🚨 [복구 및 다국어 업데이트 완료] 통근력 (나의 뿌리) */}
+                                        {/* 🚨 [수정 완료] 백엔드의 boolean 판별 값만 사용하여 깔끔하게 조건 렌더링합니다 */}
                                         {resData.mechanics?.tonggeun !== undefined && (
                                             <div className="highlight-box" style={{ borderLeftColor: '#e67e22', marginBottom: 0, marginTop: '15px' }}>
                                                 <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.t_tonggeun_title}</div>
                                                 <div style={{ fontSize: '13px', lineHeight: '1.6', marginTop: '5px', color: '#ccc' }}>
-                                                    {resData.mechanics.tonggeun === true || resData.mechanics.tonggeun?.is_rooted === true || resData.mechanics.tonggeun?.status?.includes('통근') 
+                                                    {resData.mechanics.tonggeun?.is_rooted 
                                                         ? <><span className="badge badge-good">{t.t_tonggeun_yes_badge}</span> {t.t_tonggeun_yes_desc}</>
                                                         : <><span className="badge badge-bad">{t.t_tonggeun_no_badge}</span> {t.t_tonggeun_no_desc}</>
                                                     }
@@ -870,7 +775,6 @@ export default function SajuCalculator() {
                             </div>
                         </div>
 
-                        {/* 🚨 [복구 영역] 올해/이달/오늘 운세 3단 그리드 완벽 복원 */}
                         <div className="bento-row-3">
                             <div className="bento-col">
                                 {resData.unse?.year && (
@@ -967,7 +871,6 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 🚨 [복구 영역] 대운 및 세운 스와이프 타임라인 완벽 복원 */}
                         {resData.timeline && (
                             <div className="panel">
                                 <h3 style={{ marginBottom: '15px' }}>⏳ 대운(大運) 흐름 (10년 주기)</h3>
@@ -1038,7 +941,8 @@ export default function SajuCalculator() {
                                             {specialStarsArray.map((star, idx) => (
                                                 <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--gold-main)', padding: '15px' }} key={idx}>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                                                        <span style={{ color: 'var(--gold-light)', fontWeight: 'bold', fontSize: '15px' }}>{renderTooltipItem(star.name.split('(')[0], false)}</span>
+                                                        {/* 🚨 [수정 완료] 엔진에서 쪼갠 name_clean을 이용해 툴팁 호출, 원본 name은 그대로 표시 */}
+                                                        <span style={{ color: 'var(--gold-light)', fontWeight: 'bold', fontSize: '15px' }}>{renderTooltipItem(star.name_clean, false, star.name)}</span>
                                                         <span className="badge" style={{ margin: 0, border: '1px solid var(--gold-dark)', color: 'var(--gold-main)', background: 'transparent' }}>{renderHanjaString(star.position)}</span>
                                                     </div>
                                                     <div style={{ fontSize: '13px', color: '#ccc', wordBreak: 'keep-all', lineHeight: '1.6' }}>
@@ -1061,7 +965,8 @@ export default function SajuCalculator() {
                                             {disastersArray.map((dis, idx) => (
                                                 <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--accent-red)', padding: '15px' }} key={idx}>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                                                        <span style={{ color: 'var(--accent-red)', fontWeight: 'bold', fontSize: '15px' }}>{renderTooltipItem(dis.name.split('(')[0], false, dis.name)}</span>
+                                                        {/* 🚨 [수정 완료] 엔진에서 쪼갠 name_clean을 이용해 툴팁 호출, 원본 name은 그대로 표시 */}
+                                                        <span style={{ color: 'var(--accent-red)', fontWeight: 'bold', fontSize: '15px' }}>{renderTooltipItem(dis.name_clean, false, dis.name)}</span>
                                                         <span className="badge badge-bad" style={{ margin: 0 }}>{renderHanjaString(dis.position)}</span>
                                                     </div>
                                                     <div style={{ fontSize: '13px', color: '#ccc', wordBreak: 'keep-all', lineHeight: '1.6' }}>
