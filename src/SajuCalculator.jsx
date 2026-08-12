@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-// 🔴 추후 파이썬 백엔드를 Vercel에 배포하시면 이 주소를 배포된 도메인으로 변경하세요!
+// 🔴 파이썬 백엔드 주소 (Render)
 const BACKEND_URL = "https://saju-backend-ffum.onrender.com"; 
 
 export default function SajuCalculator() {
@@ -64,7 +64,6 @@ export default function SajuCalculator() {
     };
     const hideTooltip = () => setTooltip(prev => ({ ...prev, show: false }));
 
-    // 스크롤 시 툴팁 숨김
     useEffect(() => {
         const handleScroll = () => hideTooltip();
         window.addEventListener('scroll', handleScroll, true);
@@ -105,7 +104,7 @@ export default function SajuCalculator() {
 
             const res = await response.json();
             setResData(res);
-            generateCopyText(res); // 복사 텍스트 생성
+            generateCopyText(res); 
             setView("dashboard");
             window.scrollTo(0, 0);
 
@@ -225,7 +224,6 @@ export default function SajuCalculator() {
         return str.split('').map(char => renderTooltipItem(char, true));
     };
 
-    // 가로 스와이프 기능
     const attachSwipe = (el) => {
         if (!el) return;
         let isDown = false; let startX; let scrollLeft;
@@ -240,10 +238,14 @@ export default function SajuCalculator() {
             {/* ===================== CSS 스타일 내장 ===================== */}
             <style>{`
                 :root { --bg-color: #0d0f12; --card-bg: #16181d; --text-main: #f1f2f6; --text-muted: #95a5a6; --gold-light: #f1c40f; --gold-main: #d4af37; --gold-dark: #b5952f; --accent-red: #e74c3c; --accent-blue: #3498db; --accent-green: #2ecc71; }
+                
+                /* 🚨 1. 하얀 여백 완벽 제거 */
+                html, body { margin: 0 !important; padding: 0 !important; background-color: var(--bg-color) !important; width: 100%; overflow-x: hidden; }
                 * { box-sizing: border-box; }
                 ::-webkit-scrollbar { width: 6px; height: 6px; }
                 ::-webkit-scrollbar-track { background: var(--bg-color); }
                 ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
                 .hero-section { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; background: radial-gradient(circle at center, #1a1e24 0%, var(--bg-color) 100%); text-align: center; position: relative; }
                 .hero-title { font-size: 3rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 10px; color: var(--gold-main); text-shadow: 0 4px 15px rgba(212,175,55,0.2); }
                 .hero-subtitle { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 40px; font-weight: 300; }
@@ -270,21 +272,29 @@ export default function SajuCalculator() {
                 .ten-god { font-size: 13px; color: var(--gold-main); margin-bottom: 5px; font-weight: 700; letter-spacing: 1px; }
                 .hidden-stems { font-size: 12px; color: #777; margin-top: 15px; text-align: left; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; }
                 .panel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-                .panel { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid #222; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; }
+                
+                /* 🚨 2. 모든 패널 내 글씨를 무조건 '왼쪽 정렬'로 강제 고정 */
+                .panel { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid #222; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; text-align: left !important; }
                 .panel-full { grid-column: 1 / -1; }
-                .panel h3 { margin-top: 0; color: var(--gold-main); font-size: 1.1rem; margin-bottom: 20px; display: flex; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
+                .panel h3 { margin-top: 0; color: var(--gold-main); font-size: 1.1rem; margin-bottom: 20px; display: flex; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; text-align: left !important; }
+                .highlight-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 3px solid var(--gold-main); margin-bottom: 15px; text-align: left !important; }
+                
                 .swipe-container { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; cursor: grab; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
                 .swipe-container::-webkit-scrollbar { display: none; }
-                .timeline-card { flex: 0 0 100px; background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 8px; text-align: center; padding: 15px 10px; transition: 0.3s; user-select: none; }
+                .timeline-card { flex: 0 0 100px; background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 8px; text-align: center !important; padding: 15px 10px; transition: 0.3s; user-select: none; }
                 .timeline-card:hover { background: rgba(212,175,55,0.1); border-color: var(--gold-dark); transform: translateY(-3px); }
-                .highlight-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 3px solid var(--gold-main); margin-bottom: 15px; }
+                
+                /* 🚨 3. 올해 세운 황금색 강조 테두리 효과 */
+                .timeline-card.current-year { border: 2px solid var(--gold-main) !important; background: rgba(212,175,55,0.2) !important; box-shadow: 0 0 15px rgba(212,175,55,0.5); transform: scale(1.05); }
+
                 .badge { display: inline-block; padding: 4px 8px; background: rgba(255,255,255,0.05); border: 1px solid #444; border-radius: 4px; font-size: 12px; margin: 3px; font-weight: 700; color: #ccc; }
                 .badge-good { border-color: var(--accent-green); color: var(--accent-green); background: rgba(46,204,113,0.1); }
                 .badge-bad { border-color: var(--accent-red); color: var(--accent-red); background: rgba(231,76,60,0.1); }
                 .hanja-tooltip { display: inline-block; cursor: pointer; color: var(--gold-main); border-bottom: 1px dashed rgba(212,175,55,0.5); }
                 .hanja-tooltip.char-tooltip { color: #fff; border-bottom: none; }
+                
                 .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 2000; backdrop-filter: blur(5px); }
-                .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); width: 90%; max-width: 600px; max-height: 80vh; border-radius: 12px; padding: 25px; display: flex; flex-direction: column; border: 1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+                .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); width: 90%; max-width: 600px; max-height: 80vh; border-radius: 12px; padding: 25px; display: flex; flex-direction: column; border: 1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: left; }
                 .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
                 .modal-header h3 { margin: 0; color: var(--gold-main); }
                 .close-btn { background: none; border: none; font-size: 28px; color: #888; cursor: pointer; }
@@ -644,16 +654,16 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 6. 납음오행 */}
+                        {/* 🚨 6. 납음오행: 4칸 일렬 정렬 강제 고정! */}
                         {resData.napeum_reading && (
                             <div className="panel panel-full">
                                 <h3>🎵 납음오행(納音五行)의 숨은 파동</h3>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '15px' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px' }}>
                                     {resData.napeum_reading.map((n, i) => (
                                         <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--gold-main)', padding: '15px' }} key={i}>
                                             <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '3px' }}>{n.pillar}</div>
-                                            <div style={{ color: 'var(--gold-light)', fontWeight: 'bold', fontSize: '16px', marginBottom: '5px' }}>[납음] {n.full}</div>
-                                            <div style={{ fontSize: '13px', color: '#ccc' }}>{n.desc}</div>
+                                            <div style={{ color: 'var(--gold-light)', fontWeight: 'bold', fontSize: '15px', marginBottom: '5px' }}>[납음] {n.full}</div>
+                                            <div style={{ fontSize: '12px', color: '#ccc', wordBreak: 'keep-all' }}>{n.desc}</div>
                                         </div>
                                     ))}
                                 </div>
@@ -689,7 +699,7 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 8. 인생 타임라인 */}
+                        {/* 🚨 8. 인생 타임라인 (올해 세운 강조 효과 추가) */}
                         {resData.timeline && (
                             <div className="panel panel-full">
                                 <h3>⏳ 인생 타임라인 (스와이프 하여 확인)</h3>
@@ -704,16 +714,22 @@ export default function SajuCalculator() {
                                         </div>
                                     ))}
                                 </div>
-                                <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '15px', marginBottom: '5px' }}>■ 최근 10년 세운 (올해 기준)</div>
+                                
+                                <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '15px', marginBottom: '5px' }}>■ 최근 10년 세운 (과거 4년 ~ 미래 5년)</div>
                                 <div className="swipe-container" ref={el => attachSwipe(el)}>
-                                    {resData.timeline.sewun.map((sw, i) => (
-                                        <div className="timeline-card" key={i}>
-                                            <div className="timeline-age">{sw.year}년</div>
-                                            <div style={{ fontSize: '11px', color: 'var(--gold-main)', marginBottom: '2px' }}>{renderTooltipItem(sw.stem_tg, false)}</div>
-                                            <div className="timeline-ganzhi">{renderTooltipItem(sw.stem, true)}<br />{renderTooltipItem(sw.branch, true)}</div>
-                                            <div style={{ fontSize: '11px', color: 'var(--gold-main)', marginTop: '2px' }}>{renderTooltipItem(sw.branch_tg, false)}</div>
-                                        </div>
-                                    ))}
+                                    {resData.timeline.sewun.map((sw, i) => {
+                                        const isCurrent = sw.year === new Date().getFullYear(); // 현재 연도 판별
+                                        return (
+                                            <div className={`timeline-card ${isCurrent ? 'current-year' : ''}`} key={i}>
+                                                <div className="timeline-age" style={{ fontWeight: isCurrent ? '900' : 'normal', color: isCurrent ? 'var(--gold-main)' : '#ccc' }}>
+                                                    {sw.year}년 {isCurrent && <span style={{fontSize:'10px', display:'block'}}>(올해)</span>}
+                                                </div>
+                                                <div style={{ fontSize: '11px', color: 'var(--gold-main)', marginBottom: '2px' }}>{renderTooltipItem(sw.stem_tg, false)}</div>
+                                                <div className="timeline-ganzhi">{renderTooltipItem(sw.stem, true)}<br />{renderTooltipItem(sw.branch, true)}</div>
+                                                <div style={{ fontSize: '11px', color: 'var(--gold-main)', marginTop: '2px' }}>{renderTooltipItem(sw.branch_tg, false)}</div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         )}
