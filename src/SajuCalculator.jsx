@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 const BACKEND_URL = "https://saju-backend-ffum.onrender.com"; 
 
 export default function SajuCalculator() {
-    const [view, setView] = useState("hero"); 
+    // 🚨 초기 뷰를 'home'(대문)으로 변경
+    const [view, setView] = useState("home"); 
     const [loading, setLoading] = useState(false);
     const [resData, setResData] = useState(null);
     const [copyFormattedText, setCopyFormattedText] = useState("");
@@ -32,7 +33,7 @@ export default function SajuCalculator() {
 
     const hideTooltip = () => setTooltip(prev => ({ ...prev, show: false }));
 
-    // 🚨 [버그 픽스] 화면(view)이 바뀔 때 무조건 툴팁을 강제로 끄는 방어 로직
+    // 화면(view)이 바뀔 때 무조건 툴팁을 강제로 끄는 방어 로직
     useEffect(() => {
         hideTooltip();
     }, [view]);
@@ -82,7 +83,7 @@ export default function SajuCalculator() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        hideTooltip(); // 🚨 스캔 시작 시에도 툴팁 강제 종료
+        hideTooltip(); // 스캔 시작 시 툴팁 강제 종료
         setLoading(true);
         try {
             const payload = {
@@ -190,6 +191,7 @@ export default function SajuCalculator() {
                 
                 .app-container { font-family: "'Noto Serif KR', serif"; background: var(--bg-color); min-height: 100vh; color: var(--text-main); width: 100%; max-width: 100vw; overflow-x: hidden; }
                 
+                /* 햄버거 메뉴 버튼 (우측 상단) */
                 .hamburger-btn {
                     position: fixed; top: 20px; right: 20px; z-index: 1000;
                     background: rgba(255,255,255,0.05); border: 1px solid #333; color: white;
@@ -198,6 +200,7 @@ export default function SajuCalculator() {
                 }
                 .hamburger-btn:hover { background: rgba(212,175,55,0.2); color: var(--gold-main); border-color: var(--gold-main); }
 
+                /* 사이드바 메뉴 디자인 */
                 .sidebar-overlay {
                     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
                     background: rgba(0,0,0,0.7); z-index: 3000;
@@ -229,10 +232,34 @@ export default function SajuCalculator() {
                 .sidebar-login { display: flex; align-items: center; gap: 10px; color: #aaa; cursor: pointer; font-size: 14px; margin-top: 15px; font-weight: bold; transition: 0.2s; }
                 .sidebar-login:hover { color: var(--gold-light); }
 
-                .hero-section { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; background: radial-gradient(circle at center, #1a1e24 0%, var(--bg-color) 100%); text-align: center; position: relative; }
+                /* 🚨 대문(Home) 랜딩 페이지 전용 디자인 */
+                .landing-section { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 60px 20px; background: radial-gradient(circle at center, #1a1e24 0%, var(--bg-color) 100%); text-align: center; }
+                .landing-hero { max-width: 900px; margin-bottom: 50px; animation: fadeIn 1s ease-out; }
+                .landing-title { font-size: 3.5rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 20px; color: #fff; line-height: 1.3; }
+                .landing-title span { color: var(--gold-main); text-shadow: 0 0 20px rgba(212,175,55,0.3); }
+                .landing-subtitle { font-size: 1.2rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 40px; font-weight: 300; }
                 
-                .hero-title { font-size: 3rem; font-weight: 900; letter-spacing: 2px; margin-top: -60px; margin-bottom: 25px; color: var(--gold-main); text-shadow: 0 4px 15px rgba(212,175,55,0.2); }
-                .hero-subtitle { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 50px; font-weight: 300; line-height: 1.6; }
+                .btn-cta { background: linear-gradient(135deg, var(--gold-dark), var(--gold-main)); color: #000; border: none; border-radius: 50px; padding: 20px 40px; font-size: 1.2rem; font-weight: 900; cursor: pointer; box-shadow: 0 10px 30px rgba(212,175,55,0.3); transition: all 0.3s; animation: pulse 2s infinite; }
+                .btn-cta:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(212,175,55,0.5); animation: none; }
+                
+                .bento-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1100px; width: 100%; margin-bottom: 50px; }
+                .feature-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(212,175,55,0.2); border-radius: 16px; padding: 30px; text-align: left; backdrop-filter: blur(10px); transition: 0.3s; }
+                .feature-card:hover { transform: translateY(-5px); background: rgba(212,175,55,0.05); border-color: var(--gold-main); }
+                .feature-icon { font-size: 2.5rem; margin-bottom: 15px; }
+                .feature-card h3 { color: var(--gold-light); font-size: 1.3rem; margin: 0 0 15px 0; }
+                .feature-card p { color: #aaa; font-size: 0.95rem; line-height: 1.6; margin: 0; }
+                
+                .system-status { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: #777; background: rgba(0,0,0,0.4); padding: 10px 20px; border-radius: 30px; border: 1px solid #333; }
+                .status-dot { width: 10px; height: 10px; background-color: var(--accent-green); border-radius: 50%; box-shadow: 0 0 10px var(--accent-green); animation: blink 1.5s infinite; }
+                
+                @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+                @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(212,175,55,0.4); } 70% { box-shadow: 0 0 0 15px rgba(212,175,55,0); } 100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); } }
+                @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+                /* 프로필 입력 화면 (hero-section) */
+                .hero-section { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; background: var(--bg-color); text-align: center; position: relative; }
+                .hero-title { font-size: 2.5rem; font-weight: 900; letter-spacing: 2px; margin-top: -30px; margin-bottom: 20px; color: var(--gold-main); text-shadow: 0 4px 15px rgba(212,175,55,0.2); }
+                .hero-subtitle { font-size: 1rem; color: var(--text-muted); margin-bottom: 40px; font-weight: 300; line-height: 1.6; }
                 
                 .input-card { background: var(--card-bg); padding: 30px; border-radius: 12px; width: 100%; max-width: 700px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
                 .input-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, var(--gold-main), transparent); }
@@ -244,10 +271,12 @@ export default function SajuCalculator() {
                 .btn-primary { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--gold-dark), var(--gold-main)); color: #000; border: none; border-radius: 6px; font-size: 16px; font-weight: 900; cursor: pointer; margin-top: 25px; transition: transform 0.2s, box-shadow 0.2s; }
                 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212,175,55,0.4); }
                 
+                /* 좌측 사전 열기 버튼 */
                 .top-nav { position: absolute; top: 20px; left: 20px; z-index: 100; }
                 .btn-icon { background: rgba(255,255,255,0.1); color: white; border: 1px solid #333; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; transition: 0.3s; }
                 .btn-icon:hover { background: var(--gold-main); color: #000; border-color: var(--gold-main); }
                 
+                /* 대시보드 (분석 리포트) */
                 .dashboard { padding: 60px 20px 40px 20px; max-width: 1300px; margin: auto; width: 100%; box-sizing: border-box; }
                 .dash-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 30px; }
                 .dash-header h2 { margin: 0; color: var(--gold-main); font-weight: 900; }
@@ -298,14 +327,20 @@ export default function SajuCalculator() {
                 /* 📱📱 모바일 및 테블릿 반응형 제어 📱📱 */
                 @media (max-width: 1024px) {
                     .bento-row-3 { grid-template-columns: 1fr 1fr; }
+                    .bento-features { grid-template-columns: 1fr; }
+                    .landing-title { font-size: 2.5rem; }
                 }
                 @media (max-width: 768px) {
                     .hamburger-btn { top: 15px; right: 15px; font-size: 18px; padding: 6px 10px; }
                     .top-nav { left: 15px; top: 15px; }
                     .sidebar-menu { width: 85vw; max-width: 320px; }
                     
-                    .hero-title { font-size: 1.8rem; margin-top: -40px; margin-bottom: 20px; }
-                    .hero-subtitle { font-size: 0.9rem; word-break: keep-all; padding: 0 10px; margin-bottom: 40px; }
+                    .landing-title { font-size: 2rem; }
+                    .landing-subtitle { font-size: 1rem; padding: 0 10px; }
+                    .feature-card { padding: 20px; }
+                    
+                    .hero-title { font-size: 1.8rem; margin-top: 0px; margin-bottom: 15px; }
+                    .hero-subtitle { font-size: 0.9rem; word-break: keep-all; padding: 0 10px; margin-bottom: 30px; }
                     
                     .input-card { padding: 20px 15px; border-radius: 0; border-left: none; border-right: none; }
                     .form-grid { grid-template-columns: 1fr; gap: 15px; } 
@@ -345,17 +380,17 @@ export default function SajuCalculator() {
                     <button className="sidebar-close-btn" onClick={() => setIsSidebarOpen(false)}>×</button>
                 </div>
                 <div className="sidebar-content">
-                    <div className="sidebar-item" onClick={() => { setView("hero"); setIsSidebarOpen(false); window.scrollTo(0,0); }}>
+                    <div className="sidebar-item" onClick={() => { setView("home"); setIsSidebarOpen(false); window.scrollTo(0,0); }}>
                         🏠 홈
+                    </div>
+                    <div className="sidebar-item" onClick={() => { setView("input"); setIsSidebarOpen(false); window.scrollTo(0,0); }}>
+                        ⚙️ 프로필 입력
                     </div>
                     <div className="sidebar-item" onClick={() => { setDictModal({ show: true, keyword: "", results: null }); setIsSidebarOpen(false); }}>
                         📖 마스터 백과사전
                     </div>
                     <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>
                         🗂️ 저장한 명식
-                    </div>
-                    <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>
-                        ⚙️ 프로필 입력
                     </div>
                     <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>
                         ❓ 자주 묻는 질문
@@ -374,6 +409,7 @@ export default function SajuCalculator() {
                 </div>
             </div>
 
+            {/* 전역 툴팁 / 모달 */}
             {tooltip.show && tooltip.meta && (
                 <div style={{ position: 'fixed', zIndex: 9999, width: '260px', maxWidth: '90vw', backgroundColor: '#222', color: '#fff', textAlign: 'left', borderRadius: '8px', padding: '15px', fontSize: '13px', lineHeight: '1.5', border: '1px solid #444', boxShadow: '0 10px 25px rgba(0,0,0,0.8)', pointerEvents: 'none', fontWeight: 300, top: tooltip.top + 'px', left: tooltip.left + 'px' }}>
                     <strong style={{ color: 'var(--gold-main)' }}>{tooltip.meta.term} {tooltip.meta.hanja ? `(${tooltip.meta.hanja})` : ''}</strong><br /><br />{tooltip.meta.meaning}
@@ -408,11 +444,51 @@ export default function SajuCalculator() {
                 </div>
             )}
 
-            {view === "hero" && (
+            {/* ===================== VIEW 1: 대문(Home) 랜딩 페이지 ===================== */}
+            {view === "home" && (
+                <div className="landing-section">
+                    <div className="top-nav"><button className="btn-icon" onClick={() => setDictModal(prev => ({ ...prev, show: true }))}>📖 사전 열기</button></div>
+                    
+                    <div className="landing-hero">
+                        <h1 className="landing-title">당신의 운명,<br/><span>데이터와 알고리즘</span>으로 해독하다</h1>
+                        <p className="landing-subtitle">대한민국 상위 1% 대가들의 심층 간명 비법을<br/>10개의 다이내믹 엔진으로 완벽하게 구현한 초정밀 예측 시스템</p>
+                        
+                        <button className="btn-cta" onClick={() => { setView("input"); window.scrollTo(0,0); }}>
+                            내 운명 스캔 시작하기
+                        </button>
+                    </div>
+
+                    <div className="bento-features">
+                        <div className="feature-card">
+                            <div className="feature-icon">🔮</div>
+                            <h3>초정밀 사주 명리</h3>
+                            <p>단순한 키워드 나열이 아닙니다. 격국, 용신, 조후, 12성 당사주까지. 고서의 비결을 현대적 팩트폭행으로 치환한 심층 간명지를 제공합니다.</p>
+                        </div>
+                        <div className="feature-card">
+                            <div className="feature-icon">💞</div>
+                            <h3>영혼을 꿰뚫는 심층 궁합</h3>
+                            <p>구궁(九宮) 겉궁합과 일지(日支) 속궁합의 완벽한 크로스체크. 삼원갑자를 기반으로 인연의 깊이와 파국의 타이밍까지 적나라하게 분석합니다.</p>
+                        </div>
+                        <div className="feature-card">
+                            <div className="feature-icon">🧭</div>
+                            <h3>현대 실용 통변 & 풍수</h3>
+                            <p>나의 기질에 맞는 최적의 직무, 취약한 건강 장기와 업상대체법. 그리고 일상에 적용할 수 있는 오행 밸런스 지표를 제시합니다.</p>
+                        </div>
+                    </div>
+
+                    <div className="system-status">
+                        <span className="status-dot"></span> 10-Core Master Engine 정상 가동 중
+                    </div>
+                </div>
+            )}
+
+            {/* ===================== VIEW 2: 프로필 입력폼 ===================== */}
+            {view === "input" && (
                 <div className="hero-section">
                     <div className="top-nav"><button className="btn-icon" onClick={() => setDictModal(prev => ({ ...prev, show: true }))}>📖 사전 열기</button></div>
-                    <h1 className="hero-title">MYEONGRI MASTER</h1>
-                    <div className="hero-subtitle">대한민국 1% 명리 마스터를 위한 초정밀 예측 시스템</div>
+                    <h1 className="hero-title">프로필 입력</h1>
+                    <div className="hero-subtitle">정확한 연산을 위해 운명을 스캔할 정보를 입력해 주세요.</div>
+                    
                     <form className="input-card" onSubmit={handleSubmit}>
                         <div className="form-grid">
                             <div>
@@ -456,6 +532,7 @@ export default function SajuCalculator() {
                 </div>
             )}
 
+            {/* ===================== VIEW 3: 대시보드 리포트 ===================== */}
             {view === "dashboard" && resData && (
                 <div className="dashboard">
                     <div className="dash-header">
@@ -463,7 +540,8 @@ export default function SajuCalculator() {
                         <div>
                             <span style={{ fontSize: '12px', color: '#777', marginRight: '15px' }}>진태양시 보정: <span style={{ color: '#fff' }}>{resData.corrected_time}</span></span>
                             <button className="btn-icon" onClick={handleCopy} style={{ marginRight: '8px' }}>📋 복사</button>
-                            <button className="btn-icon" onClick={() => { hideTooltip(); setView("hero"); window.scrollTo(0,0); }} style={{ background: '#333' }}>⟲ 다시하기</button>
+                            {/* 다시하기 버튼 클릭 시 input 화면으로 이동 */}
+                            <button className="btn-icon" onClick={() => { hideTooltip(); setView("input"); window.scrollTo(0,0); }} style={{ background: '#333' }}>⟲ 다시하기</button>
                         </div>
                     </div>
 
