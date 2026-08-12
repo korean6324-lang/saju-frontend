@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from 'react';
 // 🔴 파이썬 백엔드 주소 (Render)
 const BACKEND_URL = "https://saju-backend-ffum.onrender.com"; 
 
-// 🚨 프론트엔드 UI 다국어 언어팩 (일본어 타이틀 완벽 수정 및 복구)
 const uiTexts = {
     ko: {
         btnDict: "📖 사전 열기", btnHome: "🏠 홈", btnProfile: "⚙️ 프로필 입력", btnSave: "🗂️ 저장한 명식", btnFaq: "❓ 자주 묻는 질문", btnCs: "🎧 고객센터", btnApp: "앱 다운로드", btnLogin: "로그인",
@@ -24,12 +23,12 @@ const uiTexts = {
         colYear: "연주 (Year)", colMonth: "월주 (Month)", colDay: "일주 (Day)", colHour: "시주 (Hour)",
         txtGongmang: "공망", txtHidden: "지장간", txtNapeum: "[납음]",
         locSeoul: "🇰🇷 대한민국 (서울/표준: UTC+9, 127.0°)", locBusan: "🇰🇷 대한민국 (부산/동부: UTC+9, 129.0°)", locTokyo: "🇯🇵 일본 (도쿄: UTC+9, 139.7°)", locOsaka: "🇯🇵 일본 (오사카: UTC+9, 135.5°)", locBeijing: "🇨🇳 중국 (베이징: UTC+8, 116.4°)", locShanghai: "🇨🇳 중국 (상하이: UTC+8, 121.5°)", locHongKong: "🇭🇰 홍콩 (UTC+8, 114.0°)", locTaipei: "🇹🇼 대만 (타이베이: UTC+8, 121.5°)", locHanoi: "🇻🇳 베트남 (하노이: UTC+7, 105.8°)", locSydney: "🇦🇺 호주 (시드니: UTC+11, 151.2°E)", locLA: "🇺🇸 미국 (LA/서부: UTC-8, 118.2°W)", locNY: "🇺🇸 미국 (뉴욕/동부: UTC-5, 74.0°W)", locLondon: "🇬🇧 영국 (런던: UTC+0, 0.1°W)",
-        dictPlaceholder: "궁금한 용어나 한자를 입력하세요", dictEmpty: "검색어를 입력하시면 전문 해설이 나타납니다.", dictNoResult: "검색 결과가 없습니다."
+        dictPlaceholder: "궁금한 용어나 한자를 입력하세요", dictEmpty: "검색어를 입력하시면 전문 해설이 나타납니다.", dictNoResult: "검색 결과가 없습니다.",
+        faqTitle: "❓ 자주 묻는 질문"
     },
     ja: {
         btnDict: "📖 辞典を開く", btnHome: "🏠 ホーム", btnProfile: "⚙️ 入力フォーム", btnSave: "🗂️ 保存した命式", btnFaq: "❓ よくある質問", btnCs: "🎧 サポート", btnApp: "アプリ", btnLogin: "ログイン",
-        landingTitle1: "あなたの運命を、", landingTitle2: "データとアルゴリズム", 
-        landingTitle3: "で解読", /* 🚨 명사형 종결로 복구 완료 (줄바꿈 원천 차단) */
+        landingTitle1: "あなたの運命を、", landingTitle2: "データとアルゴリズム", landingTitle3: "で解読",
         landingDesc: "上位1%の大家の深層鑑定秘法を\n10のダイナミックエンジンで完璧に具現化した超精密予測システム",
         btnStart: "運命のスキャンを開始する",
         feature1Title: "超精密 四柱推命", feature1Desc: "単純なキーワードの羅列ではありません。格局、用神、調候から十二星まで。古書の秘訣を現代的かつ直説的に変換した深層鑑定書を提供します。",
@@ -46,7 +45,8 @@ const uiTexts = {
         colYear: "年柱 (Year)", colMonth: "月柱 (Month)", colDay: "日柱 (Day)", colHour: "時柱 (Hour)",
         txtGongmang: "空亡", txtHidden: "蔵干", txtNapeum: "[納音]",
         locSeoul: "🇰🇷 韓国 (ソウル: UTC+9, 127.0°)", locBusan: "🇰🇷 韓国 (釜山: UTC+9, 129.0°)", locTokyo: "🇯🇵 日本 (東京: UTC+9, 139.7°)", locOsaka: "🇯🇵 日本 (大阪: UTC+9, 135.5°)", locBeijing: "🇨🇳 中国 (北京: UTC+8, 116.4°)", locShanghai: "🇨🇳 中国 (上海: UTC+8, 121.5°)", locHongKong: "🇭🇰 香港 (UTC+8, 114.0°)", locTaipei: "🇹🇼 台湾 (台北: UTC+8, 121.5°)", locHanoi: "🇻🇳 ベトナム (ハノイ: UTC+7, 105.8°)", locSydney: "🇦🇺 豪州 (シドニー: UTC+11, 151.2°E)", locLA: "🇺🇸 米国 (LA: UTC-8, 118.2°W)", locNY: "🇺🇸 米国 (NY: UTC-5, 74.0°W)", locLondon: "🇬🇧 英国 (ロンドン: UTC+0, 0.1°W)",
-        dictPlaceholder: "気になる用語や漢字を入力してください", dictEmpty: "検索語を入力すると専門的な解説が表示されます。", dictNoResult: "検索結果がありません。"
+        dictPlaceholder: "気になる用語や漢字を入力してください", dictEmpty: "検索語を入力すると専門的な解説が表示されます。", dictNoResult: "検索結果がありません。",
+        faqTitle: "❓ よくある質問"
     },
     'zh-CN': {
         btnDict: "📖 打开字典", btnHome: "🏠 首页", btnProfile: "⚙️ 填写资料", btnSave: "🗂️ 已存命盘", btnFaq: "❓ 常见问题", btnCs: "🎧 客服中心", btnApp: "下载 APP", btnLogin: "登录",
@@ -67,7 +67,8 @@ const uiTexts = {
         colYear: "年柱 (Year)", colMonth: "月柱 (Month)", colDay: "日柱 (Day)", colHour: "时柱 (Hour)",
         txtGongmang: "空亡", txtHidden: "地支藏干", txtNapeum: "[纳音]",
         locSeoul: "🇰🇷 韩国 (首尔: UTC+9, 127.0°)", locBusan: "🇰🇷 韩国 (釜山: UTC+9, 129.0°)", locTokyo: "🇯🇵 日本 (东京: UTC+9, 139.7°)", locOsaka: "🇯🇵 日本 (大阪: UTC+9, 135.5°)", locBeijing: "🇨🇳 中国 (北京: UTC+8, 116.4°)", locShanghai: "🇨🇳 中国 (上海: UTC+8, 121.5°)", locHongKong: "🇭🇰 香港 (UTC+8, 114.0°)", locTaipei: "🇹🇼 台湾 (台北: UTC+8, 121.5°)", locHanoi: "🇻🇳 越南 (河内: UTC+7, 105.8°)", locSydney: "🇦🇺 澳洲 (悉尼: UTC+11, 151.2°E)", locLA: "🇺🇸 美国 (洛杉矶: UTC-8, 118.2°W)", locNY: "🇺🇸 美国 (纽约: UTC-5, 74.0°W)", locLondon: "🇬🇧 英国 (伦敦: UTC+0, 0.1°W)",
-        dictPlaceholder: "请输入想了解的术语或汉字", dictEmpty: "输入搜索词即可查看专业解析。", dictNoResult: "没有搜索结果。"
+        dictPlaceholder: "请输入想了解的术语或汉字", dictEmpty: "输入搜索词即可查看专业解析。", dictNoResult: "没有搜索结果。",
+        faqTitle: "❓ 常见问题"
     },
     'zh-TW': {
         btnDict: "📖 打開字典", btnHome: "🏠 首頁", btnProfile: "⚙️ 填寫資料", btnSave: "🗂️ 已存命盤", btnFaq: "❓ 常見問題", btnCs: "🎧 客服中心", btnApp: "下載 APP", btnLogin: "登入",
@@ -88,7 +89,8 @@ const uiTexts = {
         colYear: "年柱 (Year)", colMonth: "月柱 (Month)", colDay: "日柱 (Day)", colHour: "時柱 (Hour)",
         txtGongmang: "空亡", txtHidden: "地支藏干", txtNapeum: "[納音]",
         locSeoul: "🇰🇷 韓國 (首爾: UTC+9, 127.0°)", locBusan: "🇰🇷 韓國 (釜山: UTC+9, 129.0°)", locTokyo: "🇯🇵 日本 (東京: UTC+9, 139.7°)", locOsaka: "🇯🇵 日本 (大阪: UTC+9, 135.5°)", locBeijing: "🇨🇳 中國 (北京: UTC+8, 116.4°)", locShanghai: "🇨🇳 中國 (上海: UTC+8, 121.5°)", locHongKong: "🇭🇰 香港 (UTC+8, 114.0°)", locTaipei: "🇹🇼 台灣 (台北: UTC+8, 121.5°)", locHanoi: "🇻🇳 越南 (河內: UTC+7, 105.8°)", locSydney: "🇦🇺 澳洲 (悉尼: UTC+11, 151.2°E)", locLA: "🇺🇸 美國 (洛杉磯: UTC-8, 118.2°W)", locNY: "🇺🇸 美國 (紐約: UTC-5, 74.0°W)", locLondon: "🇬🇧 英國 (倫敦: UTC+0, 0.1°W)",
-        dictPlaceholder: "請輸入想了解的術語或漢字", dictEmpty: "輸入搜尋詞即可查看專業解析。", dictNoResult: "沒有搜尋結果。"
+        dictPlaceholder: "請輸入想了解的術語或漢字", dictEmpty: "輸入搜尋詞即可查看專業解析。", dictNoResult: "沒有搜尋結果。",
+        faqTitle: "❓ 常見問題"
     }
 };
 
@@ -103,6 +105,7 @@ export default function SajuCalculator() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [errorModal, setErrorModal] = useState({ show: false, msg: "" });
     const [dictModal, setDictModal] = useState({ show: false, keyword: "", results: null });
+    const [faqModal, setFaqModal] = useState({ show: false, data: null });
     const [tooltip, setTooltip] = useState({ show: false, meta: null, top: 0, left: 0 });
 
     const [form, setForm] = useState({
@@ -149,6 +152,19 @@ export default function SajuCalculator() {
         } catch (err) { console.error(err); }
     };
 
+    const handleFaqOpen = async () => {
+        setIsSidebarOpen(false); 
+        setFaqModal({ show: true, data: null });
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/faq?lang=${lang}`);
+            const data = await response.json();
+            setFaqModal({ show: true, data: data });
+        } catch (err) {
+            console.error("FAQ Fetch Error:", err);
+            setFaqModal({ show: true, data: [] });
+        }
+    };
+
     const showTooltip = (e, meta) => {
         if (!meta) return;
         const rect = e.target.getBoundingClientRect();
@@ -193,18 +209,19 @@ export default function SajuCalculator() {
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
             });
 
-            if (!response.ok) {
-                const errData = await response.json();
-                throw new Error(errData.detail || JSON.stringify(errData));
+            const res = await response.json();
+            
+            // 🚨 [철통 방어] 백엔드에서 200 OK를 주더라도 status가 error면 무조건 컷!
+            if (!response.ok || res.status === "error" || res.detail) {
+                throw new Error(res.message || res.detail || "서버 연산 중 알 수 없는 오류가 발생했습니다.");
             }
 
-            const res = await response.json();
             setResData(res);
             setView("dashboard");
             window.scrollTo(0, 0);
 
         } catch (err) {
-            setErrorModal({ show: true, msg: `서버 연산 중 에러:\n\n${err.message}` });
+            setErrorModal({ show: true, msg: `⚠️ 에러 발생:\n\n${err.message}` });
         } finally {
             setLoading(false);
         }
@@ -214,7 +231,8 @@ export default function SajuCalculator() {
 
     const renderTooltipItem = (keyword, isChar = true, text = null) => {
         if (!resData) return text || keyword;
-        const metaDict = resData.mechanics.metadata || {};
+        // 안전한 객체 접근 (?.)
+        const metaDict = resData.mechanics?.metadata || {};
         const meta = metaDict[keyword];
         const display = text || keyword;
         if (!meta || keyword === "-" || keyword === "알수없음") return <span key={Math.random()}>{display}</span>;
@@ -265,16 +283,10 @@ export default function SajuCalculator() {
                 :root { --bg-color: #0d0f12; --card-bg: #16181d; --text-main: #f1f2f6; --text-muted: #95a5a6; --gold-light: #f1c40f; --gold-main: #d4af37; --gold-dark: #b5952f; --accent-red: #e74c3c; --accent-blue: #3498db; --accent-green: #2ecc71; }
                 html, body, #root, #__next { margin: 0 !important; padding: 0 !important; background-color: var(--bg-color) !important; width: 100%; max-width: 100vw; min-height: 100vh; overflow-x: hidden; }
                 
-                /* 🚨 [무결점 CSS 방어] 일본어/중국어는 무조건 글자 단위로 줄바꿈 되도록 !important 강제 쐐기 박기 */
                 * { box-sizing: border-box; }
                 div, p, span, h1, h2, h3, h4 { word-break: keep-all; overflow-wrap: break-word; } 
-                .app-container:not(:lang(ko)) *, 
-                .app-container:not(:lang(ko)) h1, 
-                .app-container:not(:lang(ko)) p, 
-                .app-container:not(:lang(ko)) div { 
-                    word-break: normal !important; 
-                    overflow-wrap: break-word !important; 
-                }
+                .app-container:lang(ko) { word-break: keep-all; overflow-wrap: break-word; }
+                .app-container:not(:lang(ko)) { word-break: normal; overflow-wrap: break-word; line-break: strict; }
                 
                 ::-webkit-scrollbar { width: 6px; height: 6px; }
                 ::-webkit-scrollbar-track { background: var(--bg-color); }
@@ -387,7 +399,7 @@ export default function SajuCalculator() {
                 .hanja-tooltip { display: inline-block; cursor: pointer; color: var(--gold-main); border-bottom: 1px dashed rgba(212,175,55,0.5); }
                 .hanja-tooltip.char-tooltip { color: #fff; border-bottom: none; }
                 
-                /* 사전 모달창 고정 (Jitter 완벽 해결) */
+                /* 고정된 높이의 안전한 모달창 */
                 .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 4000; backdrop-filter: blur(5px); }
                 .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-bg); width: 90%; max-width: 600px; height: 80vh; border-radius: 12px; padding: 25px; display: flex; flex-direction: column; border: 1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: left; }
                 .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
@@ -396,6 +408,10 @@ export default function SajuCalculator() {
                 .dict-search-box input { width: 100%; padding: 15px; font-size: 15px; background: #000; border-radius: 8px; color: white; border: 1px solid #333; }
                 .dict-results { flex: 1; overflow-y: auto; padding-right: 10px; margin-top: 15px; }
                 .dict-item { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 4px solid var(--gold-main); margin-bottom: 15px; }
+                
+                /* FAQ 텍스트 최적화 */
+                .faq-q { color: var(--gold-light); font-weight: 900; font-size: 1.1rem; margin-bottom: 8px; line-height: 1.4; }
+                .faq-a { color: #ccc; font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
 
                 /* 📱📱 모바일 및 테블릿 반응형 제어 📱📱 */
                 @media (max-width: 1024px) {
@@ -467,7 +483,7 @@ export default function SajuCalculator() {
                     <div className="sidebar-item" onClick={() => { setView("input"); setIsSidebarOpen(false); window.scrollTo(0,0); }}>{t.btnProfile}</div>
                     <div className="sidebar-item" onClick={() => { setDictModal({ show: true, keyword: "", results: null }); setIsSidebarOpen(false); }}>{t.btnDict}</div>
                     <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>{t.btnSave}</div>
-                    <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>{t.btnFaq}</div>
+                    <div className="sidebar-item" onClick={handleFaqOpen}>{t.btnFaq}</div>
                     <div className="sidebar-item" onClick={() => alert('업데이트 준비 중입니다.')}>{t.btnCs}</div>
                 </div>
                 <div className="sidebar-footer">
@@ -502,6 +518,32 @@ export default function SajuCalculator() {
                 </div>
             )}
 
+            {/* FAQ 독립 모달창 */}
+            {faqModal.show && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h3>{t.faqTitle}</h3>
+                            <button className="close-btn" onClick={() => setFaqModal({ show: false, data: null })}>×</button>
+                        </div>
+                        <div className="dict-results">
+                            {!faqModal.data ? (
+                                <div style={{ textAlign: 'center', color: '#555', marginTop: '30px' }}>Loading...</div>
+                            ) : faqModal.data.length === 0 ? (
+                                <div style={{ textAlign: 'center', color: '#888', marginTop: '30px' }}>Error fetching FAQ.</div>
+                            ) : (
+                                faqModal.data.map((faq, idx) => (
+                                    <div className="dict-item" key={idx}>
+                                        <div className="faq-q">Q. {faq.q}</div>
+                                        <div className="faq-a">A. {faq.a}</div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {errorModal.show && (
                 <div className="modal-overlay" style={{ zIndex: 4000 }}>
                     <div className="modal-content" style={{ borderLeft: '4px solid var(--accent-red)', height: 'auto' }}>
@@ -520,7 +562,7 @@ export default function SajuCalculator() {
                         <h1 className="landing-title">
                             {t.landingTitle1}<br/>
                             <span className="highlight">{t.landingTitle2}</span>
-                            {t.landingTitle3}
+                            <span style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>{t.landingTitle3}</span>
                         </h1>
                         <p className="landing-subtitle">{t.landingDesc}</p>
                         <button className="btn-cta" onClick={() => { setView("input"); window.scrollTo(0,0); }}>{t.btnStart}</button>
@@ -677,9 +719,11 @@ export default function SajuCalculator() {
                             <tbody>
                                 <tr>
                                     {['year', 'month', 'day', 'hour'].map(p => {
-                                        const bazi = resData.bazi[p];
-                                        const hidden = resData.mechanics.hidden_stems[p];
-                                        const isGm = resData.mechanics.gongmang.includes(bazi.branch);
+                                        const bazi = resData.bazi?.[p];
+                                        if (!bazi) return <td key={p}>-</td>;
+                                        
+                                        const hidden = resData.mechanics?.hidden_stems?.[p] || {initial:['-'], middle:['-'], main:['-']};
+                                        const isGm = resData.mechanics?.gongmang?.includes(bazi.branch) || false;
                                         const safeStem = (arr, isBold) => {
                                             if (!arr || !arr[0] || arr[0].trim() === '' || arr[0] === 'null' || arr[0] === 'None' || arr[0] === '-') return '-';
                                             const el = renderTooltipItem(arr[0], true);
@@ -778,7 +822,7 @@ export default function SajuCalculator() {
                                                                 <div style={{ fontSize: '12px', color: '#ccc' }}>{ev.desc}</div>
                                                             </div>
                                                         )
-                                                    }) : <div style={{ fontSize: '12px', color: '#777' }}>올해는 큰 충/합이 없는 평탄한 시기닙니다.</div>}
+                                                    }) : <div style={{ fontSize: '12px', color: '#777' }}>올해는 큰 충/합이 없는 평탄한 시기입니다.</div>}
                                                 </>
                                             )
                                         })()}
