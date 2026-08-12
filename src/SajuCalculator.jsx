@@ -14,20 +14,19 @@ export default function SajuCalculator() {
     const [dictModal, setDictModal] = useState({ show: false, keyword: "", results: null });
     const [tooltip, setTooltip] = useState({ show: false, meta: null, top: 0, left: 0 });
 
-    // 🚨 폼 상태에 글로벌 위치(location) 및 시간모름(unknown_time) 추가
+    // 🚨 폼 상태에 파트너 위치(p_location) 추가
     const [form, setForm] = useState({
         calendar_type: 'solar', dt_input: '1946-12-07T12:00', gender: 'M',
-        location: '127.0|+9', // 기본값: 서울 (경도 127.0, UTC+9)
+        location: '127.0|+9', 
         unknown_time: false,
         opt_daewun: false, daewun_num: '', 
         use_traditional: false, lunar_month: 11,
-        use_partner: false, p_calendar_type: 'solar', p_dt_input: '1950-05-12T12:00', p_gender: 'F'
+        use_partner: false, p_calendar_type: 'solar', p_dt_input: '1950-05-12T12:00', p_gender: 'F',
+        p_location: '127.0|+9' // 파트너 기본 위치 (서울)
     });
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
-        
-        // 🚨 시간 모름 체크 시 시간 입력 포맷 동적 변경
         if (name === 'unknown_time') {
             setForm(prev => ({
                 ...prev,
@@ -36,7 +35,6 @@ export default function SajuCalculator() {
             }));
             return;
         }
-        
         setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     };
 
@@ -90,7 +88,6 @@ export default function SajuCalculator() {
         hideTooltip(); 
         setLoading(true);
         try {
-            // 🚨 location 값을 파싱하여 경도와 시차(UTC)를 백엔드로 전송
             const [longitudeStr, timezoneStr] = form.location.split('|');
             
             const payload = {
@@ -104,11 +101,17 @@ export default function SajuCalculator() {
                 apply_traditional_lunar: form.use_traditional,
                 lunar_month: form.use_traditional ? parseInt(form.lunar_month) : null
             };
+            
             if (form.opt_daewun && form.daewun_num !== '') payload.daewun_num = parseInt(form.daewun_num);
+            
+            // 🚨 파트너의 경도 및 타임존 추출 후 payload에 포함
             if (form.use_partner) {
+                const [pLonStr, pTzStr] = form.p_location.split('|');
                 payload.partner_datetime_str = form.p_dt_input.replace('T', ' ');
                 payload.partner_calendar_type = form.p_calendar_type;
                 payload.partner_gender = form.p_gender;
+                payload.partner_longitude = parseFloat(pLonStr);
+                payload.partner_timezone = parseInt(pTzStr);
             }
 
             const response = await fetch(`${BACKEND_URL}/api/bazi`, {
@@ -149,7 +152,6 @@ export default function SajuCalculator() {
         const metaDict = resData.mechanics.metadata || {};
         const meta = metaDict[keyword];
         const display = text || keyword;
-        // 빈 데이터나 알 수 없음 처리
         if (!meta || keyword === "-" || keyword === "알수없음") return <span key={Math.random()}>{display}</span>;
         
         const cssClass = isChar ? "hanja-tooltip char-tooltip" : "hanja-tooltip";
@@ -186,6 +188,25 @@ export default function SajuCalculator() {
 
     const specialStarsArray = resData ? normalizeDynamics(resData.dynamics?.special_stars) : [];
     const disastersArray = resData ? normalizeDynamics(resData.dynamics?.disasters) : [];
+
+    // 공통 글로벌 지역 옵션 렌더링 함수
+    const renderLocationOptions = () => (
+        <>
+            <option value="127.0|+9">🇰🇷 대한민국 (서울/표준: UTC+9, 경도 127.0°)</option>
+            <option value="129.0|+9">🇰🇷 대한민국 (부산/동부: UTC+9, 경도 129.0°)</option>
+            <option value="139.7|+9">🇯🇵 일본 (도쿄: UTC+9, 경도 139.7°)</option>
+            <option value="135.5|+9">🇯🇵 일본 (오사카: UTC+9, 경도 135.5°)</option>
+            <option value="116.4|+8">🇨🇳 중국 (베이징: UTC+8, 경도 116.4°)</option>
+            <option value="121.5|+8">🇨🇳 중국 (상하이: UTC+8, 경도 121.5°)</option>
+            <option value="114.0|+8">🇭🇰 홍콩 (UTC+8, 경도 114.0°)</option>
+            <option value="121.5|+8">🇹🇼 대만 (타이베이: UTC+8, 경도 121.5°)</option>
+            <option value="105.8|+7">🇻🇳 베트남 (하노이: UTC+7, 경도 105.8°)</option>
+            <option value="151.2|+11">🇦🇺 호주 (시드니: UTC+11, 경도 151.2°E)</option>
+            <option value="-118.2|-8">🇺🇸 미국 (LA/서부: UTC-8, 경도 118.2°W)</option>
+            <option value="-74.0|-5">🇺🇸 미국 (뉴욕/동부: UTC-5, 경도 74.0°W)</option>
+            <option value="-0.1|+0">🇬🇧 영국 (런던: UTC+0, 경도 0.1°W)</option>
+        </>
+    );
 
     return (
         <div className="app-container">
@@ -249,7 +270,6 @@ export default function SajuCalculator() {
                 .input-card { background: var(--card-bg); padding: 30px; border-radius: 12px; width: 100%; max-width: 750px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
                 .input-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, var(--gold-main), transparent); }
                 
-                /* 🚨 폼 그리드 조정 (글로벌 옵션 포함) */
                 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; text-align: left; }
                 .full-width { grid-column: 1 / -1; }
                 .options-row { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 20px; font-size: 13px; }
@@ -472,23 +492,14 @@ export default function SajuCalculator() {
                                 <select name="gender" value={form.gender} onChange={handleInputChange}><option value="M">남성 (Male)</option><option value="F">여성 (Female)</option></select>
                             </div>
 
-                            {/* 🚨 글로벌 위치 (경도 & 시차) 선택 기능 추가 */}
                             <div className="full-width">
                                 <label>태어난 지역 (글로벌 표준시 및 진태양시 정밀 보정)</label>
                                 <select name="location" value={form.location} onChange={handleInputChange}>
-                                    <option value="127.0|+9">🇰🇷 대한민국 (서울/표준: UTC+9, 경도 127.0°)</option>
-                                    <option value="129.0|+9">🇰🇷 대한민국 (부산/동부: UTC+9, 경도 129.0°)</option>
-                                    <option value="139.7|+9">🇯🇵 일본 (도쿄: UTC+9, 경도 139.7°)</option>
-                                    <option value="135.5|+9">🇯🇵 일본 (오사카: UTC+9, 경도 135.5°)</option>
-                                    <option value="116.4|+8">🇨🇳 중국 (베이징: UTC+8, 경도 116.4°)</option>
-                                    <option value="121.5|+8">🇨🇳 중국 (상하이: UTC+8, 경도 121.5°)</option>
-                                    <option value="114.0|+8">🇭🇰 홍콩 (UTC+8, 경도 114.0°)</option>
-                                    <option value="121.5|+8">🇹🇼 대만 (타이베이: UTC+8, 경도 121.5°)</option>
+                                    {renderLocationOptions()}
                                 </select>
                             </div>
                         </div>
 
-                        {/* 🚨 시간 모름 체크박스 추가 */}
                         <div className="options-row">
                             <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', color: 'var(--gold-main)' }}>
                                 <input type="checkbox" name="unknown_time" checked={form.unknown_time} onChange={handleInputChange} style={{ width: 'auto' }} /> 🕒 시간 모름
@@ -515,9 +526,15 @@ export default function SajuCalculator() {
                         {form.use_partner && (
                             <div style={{ marginTop: '15px', background: 'rgba(231,76,60,0.05)', border: '1px solid rgba(231,76,60,0.2)', padding: '15px', borderRadius: '6px' }}>
                                 <label style={{ color: 'var(--accent-red)' }}>상대방 (궁합용)</label>
-                                <div className="form-grid" style={{ marginBottom: 0 }}>
+                                <div className="form-grid" style={{ marginBottom: '15px' }}>
                                     <div style={{ display: 'flex', gap: '10px' }}><select name="p_calendar_type" value={form.p_calendar_type} onChange={handleInputChange} style={{ width: '35%' }}><option value="solar">양력</option><option value="lunar">음력(평달)</option><option value="lunar_leap">음력(윤달)</option></select><input type="datetime-local" name="p_dt_input" value={form.p_dt_input} onChange={handleInputChange} style={{ width: '65%' }} /></div>
                                     <select name="p_gender" value={form.p_gender} onChange={handleInputChange}><option value="F">여성 (Female)</option><option value="M">남성 (Male)</option></select>
+                                </div>
+                                <div className="full-width">
+                                    <label style={{ color: 'var(--accent-red)' }}>상대방 태어난 지역</label>
+                                    <select name="p_location" value={form.p_location} onChange={handleInputChange}>
+                                        {renderLocationOptions()}
+                                    </select>
                                 </div>
                             </div>
                         )}
@@ -552,7 +569,6 @@ export default function SajuCalculator() {
                                         const hidden = resData.mechanics.hidden_stems[p];
                                         const isGm = resData.mechanics.gongmang.includes(bazi.branch);
                                         const safeStem = (arr, isBold) => {
-                                            // 🚨 시간 모름 등으로 인한 빈 값(-) 안전 처리
                                             if (!arr || !arr[0] || arr[0].trim() === '' || arr[0] === 'null' || arr[0] === 'None' || arr[0] === '-') return '-';
                                             const el = renderTooltipItem(arr[0], true);
                                             return isBold ? <b>{el}</b> : el;
@@ -580,6 +596,7 @@ export default function SajuCalculator() {
                     </div>
 
                     <div className="dashboard-layout">
+                        
                         {resData.classical?.reading && (
                             <div className="panel">
                                 <h3>📜 전문가용 심층 고법 간명지</h3>
