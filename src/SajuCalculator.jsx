@@ -56,6 +56,8 @@ export default function SajuCalculator() {
         const rect = e.target.getBoundingClientRect();
         let top = rect.top - 120;
         let left = rect.left + (rect.width / 2) - 130;
+        
+        // 모바일 화면 밖으로 넘어가지 않도록 방어 로직 추가
         if (top < 10) top = rect.bottom + 10;
         if (left < 10) left = 10;
         if (left + 260 > window.innerWidth - 10) left = window.innerWidth - 270;
@@ -239,58 +241,68 @@ export default function SajuCalculator() {
             <style>{`
                 :root { --bg-color: #0d0f12; --card-bg: #16181d; --text-main: #f1f2f6; --text-muted: #95a5a6; --gold-light: #f1c40f; --gold-main: #d4af37; --gold-dark: #b5952f; --accent-red: #e74c3c; --accent-blue: #3498db; --accent-green: #2ecc71; }
                 
-                /* 하얀 여백 완벽 제거 (root, body 모두 커버) */
+                /* 하얀 여백 완벽 제거 */
                 html, body, #root, #__next { margin: 0 !important; padding: 0 !important; background-color: var(--bg-color) !important; width: 100%; min-height: 100vh; overflow-x: hidden; }
                 * { box-sizing: border-box; }
                 ::-webkit-scrollbar { width: 6px; height: 6px; }
                 ::-webkit-scrollbar-track { background: var(--bg-color); }
                 ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
+                /* 레이아웃 공통 */
                 .hero-section { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; background: radial-gradient(circle at center, #1a1e24 0%, var(--bg-color) 100%); text-align: center; position: relative; }
                 .hero-title { font-size: 3rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 10px; color: var(--gold-main); text-shadow: 0 4px 15px rgba(212,175,55,0.2); }
                 .hero-subtitle { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 40px; font-weight: 300; }
+                
                 .input-card { background: var(--card-bg); padding: 30px; border-radius: 12px; width: 100%; max-width: 700px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
                 .input-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, var(--gold-main), transparent); }
+                
                 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; text-align: left; }
                 label { font-size: 13px; font-weight: 700; color: var(--gold-light); margin-bottom: 5px; display: block; }
                 input, select { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid #333; color: white; border-radius: 6px; font-family: inherit; font-size: 14px; transition: all 0.3s; }
                 input:focus, select:focus { border-color: var(--gold-main); outline: none; }
+                
                 .btn-primary { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--gold-dark), var(--gold-main)); color: #000; border: none; border-radius: 6px; font-size: 16px; font-weight: 900; cursor: pointer; margin-top: 25px; transition: transform 0.2s, box-shadow 0.2s; }
                 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212,175,55,0.4); }
+                
                 .top-nav { position: absolute; top: 20px; right: 20px; z-index: 100; }
                 .btn-icon { background: rgba(255,255,255,0.1); color: white; border: 1px solid #333; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; transition: 0.3s; }
                 .btn-icon:hover { background: var(--gold-main); color: #000; border-color: var(--gold-main); }
+                
                 .dashboard { padding: 40px 20px; max-width: 1200px; margin: auto; }
                 .dash-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 30px; }
                 .dash-header h2 { margin: 0; color: var(--gold-main); font-weight: 900; }
-                .bazi-table-container { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid #222; margin-bottom: 30px; }
-                .bazi-table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: center; }
+                
+                /* 사주 4기둥 테이블 */
+                .bazi-table-container { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid #222; margin-bottom: 30px; overflow-x: auto; }
+                .bazi-table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: center; min-width: 400px; }
                 .bazi-table th { color: var(--text-muted); font-size: 13px; padding-bottom: 15px; border-bottom: 1px solid #333; font-weight: 400; }
                 .bazi-table td { padding: 15px 10px; border-right: 1px solid #222; }
                 .bazi-table td:last-child { border-right: none; }
                 .stem, .branch { font-size: 38px; font-weight: 900; color: #fff; line-height: 1.2; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
                 .ten-god { font-size: 13px; color: var(--gold-main); margin-bottom: 5px; font-weight: 700; letter-spacing: 1px; }
+                .hidden-stems { font-size: 13px; color: #eee; margin-top: 15px; text-align: center !important; background: rgba(0,0,0,0.4); padding: 12px 5px; border-radius: 8px; font-weight: 500; letter-spacing: 2px; }
                 
-                /* 지장간 가독성 개선 */
-                .hidden-stems { font-size: 13px; color: #eee; margin-top: 15px; text-align: center !important; background: rgba(0,0,0,0.4); padding: 12px 10px; border-radius: 8px; font-weight: 500; letter-spacing: 2px; }
-                
-                /* 그리드 밀도 강화를 위해 align-items: start 유지 */
+                /* 그리드 및 패널 레이아웃 */
                 .panel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; align-items: start; }
-                
                 .panel { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid #222; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; text-align: left !important; }
                 .panel-full { grid-column: 1 / -1; }
                 .panel h3 { margin-top: 0; color: var(--gold-main); font-size: 1.1rem; margin-bottom: 20px; display: flex; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; text-align: left !important; }
+                
                 .highlight-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 3px solid var(--gold-main); margin-bottom: 15px; text-align: left !important; }
                 
-                /* 세운 강조 시 잘림 방지 패딩 유지 */
+                /* 반응형 내부 그리드 클래스화 */
+                .napeum-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+                .gunghap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+                .practical-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+                
+                /* 세운 및 타임라인 스와이프 */
                 .swipe-container { display: flex; gap: 15px; overflow-x: auto; padding: 10px 5px 25px 5px; cursor: grab; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
                 .swipe-container::-webkit-scrollbar { display: none; }
                 .timeline-card { flex: 0 0 100px; background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 8px; text-align: center !important; padding: 15px 10px; transition: 0.3s; user-select: none; }
                 .timeline-card:hover { background: rgba(212,175,55,0.1); border-color: var(--gold-dark); transform: translateY(-3px); }
-                
-                /* 올해 세운 황금색 강조 테두리 효과 */
                 .timeline-card.current-year { border: 2px solid var(--gold-main) !important; background: rgba(212,175,55,0.2) !important; box-shadow: 0 0 15px rgba(212,175,55,0.5); transform: scale(1.05); }
 
+                /* 뱃지 및 모달 */
                 .badge { display: inline-block; padding: 4px 8px; background: rgba(255,255,255,0.05); border: 1px solid #444; border-radius: 4px; font-size: 12px; margin: 3px; font-weight: 700; color: #ccc; }
                 .badge-good { border-color: var(--accent-green); color: var(--accent-green); background: rgba(46,204,113,0.1); }
                 .badge-bad { border-color: var(--accent-red); color: var(--accent-red); background: rgba(231,76,60,0.1); }
@@ -305,12 +317,43 @@ export default function SajuCalculator() {
                 .dict-search-box input { width: 100%; padding: 15px; font-size: 15px; background: #000; border-radius: 8px; color: white; border: 1px solid #333; }
                 .dict-results { overflow-y: auto; padding-right: 10px; margin-top: 15px; }
                 .dict-item { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 4px solid var(--gold-main); margin-bottom: 15px; }
+
+                /* 📱 🚨 반응형 모바일 (미디어 쿼리) 🚨 📱 */
+                @media (max-width: 768px) {
+                    .hero-title { font-size: 2rem; }
+                    .hero-subtitle { font-size: 0.95rem; }
+                    .input-card { padding: 20px; }
+                    .form-grid { grid-template-columns: 1fr; gap: 15px; } /* 인풋 필드 1줄로 쌓기 */
+                    .options-row { flex-wrap: wrap; gap: 10px; } /* 체크박스 줄바꿈 허용 */
+                    
+                    .dashboard { padding: 20px 10px; }
+                    .dash-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+                    .dash-header > div { width: 100%; display: flex; justify-content: space-between; }
+                    
+                    /* 사주 기둥 축소 및 패딩 조정 */
+                    .bazi-table th { font-size: 11px; padding-bottom: 10px; }
+                    .bazi-table td { padding: 10px 5px; }
+                    .stem, .branch { font-size: 28px; }
+                    .hidden-stems { font-size: 11px; letter-spacing: 1px; padding: 8px 3px; }
+                    
+                    .panel { padding: 15px; }
+                    .panel-grid { grid-template-columns: 1fr; } /* 패널들 1열로 나열 */
+                    
+                    /* 그리드 레이아웃 모바일용으로 분할 */
+                    .napeum-grid { grid-template-columns: repeat(2, 1fr); } /* 납음오행 모바일선 2개씩 2줄 */
+                    .gunghap-grid { grid-template-columns: 1fr; } /* 궁합 박스 1줄로 */
+                    .practical-grid { grid-template-columns: 1fr; } /* 실용통변 박스 1줄로 */
+                    
+                    /* 오행 분포 박스 반응형 조절 */
+                    .elements-flex { flex-wrap: wrap; }
+                    .elements-flex > div { flex: 1 1 30%; min-width: 60px; }
+                }
             `}</style>
 
             {/* ===================== 전역 툴팁 ===================== */}
             {tooltip.show && tooltip.meta && (
                 <div style={{
-                    position: 'fixed', zIndex: 9999, width: '260px',
+                    position: 'fixed', zIndex: 9999, width: '260px', maxWidth: '90vw',
                     backgroundColor: '#222', color: '#fff', textAlign: 'left', borderRadius: '8px',
                     padding: '15px', fontSize: '13px', lineHeight: '1.5', border: '1px solid #444',
                     boxShadow: '0 10px 25px rgba(0,0,0,0.8)', pointerEvents: 'none', fontWeight: 300,
@@ -400,7 +443,7 @@ export default function SajuCalculator() {
                             </div>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '15px', marginTop: '20px', fontSize: '13px' }}>
+                        <div className="options-row" style={{ display: 'flex', gap: '15px', marginTop: '20px', fontSize: '13px' }}>
                             <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
                                 <input type="checkbox" name="opt_daewun" checked={form.opt_daewun} onChange={handleInputChange} style={{ width: 'auto' }} /> 대운수 수동지정
                             </label>
@@ -497,7 +540,6 @@ export default function SajuCalculator() {
                                                 <div className="ten-god" style={{ color: 'var(--text-muted)' }}>{renderTooltipItem(bazi.branch_tg, false)}</div>
                                                 <div style={{ fontSize: '11px', color: '#555', marginTop: '5px' }}>[납음] {bazi.napeum}</div>
                                                 
-                                                {/* 공망 칼각 정렬 */}
                                                 <div style={{ height: '24px', margin: '10px 0 5px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                     {isGm && <div className="badge badge-bad" style={{ margin: 0 }}>{renderTooltipItem('공망', false)}</div>}
                                                 </div>
@@ -579,7 +621,7 @@ export default function SajuCalculator() {
                         {/* 3. 올해 예측 */}
                         {resData.unse?.year && (
                             <div className="panel">
-                                <h3>🎯 올해({new Date().getFullYear()}년) 족집게 예측</h3>
+                                <h3>🎯 올해({new Date().getFullYear()}년) 예측</h3>
                                 {(() => {
                                     const y = resData.unse.year;
                                     const isGood = y.overall_status.includes('발복') || y.overall_status.includes('무난') || y.overall_status.includes('성취');
@@ -632,11 +674,11 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 5. 현대 실용 통변 */}
+                        {/* 5. 현대 실용 통변 (직업 & 헬스케어) */}
                         {resData.practical && (
                             <div className="panel panel-full">
                                 <h3>💼 현대 실용 통변 (직업 & 헬스케어)</h3>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '15px' }}>
+                                <div className="practical-grid">
                                     <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--accent-blue)' }}>
                                         <div style={{ color: 'var(--accent-blue)', fontWeight: 'bold', fontSize: '15px', marginBottom: '5px' }}>🎯 추천 직무: {resData.practical.career.core_trait}</div>
                                         <div style={{ fontSize: '13px', marginBottom: '8px' }}>{resData.practical.career.recommended_jobs}</div>
@@ -658,11 +700,11 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 납음오행 4칸 일렬정렬 강제 지정 */}
+                        {/* 6. 납음오행 */}
                         {resData.napeum_reading && (
                             <div className="panel panel-full">
                                 <h3>🎵 납음오행(納音五行)의 숨은 파동</h3>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px' }}>
+                                <div className="napeum-grid">
                                     {resData.napeum_reading.map((n, i) => (
                                         <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--gold-main)', padding: '15px' }} key={i}>
                                             <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '3px' }}>{n.pillar}</div>
@@ -678,7 +720,7 @@ export default function SajuCalculator() {
                         {resData.gunghap && (
                             <div className="panel panel-full">
                                 <h3>💞 삼원갑자 및 심층 궁합 분석</h3>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+                                <div className="gunghap-grid">
                                     <div className="highlight-box" style={{ margin: 0, borderLeftColor: 'var(--accent-blue)' }}>
                                         <div style={{ fontSize: '12px', color: '#aaa' }}>나의 영혼 기운</div>
                                         <div style={{ fontSize: '14px' }}>{resData.gunghap.my_samwon.name} / <b style={{ color: 'var(--accent-blue)' }}>{resData.gunghap.my_star.name}</b></div>
@@ -703,7 +745,7 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 8. 인생 타임라인 (올해 세운 강조 효과) */}
+                        {/* 8. 인생 타임라인 */}
                         {resData.timeline && (
                             <div className="panel panel-full">
                                 <h3>⏳ 인생 타임라인 (스와이프 하여 확인)</h3>
@@ -738,11 +780,11 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 9. 오행, 통근, 과다고립 3단 그리드 */}
+                        {/* 9. 오행 분포 */}
                         {resData.mechanics?.elements_dist && (
                             <div className="panel">
                                 <h3>📊 오행 분포</h3>
-                                <div style={{ display: 'flex', gap: '10px' }}>
+                                <div className="elements-flex" style={{ display: 'flex', gap: '10px' }}>
                                     {['목', '화', '토', '금', '수'].map((el) => {
                                         const colors = { '목': '#2ecc71', '화': '#e74c3c', '토': '#f1c40f', '금': '#bdc3c7', '수': '#3498db' };
                                         return (
@@ -756,6 +798,7 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
+                        {/* 10. 통근력 */}
                         <div className="panel">
                             <h3>🌱 통근력 (아성)</h3>
                             {(() => {
@@ -769,6 +812,7 @@ export default function SajuCalculator() {
                             })()}
                         </div>
 
+                        {/* 11. 오행 과다/고립 분석 */}
                         {resData.elements_imbalance && (
                             <div className="panel">
                                 <h3>⚖️ 오행 과다/고립 분석</h3>
@@ -786,7 +830,7 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
-                        {/* 🚨 10. 신살 및 흉액 (panel-full 속성 제거하여 그리드 안으로 삽입) */}
+                        {/* 12. 심층 신살 (그리드 내부로 쏙 들어감) */}
                         {resData.dynamics && Object.keys(resData.dynamics.special_stars).length > 0 && (
                             <div className="panel">
                                 <h3>🌟 심층 신살</h3>
@@ -800,6 +844,7 @@ export default function SajuCalculator() {
                             </div>
                         )}
 
+                        {/* 13. 상호작용 및 흉액 진단 (그리드 내부로 쏙 들어감) */}
                         {resData.dynamics && Object.keys(resData.dynamics.disasters).length > 0 && (
                             <div className="panel">
                                 <h3>⚠️ 상호작용 및 흉액 진단</h3>
