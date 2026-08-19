@@ -1,11 +1,13 @@
-import React from 'react';
-import SajuCalculator from './SajuCalculator';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import SajuDashboard from './pages/SajuDashboard';
 
 function App() {
   return (
-    <div>
-      <SajuCalculator />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<SajuDashboard />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
